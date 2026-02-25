@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YemekChat - Hızlı Sipariş</title>
+    <style>
+        body {
+            background-color: #0a0a0a; /* Zifiri Karanlık Siyah */
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            padding: 20px;
+        }
+        .logo-placeholder {
+            font-size: 3em;
+            font-weight: bold;
+            color: #ff0000; /* YemekChat Kırmızısı */
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 10px rgba(255, 0, 0, 0.3);
+        }
+        .subtitle {
+            font-size: 1.2em;
+            color: #aaaaaa;
+            margin-bottom: 40px;
+        }
+        .whatsapp-btn {
+            display: inline-block;
+            background-color: #ff0000; /* Kan Kırmızı Buton */
+            color: #ffffff;
+            font-size: 1.5em;
+            font-weight: bold;
+            text-decoration: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .whatsapp-btn:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 10px rgba(255, 0, 0, 0.3);
+        }
+        .footer-links {
+            margin-top: 50px;
+            font-size: 0.9em;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .footer-links a {
+            color: #777777;
+            text-decoration: underline;
+        }
+        /* Gizli Sözleşme Kutuları */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #1a1a1a;
+            border: 1px solid #ff0000;
+            padding: 20px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            border-radius: 10px;
+            z-index: 1000;
+            text-align: left;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+        .close-btn {
+            color: #ff0000;
+            float: right;
+            font-size: 1.5em;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 999;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="logo-placeholder">YemekChat</div>
+        <div class="subtitle">Bölgenin En Hızlı Yemek Sipariş Ağı</div>
+
+        <a href="https://wa.me/15551626691?text=Selam" class="whatsapp-btn">🍔 WhatsApp'tan Sipariş Ver</a>
+
+        <div class="footer-links">
+            <a href="#" onclick="openModal('kvkkModal')">KVKK ve Aydınlatma Metni</a>
+            <a href="#" onclick="openModal('tosModal')">Kullanım Koşulları ve Sözleşme</a>
+        </div>
+    </div>
+
+    <div id="kvkkModal" class="modal">
+        <span class="close-btn" onclick="closeModal('kvkkModal')">&times;</span>
+        <h3 style="color:#ff0000;">KVKK ve Gizlilik Politikası</h3>
+        <p>Veri Sorumlusu: YemekChat (Aracı Hizmet Sağlayıcı) kişisel verilerin korunmasından ve işlenmesinden sorumludur...</p>
+        <p><i>(Dün yazdığımız o uzun metnin tamamını buraya daha sonra kopyalayacağız ustam, şimdilik yerini hazırladım.)</i></p>
+    </div>
+
+    <div id="tosModal" class="modal">
+        <span class="close-btn" onclick="closeModal('tosModal')">&times;</span>
+        <h3 style="color:#ff0000;">Kullanım Koşulları</h3>
+        <p>Hizmet Sağlayıcı: YemekChat, WhatsApp ve ilgili web/mobil arayüzleri üzerinden kullanıcılar ile restoranlar arasında aracı hizmet sağlayan bir platformdur...</p>
+        <p><i>(Sözleşme metninin kalanı buraya gelecek.)</i></p>
+    </div>
+
+    <div id="overlay" class="overlay" onclick="closeAllModals()"></div>
+
+    <script>
+        function openModal(id) {
+            document.getElementById(id).style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
+        }
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+        }
+        function closeAllModals() {
+            closeModal('kvkkModal');
+            closeModal('tosModal');
+        }
+    </script>
+</body>
+</html>
