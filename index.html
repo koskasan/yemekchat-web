@@ -6,7 +6,7 @@
     <title>YemekChat - Hızlı Sipariş</title>
     <style>
         body {
-            background-color: #0a0a0a; /* Zifiri Karanlık Siyah */
+            background-color: #0a0a0a;
             color: #ffffff;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
@@ -22,12 +22,13 @@
             max-width: 600px;
             padding: 20px;
         }
-        .logo-placeholder {
-            font-size: 3em;
-            font-weight: bold;
-            color: #ff0000; /* YemekChat Kırmızısı */
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 10px rgba(255, 0, 0, 0.3);
+        /* Logo Ayarları */
+        .main-logo {
+            max-width: 250px; /* Logonun büyüklüğü */
+            height: auto;
+            margin-bottom: 20px;
+            border-radius: 10px; /* Kenarları hafif yumuşatır */
+            box-shadow: 0 4px 15px rgba(255, 0, 0, 0.2);
         }
         .subtitle {
             font-size: 1.2em;
@@ -36,7 +37,7 @@
         }
         .whatsapp-btn {
             display: inline-block;
-            background-color: #ff0000; /* Kan Kırmızı Buton */
+            background-color: #ff0000;
             color: #ffffff;
             font-size: 1.5em;
             font-weight: bold;
@@ -60,8 +61,9 @@
         .footer-links a {
             color: #777777;
             text-decoration: underline;
+            cursor: pointer;
         }
-        /* Gizli Sözleşme Kutuları */
+        /* Modal (Pencere) Ayarları */
         .modal {
             display: none;
             position: fixed;
@@ -70,28 +72,44 @@
             transform: translate(-50%, -50%);
             background-color: #1a1a1a;
             border: 1px solid #ff0000;
-            padding: 20px;
+            padding: 30px;
             width: 90%;
-            max-width: 500px;
+            max-width: 600px;
             max-height: 80vh;
             overflow-y: auto;
             border-radius: 10px;
             z-index: 1000;
             text-align: left;
             box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            line-height: 1.6;
         }
         .close-btn {
             color: #ff0000;
             float: right;
-            font-size: 1.5em;
+            font-size: 2em;
             font-weight: bold;
             cursor: pointer;
+            margin-top: -10px;
+        }
+        .modal h3 {
+            color: #ff0000;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+        .modal h4 {
+            color: #dddddd;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        .modal p {
+            color: #cccccc;
+            font-size: 0.95em;
         }
         .overlay {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0,0,0,0.8);
             z-index: 999;
         }
     </style>
@@ -99,29 +117,70 @@
 <body>
 
     <div class="container">
-        <div class="logo-placeholder">YemekChat</div>
+        <!-- LOGO BURADA ÇAĞRILIYOR -->
+        <!-- Eğer logonun adı logo.png ise böyle kalacak, logo.jpg ise burayı .jpg yap ustam -->
+        <img src="logo.png" alt="YemekChat Logo" class="main-logo">
+        
         <div class="subtitle">Bölgenin En Hızlı Yemek Sipariş Ağı</div>
 
-        <a href="https://wa.me/15551626691?text=Selam" class="whatsapp-btn">🍔 WhatsApp'tan Sipariş Ver</a>
+        <!-- WHATSAPP NUMARANI BURAYA YAZ (905... şeklinde) -->
+        <a href="https://wa.me/905550000000?text=Selam" class="whatsapp-btn">🍔 WhatsApp'tan Sipariş Ver</a>
 
         <div class="footer-links">
-            <a href="#" onclick="openModal('kvkkModal')">KVKK ve Aydınlatma Metni</a>
-            <a href="#" onclick="openModal('tosModal')">Kullanım Koşulları ve Sözleşme</a>
+            <a onclick="openModal('tosModal')">Kullanım Koşulları ve Mesafeli Satış Sözleşmesi</a>
+            <a onclick="openModal('kvkkModal')">KVKK ve Gizlilik Politikası</a>
         </div>
     </div>
 
-    <div id="kvkkModal" class="modal">
-        <span class="close-btn" onclick="closeModal('kvkkModal')">&times;</span>
-        <h3 style="color:#ff0000;">KVKK ve Gizlilik Politikası</h3>
-        <p>Veri Sorumlusu: YemekChat (Aracı Hizmet Sağlayıcı) kişisel verilerin korunmasından ve işlenmesinden sorumludur...</p>
-        <p><i>(Dün yazdığımız o uzun metnin tamamını buraya daha sonra kopyalayacağız ustam, şimdilik yerini hazırladım.)</i></p>
-    </div>
-
+    <!-- SÖZLEŞME PENCERESİ (TOS) -->
     <div id="tosModal" class="modal">
         <span class="close-btn" onclick="closeModal('tosModal')">&times;</span>
-        <h3 style="color:#ff0000;">Kullanım Koşulları</h3>
-        <p>Hizmet Sağlayıcı: YemekChat, WhatsApp ve ilgili web/mobil arayüzleri üzerinden kullanıcılar ile restoranlar arasında aracı hizmet sağlayan bir platformdur...</p>
-        <p><i>(Sözleşme metninin kalanı buraya gelecek.)</i></p>
+        <h3>YemekChat Kullanım Koşulları ve Kullanıcı Sözleşmesi</h3>
+        
+        <h4>1. Taraflar ve Hizmetin Konusu</h4>
+        <p><strong>Hizmet Sağlayıcı:</strong> YemekChat, WhatsApp ve ilgili web/mobil arayüzleri üzerinden kullanıcılar ile restoranlar arasında aracı hizmet sağlayan bir platformdur.</p>
+        <p><strong>Kullanıcı:</strong> YemekChat platformu üzerinden yemek siparişi veren gerçek kişidir.</p>
+        <p><strong>Sözleşmenin Konusu:</strong> İşbu sözleşme, YemekChat’in sunduğu aracılık hizmetlerinden kullanıcıların yararlanma şartlarını, tarafların hak ve yükümlülüklerini düzenler. YemekChat, kullanıcıların sipariş taleplerini restoranlarla eşleştirerek teslim sürecini kolaylaştırır. Restoranlar (Üye İşyerleri) platformda listelenen bağımsız satıcılardır ve sipariş ile teslimat süreçleri doğrudan kullanıcı ile restoran arasında gerçekleşir. YemekChat’in rolü yalnızca aracı olmaktır.</p>
+
+        <h4>2. Platformun Rolü ve Mesafeli Satış Sözleşmesi</h4>
+        <p><strong>Aracılık Hizmeti:</strong> YemekChat, 6563 sayılı Elektronik Ticaretin Düzenlenmesi Hakkında Kanun uyarınca “Aracı Hizmet Sağlayıcı” olarak faaliyet gösterir. Platformda listelenen restoranlar ile kullanıcı arasında kurulan her sipariş işleminde alım-satım ilişkisi doğrudan kullanıcı ile ilgili restoran arasında gerçekleşir.</p>
+        <p><strong>Mesafeli Satış Sözleşmesi:</strong> YemekChat üzerinden verilen her siparişte, kullanıcı siparişi onayladığında ilgili restoran ile bir mesafeli satış sözleşmesi kurulmuş sayılır. YemekChat bu sözleşmenin tarafı değildir.</p>
+        <p><strong>Komisyon Ücreti:</strong> YemekChat, sunduğu aracılık hizmeti karşılığında restoranlardan komisyon alır. Bu komisyon bedeli kullanıcıdan tahsil edilmez ve kullanıcı fiyatlarına yansıtılmaz.</p>
+
+        <h4>3. Sipariş İşleyişi ve Teslimat Sorumluluğu</h4>
+        <p><strong>Sipariş Onayı:</strong> Kullanıcı, oluşturduğu siparişi onayladığında verdiği isim, telefon, adres gibi iletişim bilgilerinin doğru olduğunu kabul eder. Yanlış veya eksik bilgi girilmesinden kaynaklanan teslimat aksaklıklarından YemekChat sorumlu tutulamaz.</p>
+        <p><strong>Hazırlık ve Teslimat:</strong> YemekChat’in kendi kurye ağı yoktur. Siparişin hazırlanması, paketlenmesi ve teslimatı tamamen restoranın sorumluluğundadır.</p>
+        <p><strong>Sorumluluk Reddi:</strong> Teslimat sırasında oluşabilecek gecikme, eksik ya da hatalı ürün teslimi veya hiç teslim edilmeme hallerinde YemekChat sorumlu değildir.</p>
+
+        <h4>4. Ödeme, İptal ve Ücret Yükümlülüğü</h4>
+        <p><strong>Ödeme Yöntemleri:</strong> Kullanıcı, sipariş bedelini teslimat sırasında nakit veya banka/kredi kartı ile ödeyebilir. İsteğe bağlı olarak online ödeme gerçekleştirilebilir.</p>
+        <p><strong>Cayma Hakkı ve İptal:</strong> 6502 sayılı Kanun uyarınca çabuk bozulan gıda ürünleri kapsamında kullanıcıların cayma hakkı yoktur. Onaylanan siparişler restoranda hazırlanma aşamasına geçtikten sonra iptal edilemez.</p>
+
+        <h4>5. Sorumluluk ve Diğer Hükümler</h4>
+        <p>Kullanıcı, YemekChat’in sadece bir aracı hizmet sağlayıcı olduğunu kabul eder. İşbu sözleşme Türk hukukuna tabidir. Uyuşmazlıklarda Tüketici Hakem Heyeti veya Tüketici Mahkemesi yetkilidir.</p>
+    </div>
+
+    <!-- KVKK PENCERESİ -->
+    <div id="kvkkModal" class="modal">
+        <span class="close-btn" onclick="closeModal('kvkkModal')">&times;</span>
+        <h3>Kişisel Verilerin İşlenmesi Aydınlatma Metni (KVKK) ve Gizlilik Politikası</h3>
+        
+        <h4>1. Veri Sorumlusu ve Veri Toplama</h4>
+        <p><strong>Veri Sorumlusu:</strong> YemekChat (Aracı Hizmet Sağlayıcı) kişisel verilerin korunmasından ve işlenmesinden sorumludur.</p>
+        <p><strong>Toplanan Veriler:</strong> İsim, soyisim, telefon numarası, teslimat adresi, sipariş detayları ve şikayetler.</p>
+        <p><strong>Finansal Bilgiler:</strong> Kredi kartı bilgileri YemekChat sunucularında saklanmaz; online ödemeler doğrudan BDDK lisanslı altyapılar üzerinden gerçekleştirilir.</p>
+
+        <h4>2. İşlenme Amaçları ve Hukuki Sebepler</h4>
+        <p>Kişisel verileriniz; Sözleşmenin İfası (Madde 5/2-c), Hukuki Yükümlülük (Madde 5/2-ç) ve Meşru Menfaat (Madde 5/2-f) kapsamında açık rıza aranmaksızın işlenmektedir. Verileriniz pazarlama veya reklam amaçlı üçüncü taraflarla paylaşılmaz.</p>
+
+        <h4>3. Kişisel Verilerin Aktarımı</h4>
+        <p>YemekChat, verilerinizi yalnızca siparişin hazırlanması ve teslimi için ilgili <strong>Restoranlar</strong>, ödeme güvenliği için <strong>Ödeme Kuruluşları</strong> ve kanunen gerekli hallerde <strong>Resmi Merciler</strong> ile paylaşabilir.</p>
+
+        <h4>4. Veri Güvenliği ve Saklama Süresi</h4>
+        <p>YemekChat, verilerinizin güvenliğini sağlamak amacıyla makul teknik tedbirleri uygular. İşlem kayıtları yasal mevzuatta öngörülen süreler boyunca saklanır, ardından anonim hale getirilir veya güvenli şekilde silinir.</p>
+
+        <h4>5. Veri Sahibinin Hakları (KVKK Madde 11)</h4>
+        <p>KVKK’nın 11. maddesi uyarınca veri sahibi olarak; verilerinizin işlenip işlenmediğini öğrenme, işlenme amacını bilme, yanlış ise düzeltilmesini ve KVKK madde 7 uyarınca silinmesini talep etme haklarına sahipsiniz.</p>
     </div>
 
     <div id="overlay" class="overlay" onclick="closeAllModals()"></div>
@@ -142,3 +201,4 @@
     </script>
 </body>
 </html>
+
