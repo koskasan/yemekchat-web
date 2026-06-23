@@ -8,52 +8,73 @@
   :root{
     --bg:#111B14; --card:#1C2A20; --card2:#243530; --line:#2C3E32;
     --txt:#F1EFE8; --txt2:#B4B2A9; --txt3:#888780; --muted:#5F5E5A;
-    --green:#1D9E75; --greenDark:#04342C; --mint:#9FE1CB; --red:#E24B4A;
+    --green:#1D9E75; --greenDark:#04342C; --mint:#9FE1CB; --red:#E24B4A; --amber:#EF9F27;
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   html,body{background:var(--bg);color:var(--txt);font-family:-apple-system,"Segoe UI",Roboto,sans-serif}
-  body{max-width:520px;margin:0 auto;padding-bottom:96px}
+  body{max-width:520px;margin:0 auto;padding-bottom:90px}
 
-  .top{background:var(--card);padding:12px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10;border-bottom:.5px solid var(--line)}
+  .top{background:var(--card);padding:12px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10;border-bottom:.5px solid var(--line)}
+  .back{background:none;border:none;color:var(--mint);font-size:22px;cursor:pointer;padding:0 4px;display:none}
   .logo{width:34px;height:34px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;color:#FCEBEB;font-weight:600;font-size:14px;flex-shrink:0}
   .top .name{font-size:15px;font-weight:600}
   .top .sub{font-size:11px;color:var(--mint)}
-  .badge{margin-left:auto;background:var(--card2);border-radius:8px;padding:4px 9px;font-size:10px;color:var(--mint);white-space:nowrap}
 
-  .sec{padding:14px 14px 2px}
-  .sec h3{font-size:11px;letter-spacing:.4px;color:var(--txt3);font-weight:600;margin-bottom:8px;text-transform:uppercase}
+  .screen{display:none}
+  .screen.on{display:block}
 
+  /* chips */
+  .chips{display:flex;gap:7px;overflow-x:auto;padding:12px 14px 4px;scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex-shrink:0;background:var(--card);border:1px solid var(--line);color:var(--txt2);border-radius:18px;padding:7px 14px;font-size:13px;cursor:pointer;white-space:nowrap}
+  .chip.on{background:var(--green);border-color:var(--green);color:var(--greenDark);font-weight:600}
+
+  /* restoran kart */
+  .rlist{padding:8px 14px}
+  .rc{background:var(--card);border-radius:14px;padding:14px;margin-bottom:9px;cursor:pointer;display:flex;align-items:center;gap:12px}
+  .rc .rinfo{flex:1;min-width:0}
+  .rc .rn{font-size:15px;font-weight:600}
+  .rc .rm{font-size:12px;color:var(--txt2);margin-top:3px}
+  .rc .rm .star{color:var(--amber)}
+  .rc .rcat{font-size:11px;color:var(--mint);background:var(--card2);padding:2px 9px;border-radius:12px;display:inline-block;margin-top:5px}
+  .rc .arrow{color:var(--txt3);font-size:20px}
+
+  /* menü */
+  .sec{padding:12px 14px 2px}
+  .sec h3{font-size:11px;letter-spacing:.4px;color:var(--txt3);font-weight:600;margin-bottom:6px;text-transform:uppercase}
   .cat{font-size:13px;color:var(--mint);font-weight:600;margin:14px 0 8px}
   .item{background:var(--card);border-radius:12px;padding:11px 12px;margin-bottom:7px;display:flex;align-items:center;gap:11px}
+  .item.off{opacity:.45}
   .item .info{flex:1;min-width:0}
-  .item .nm{font-size:14px;color:var(--txt)}
-  .item .ds{font-size:11px;color:var(--txt3);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .item .nm{font-size:14px}
+  .item .ds{font-size:11px;color:var(--txt3);margin-top:1px}
   .item .pr{font-size:12px;color:var(--mint);margin-top:3px}
   .stp{display:flex;align-items:center;gap:11px;background:var(--bg);border-radius:9px;padding:5px 9px;flex-shrink:0}
-  .stp button{background:none;border:none;color:var(--mint);font-size:20px;line-height:1;cursor:pointer;width:20px;height:20px;display:flex;align-items:center;justify-content:center}
-  .stp button:disabled{color:var(--muted)}
+  .stp button{background:none;border:none;color:var(--mint);font-size:20px;line-height:1;cursor:pointer;width:20px;height:20px}
   .stp .qt{font-size:14px;font-weight:600;min-width:14px;text-align:center}
   .add{background:var(--card2);border:none;color:var(--mint);border-radius:9px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer}
 
+  /* ödeme + adres */
   .pay{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
-  .pay .opt{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:11px 4px;text-align:center;cursor:pointer;transition:.12s}
+  .pay .opt{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:11px 4px;text-align:center;cursor:pointer}
   .pay .opt .ic{font-size:20px;color:var(--txt2)}
   .pay .opt .lb{font-size:11px;color:var(--txt2);margin-top:3px}
   .pay .opt.on{background:var(--green);border-color:var(--green)}
   .pay .opt.on .ic,.pay .opt.on .lb{color:var(--greenDark);font-weight:600}
-
   .fld{width:100%;background:var(--card);border:1px solid var(--line);border-radius:11px;padding:12px;font-size:14px;color:var(--txt);margin-bottom:7px;font-family:inherit}
   .fld::placeholder{color:var(--muted)}
   .row2{display:grid;grid-template-columns:1fr 1fr;gap:7px}
-  .row2 .fld{margin-bottom:7px}
+  .cartline{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:.5px solid var(--line);font-size:14px}
+  .cartline .cn{flex:1}
+  .cartline .cq{color:var(--txt3);font-size:12px;margin:0 10px}
 
-  .bar{position:fixed;bottom:0;left:0;right:0;max-width:520px;margin:0 auto;background:var(--bg);padding:10px 14px 16px;border-top:.5px solid var(--line)}
+  .bar{position:fixed;bottom:0;left:0;right:0;max-width:520px;margin:0 auto;background:var(--bg);padding:10px 14px 16px;border-top:.5px solid var(--line);display:none}
+  .bar.on{display:block}
   .go{width:100%;background:var(--green);border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:600;color:var(--greenDark);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
   .go:disabled{background:var(--card2);color:var(--muted)}
   .note{text-align:center;font-size:10px;color:var(--muted);margin-top:7px}
 
-  .empty{text-align:center;padding:40px 20px;color:var(--txt3);font-size:14px}
-  .spin{text-align:center;padding:50px 20px;color:var(--txt3);font-size:14px}
+  .empty,.spin{text-align:center;padding:44px 20px;color:var(--txt3);font-size:14px}
 
   .ok{position:fixed;inset:0;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;padding:30px;text-align:center;z-index:50}
   .ok .ring{width:80px;height:80px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:44px;color:var(--greenDark);margin-bottom:20px}
@@ -65,38 +86,43 @@
 <body>
 
   <div class="top">
+    <button class="back" id="back">‹</button>
     <div class="logo">YC</div>
     <div>
-      <div class="name" id="rName">Restoran</div>
-      <div class="sub">YemekChat güvenli sipariş</div>
-    </div>
-    <div class="badge" id="rBadge">Açık · 30-45 dk</div>
-  </div>
-
-  <div id="menuWrap">
-    <div class="spin" id="spin">Menü yükleniyor…</div>
-  </div>
-
-  <div class="sec" id="paySec" style="display:none">
-    <h3>Ödeme yöntemi</h3>
-    <div class="pay">
-      <div class="opt" data-pay="Nakit"><div class="ic">₺</div><div class="lb">Nakit</div></div>
-      <div class="opt" data-pay="Kredi Kartı"><div class="ic">▭</div><div class="lb">Kart</div></div>
-      <div class="opt" data-pay="IBAN"><div class="ic">⌂</div><div class="lb">IBAN</div></div>
+      <div class="name" id="hdName">YemekChat</div>
+      <div class="sub" id="hdSub">güvenli sipariş</div>
     </div>
   </div>
 
-  <div class="sec" id="addrSec" style="display:none">
-    <h3>Teslimat adresi</h3>
-    <input class="fld" id="bina" placeholder="Bina adı / sokak no">
-    <div class="row2">
-      <input class="fld" id="kat" placeholder="Kat">
-      <input class="fld" id="daire" placeholder="Daire">
-    </div>
-    <input class="fld" id="not" placeholder="Kuryeye not (isteğe bağlı)">
+  <!-- EKRAN 1: RESTORANLAR -->
+  <div class="screen on" id="scr1">
+    <div class="chips" id="chips"></div>
+    <div class="rlist" id="rlist"><div class="spin">Yakındaki restoranlar yükleniyor…</div></div>
   </div>
 
-  <div class="bar">
+  <!-- EKRAN 2: MENÜ -->
+  <div class="screen" id="scr2">
+    <div id="menuWrap"><div class="spin">Menü yükleniyor…</div></div>
+  </div>
+
+  <!-- EKRAN 3: ÖDEME + ADRES -->
+  <div class="screen" id="scr3">
+    <div class="sec"><h3>Sepetin</h3><div id="cartLines"></div></div>
+    <div class="sec"><h3>Ödeme yöntemi</h3>
+      <div class="pay">
+        <div class="opt" data-pay="Nakit"><div class="ic">₺</div><div class="lb">Nakit</div></div>
+        <div class="opt" data-pay="Kredi Kartı"><div class="ic">▭</div><div class="lb">Kart</div></div>
+        <div class="opt" data-pay="IBAN"><div class="ic">⌂</div><div class="lb">IBAN</div></div>
+      </div>
+    </div>
+    <div class="sec"><h3>Teslimat adresi</h3>
+      <input class="fld" id="bina" placeholder="Bina adı / sokak no">
+      <div class="row2"><input class="fld" id="kat" placeholder="Kat"><input class="fld" id="daire" placeholder="Daire"></div>
+      <input class="fld" id="adnot" placeholder="Kuryeye not (isteğe bağlı)">
+    </div>
+  </div>
+
+  <div class="bar" id="bar">
     <button class="go" id="go" disabled>Sepetin boş</button>
     <div class="note">Siparişin WhatsApp üzerinden onaylanacak</div>
   </div>
@@ -111,164 +137,164 @@
 <script>
 // ===================== AYAR =====================
 const CONFIG = {
-  // n8n webhook adresleri. Henüz hazır değilse boş bırak -> demo menü gösterilir.
-  MENU_URL:  "https://webhook.yemekchat.com/webhook/menu",   // örn: https://webhook.yemekchat.com/webhook/menu
-  ORDER_URL: "https://webhook.yemekchat.com/webhook/order"    // örn: https://webhook.yemekchat.com/webhook/order
+  NEARBY: "https://webhook.yemekchat.com/webhook/nearby",
+  MENU:   "https://webhook.yemekchat.com/webhook/menu",
+  ORDER:  "https://webhook.yemekchat.com/webhook/order"
 };
 // ================================================
 
-const params = new URLSearchParams(location.search);
-const REST = params.get("restaurant") || "Crispinn Burger";
-const TEL  = params.get("tel") || "";
+const p = new URLSearchParams(location.search);
+const TEL = p.get("tel") || "";
+const LAT = p.get("lat"); const LNG = p.get("lng");
+const DIRECT_REST = p.get("restaurant");  // tek restoran modu (yazarak/eski)
 
-const DEMO = [
-  {id:1, name:"Cheese burger", description:"çok güzel peynirli", price:250, category:"burger"},
-  {id:2, name:"Burger", description:"güzel sulu burger", price:200, category:"burger"},
-  {id:3, name:"Kajun burger", description:"özel tavuk parçalı", price:250, category:"burger"},
-  {id:4, name:"Ayran", description:"", price:20, category:"içecek"}
-];
+let screen = 1, nearby = [], menu = [], rest = null, pay = null, catFilter = "Tümü";
+const cart = {};  // id -> {item, qty}
 
-const cart = {};           // id -> {item, qty}
-let menu = [];
-let pay = null;
+const $ = id => document.getElementById(id);
+$("back").onclick = goBack;
 
-document.getElementById("rName").textContent = REST;
+/* ---------- başlangıç ---------- */
+if(DIRECT_REST){ openRestaurant(DIRECT_REST); }
+else if(LAT && LNG){ loadNearby(); }
+else { $("rlist").innerHTML = '<div class="empty">Konum bulunamadı. WhatsApp\'tan tekrar başla.</div>'; }
 
-async function loadMenu(){
+/* ---------- EKRAN 1: yakın restoranlar ---------- */
+async function loadNearby(){
   try{
-    if(CONFIG.MENU_URL){
-      const r = await fetch(CONFIG.MENU_URL + "?restaurant=" + encodeURIComponent(REST));
-      menu = await r.json();
-      if(!Array.isArray(menu)) menu = menu.data || [];
-    } else {
-      menu = DEMO;
-    }
-  }catch(e){ menu = DEMO; }
-  renderMenu();
-  document.getElementById("paySec").style.display = "block";
-  document.getElementById("addrSec").style.display = "block";
+    const r = await fetch(`${CONFIG.NEARBY}?lat=${LAT}&lng=${LNG}`);
+    let d = await r.json(); if(!Array.isArray(d)) d = d.data || [];
+    nearby = d;
+  }catch(e){ nearby = []; }
+  renderChips(); renderNearby();
+}
+function renderChips(){
+  const cats = ["Tümü", ...new Set(nearby.map(r => r.category).filter(Boolean))];
+  $("chips").innerHTML = cats.map(c => `<div class="chip ${c===catFilter?"on":""}" data-c="${c}">${c}</div>`).join("");
+  document.querySelectorAll(".chip").forEach(ch => ch.onclick = () => { catFilter = ch.dataset.c; renderChips(); renderNearby(); });
+}
+function renderNearby(){
+  const list = $("rlist");
+  const arr = catFilter==="Tümü" ? nearby : nearby.filter(r => r.category===catFilter);
+  if(!arr.length){ list.innerHTML = '<div class="empty">Bu konuma yakın restoran yok.</div>'; return; }
+  list.innerHTML = arr.map(r => `<div class="rc" onclick="openRestaurant('${r.name.replace(/'/g,"\\'")}')">
+    <div class="rinfo">
+      <div class="rn">${r.name}</div>
+      <div class="rm"><span class="star">★</span> ${r.rating||"-"} &nbsp;·&nbsp; ${r.dist_km} km &nbsp;·&nbsp; ${r.min_order_amount?("Min "+r.min_order_amount+"₺"):"Min yok"}</div>
+      ${r.category?`<div class="rcat">${r.category}</div>`:""}
+    </div>
+    <div class="arrow">›</div>
+  </div>`).join("");
 }
 
+/* ---------- EKRAN 2: menü ---------- */
+async function openRestaurant(name){
+  if(rest && rest!==name && Object.keys(cart).length){
+    if(!confirm("Başka restorana geçiyorsun, sepetin sıfırlanacak. Devam?")) return;
+    for(const k in cart) delete cart[k];
+  }
+  rest = name;
+  $("menuWrap").innerHTML = '<div class="spin">Menü yükleniyor…</div>';
+  go2();
+  try{
+    const r = await fetch(`${CONFIG.MENU}?restaurant=${encodeURIComponent(name)}`);
+    let d = await r.json(); if(!Array.isArray(d)) d = d.data || [];
+    menu = d;
+  }catch(e){ menu = []; }
+  renderMenu();
+}
 function renderMenu(){
-  const wrap = document.getElementById("menuWrap");
-  if(!menu.length){ wrap.innerHTML = '<div class="empty">Bu restoranın menüsü şu an boş.</div>'; return; }
+  const wrap = $("menuWrap");
+  if(!menu.length){ wrap.innerHTML = '<div class="empty">Bu restoranın menüsü boş.</div>'; return; }
   const cats = {};
-  menu.forEach(m => { (cats[m.category||"Diğer"] = cats[m.category||"Diğer"]||[]).push(m); });
+  menu.forEach(m => { (cats[m.category||"Diğer"]=cats[m.category||"Diğer"]||[]).push(m); });
   let html = '<div class="sec"><h3>Menü</h3>';
   for(const c in cats){
     html += `<div class="cat">${c}</div>`;
     cats[c].forEach(m => {
-      html += `<div class="item" data-id="${m.id}">
-        <div class="info">
-          <div class="nm">${m.name}</div>
-          ${m.description?`<div class="ds">${m.description}</div>`:""}
-          <div class="pr">${m.price} TL</div>
-        </div>
-        <div class="ctrl" data-id="${m.id}"></div>
+      const on = (m.is_available!==false && m.is_available!=="false");
+      html += `<div class="item ${on?"":"off"}">
+        <div class="info"><div class="nm">${m.name}</div>${m.description?`<div class="ds">${m.description}</div>`:""}<div class="pr">${m.price} TL</div></div>
+        <div class="ctrl" data-id="${m.id}">${on?"":'<span style="font-size:11px;color:var(--txt3)">Tükendi</span>'}</div>
       </div>`;
     });
   }
-  html += '</div>';
-  wrap.innerHTML = html;
-  menu.forEach(m => renderCtrl(m.id));
+  html += '</div>'; wrap.innerHTML = html;
+  menu.forEach(m => { if(m.is_available!==false && m.is_available!=="false") renderCtrl(m.id); });
 }
-
 function renderCtrl(id){
-  const box = document.querySelector(`.ctrl[data-id="${id}"]`);
+  const box = document.querySelector(`.ctrl[data-id="${id}"]`); if(!box) return;
   const q = cart[id]?.qty || 0;
-  if(q === 0){
-    box.innerHTML = `<button class="add">Ekle</button>`;
-    box.querySelector("button").onclick = () => chg(id, 1);
-  } else {
-    box.innerHTML = `<div class="stp">
-      <button>−</button><span class="qt">${q}</span><button>+</button>
-    </div>`;
-    const [minus, plus] = box.querySelectorAll("button");
-    minus.onclick = () => chg(id, -1);
-    plus.onclick  = () => chg(id, 1);
+  if(q===0){ box.innerHTML = `<button class="add">Ekle</button>`; box.querySelector("button").onclick = () => chg(id,1); }
+  else{
+    box.innerHTML = `<div class="stp"><button>−</button><span class="qt">${q}</span><button>+</button></div>`;
+    const [m,p2] = box.querySelectorAll("button"); m.onclick=()=>chg(id,-1); p2.onclick=()=>chg(id,1);
   }
 }
-
-function chg(id, d){
-  const m = menu.find(x => x.id == id);
-  const q = (cart[id]?.qty || 0) + d;
-  if(q <= 0) delete cart[id];
-  else cart[id] = {item:m, qty:q};
-  renderCtrl(id);
-  updateBar();
+function chg(id,d){
+  const m = menu.find(x=>x.id==id); const q=(cart[id]?.qty||0)+d;
+  if(q<=0) delete cart[id]; else cart[id]={item:m,qty:q};
+  renderCtrl(id); updateBar();
 }
 
-function total(){
-  return Object.values(cart).reduce((s,c) => s + c.item.price * c.qty, 0);
+/* ---------- EKRAN 3: sepet/ödeme ---------- */
+function renderCart(){
+  const lines = Object.values(cart);
+  $("cartLines").innerHTML = lines.length ? lines.map(c =>
+    `<div class="cartline"><span class="cn">${c.item.name}</span><span class="cq">x${c.qty}</span><span>${c.item.price*c.qty} TL</span></div>`
+  ).join("") + `<div class="cartline" style="border:none;font-weight:600"><span class="cn">Toplam</span><span style="color:var(--mint)">${total()} TL</span></div>`
+  : '<div class="empty">Sepet boş.</div>';
 }
-
-function updateBar(){
-  const t = total();
-  const n = Object.keys(cart).length;
-  const go = document.getElementById("go");
-  if(n === 0){ go.disabled = true; go.textContent = "Sepetin boş"; return; }
-  if(!pay){ go.disabled = true; go.textContent = `Ödeme yöntemi seç · ${t} TL`; return; }
-  go.disabled = false;
-  go.innerHTML = `✓ Siparişi tamamla · ${t} TL`;
-}
-
-document.querySelectorAll(".pay .opt").forEach(o => {
-  o.onclick = () => {
-    document.querySelectorAll(".pay .opt").forEach(x => x.classList.remove("on"));
-    o.classList.add("on");
-    pay = o.dataset.pay;
-    updateBar();
-  };
+document.querySelectorAll(".pay .opt").forEach(o => o.onclick = () => {
+  document.querySelectorAll(".pay .opt").forEach(x=>x.classList.remove("on"));
+  o.classList.add("on"); pay=o.dataset.pay; updateBar();
 });
 
-document.getElementById("go").onclick = async () => {
-  const bina = document.getElementById("bina").value.trim();
-  if(!bina){ alert("Lütfen bina adı / adres gir."); return; }
-  const kat = document.getElementById("kat").value.trim();
-  const daire = document.getElementById("daire").value.trim();
-  const not = document.getElementById("not").value.trim();
-  const address = `${bina}${kat?", Kat "+kat:""}${daire?", Daire "+daire:""}${not?" ("+not+")":""}`;
-  const details = Object.values(cart).map(c => `${c.item.name} x${c.qty}`).join(", ");
-
-  const payload = {
-    restaurant_name: REST,
-    customer_phone: TEL,
-    order_details: details,
-    total_amount: total(),
-    payment_method: pay,
-    address: address,
-    items: Object.values(cart).map(c => ({id:c.item.id, name:c.item.name, qty:c.qty, price:c.item.price}))
-  };
-
-  const go = document.getElementById("go");
-  go.disabled = true; go.textContent = "Gönderiliyor…";
-
-  try{
-    if(CONFIG.ORDER_URL){
-      const r = await fetch(CONFIG.ORDER_URL, {
-        method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload)
-      });
-      const res = await r.json().catch(()=> ({}));
-      showOk(res.order_id || res.id || "");
-    } else {
-      // Demo modu: webhook yok, sadece başarı ekranı
-      console.log("DEMO SİPARİŞ:", payload);
-      showOk("DEMO");
-    }
-  }catch(e){
-    alert("Bağlantı hatası, tekrar dene.");
-    go.disabled = false; updateBar();
+/* ---------- ortak ---------- */
+function total(){ return Object.values(cart).reduce((s,c)=>s+c.item.price*c.qty,0); }
+function go1(){ screen=1; show(); }
+function go2(){ screen=2; show(); }
+function go3(){ if(!Object.keys(cart).length) return; screen=3; renderCart(); show(); }
+function goBack(){ if(screen===3) go2(); else if(screen===2){ if(DIRECT_REST){} else go1(); } }
+function show(){
+  $("scr1").classList.toggle("on", screen===1);
+  $("scr2").classList.toggle("on", screen===2);
+  $("scr3").classList.toggle("on", screen===3);
+  $("back").style.display = (screen===1 || (screen===2&&DIRECT_REST)) ? "none" : "block";
+  $("hdName").textContent = screen===1 ? "Yakındaki Restoranlar" : (rest||"YemekChat");
+  $("hdSub").textContent = screen===1 ? "konumuna göre" : (screen===3?"sepet & ödeme":"menü");
+  $("bar").classList.toggle("on", screen===2 || screen===3);
+  window.scrollTo(0,0); updateBar();
+}
+function updateBar(){
+  const go = $("go"); const n = Object.keys(cart).length; const t = total();
+  if(screen===2){
+    go.onclick = go3;
+    if(n===0){ go.disabled=true; go.textContent="Sepetin boş"; }
+    else { go.disabled=false; go.innerHTML=`Sepet (${n} ürün · ${t} TL) →`; }
+  } else if(screen===3){
+    go.onclick = submitOrder;
+    if(!pay){ go.disabled=true; go.textContent=`Ödeme yöntemi seç · ${t} TL`; }
+    else { go.disabled=false; go.innerHTML=`✓ Siparişi tamamla · ${t} TL`; }
   }
-};
-
-function showOk(no){
-  document.getElementById("okNo").textContent = no ? "Sipariş No: #" + no : "";
-  document.getElementById("okScreen").style.display = "flex";
-  // WhatsApp webview'inde otomatik kapanma denenir
-  setTimeout(()=>{ try{ window.close(); }catch(e){} }, 3500);
 }
 
-loadMenu();
+async function submitOrder(){
+  const bina = $("bina").value.trim();
+  if(!bina){ alert("Lütfen bina adı / adres gir."); return; }
+  const kat=$("kat").value.trim(), daire=$("daire").value.trim(), nt=$("adnot").value.trim();
+  const address = `${bina}${kat?", Kat "+kat:""}${daire?", Daire "+daire:""}${nt?" ("+nt+")":""}`;
+  const details = Object.values(cart).map(c=>`${c.item.name} x${c.qty}`).join(", ");
+  const payload = { restaurant_name:rest, customer_phone:TEL, order_details:details, total_amount:total(), payment_method:pay, address };
+  const go=$("go"); go.disabled=true; go.textContent="Gönderiliyor…";
+  try{
+    const r = await fetch(CONFIG.ORDER,{ method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload) });
+    const res = await r.json().catch(()=>({}));
+    $("okNo").textContent = (res.order_id||res.id) ? "Sipariş No: #"+(res.order_id||res.id) : "";
+    $("okScreen").style.display="flex";
+    setTimeout(()=>{ try{window.close();}catch(e){} }, 3500);
+  }catch(e){ alert("Bağlantı hatası, tekrar dene."); go.disabled=false; updateBar(); }
+}
 </script>
 </body>
 </html>
