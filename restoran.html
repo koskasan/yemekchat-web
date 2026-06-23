@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YemekChat - Restoran Paneli</title>
+<style>
+  :root{
+    --bg:#111B14; --card:#1C2A20; --card2:#243530; --line:#2C3E32;
+    --txt:#F1EFE8; --txt2:#B4B2A9; --txt3:#888780; --muted:#5F5E5A;
+    --green:#1D9E75; --greenDark:#04342C; --mint:#9FE1CB; --red:#E24B4A;
+    --amber:#EF9F27; --blue:#378ADD;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{background:var(--bg);color:var(--txt);font-family:-apple-system,"Segoe UI",Roboto,sans-serif}
+  body{max-width:760px;margin:0 auto;padding:0 0 40px}
+
+  /* GİRİŞ */
+  .login{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;gap:14px}
+  .login .logo{width:64px;height:64px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;color:#FCEBEB;font-weight:700;font-size:24px}
+  .login h1{font-size:20px;font-weight:600}
+  .login p{color:var(--txt2);font-size:13px;margin-top:-8px}
+  .login input{width:100%;max-width:320px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px;font-size:15px;color:var(--txt);font-family:inherit}
+  .login button{width:100%;max-width:320px;background:var(--green);border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:600;color:var(--greenDark);cursor:pointer}
+  .login .err{color:var(--red);font-size:13px;min-height:16px}
+
+  /* PANEL */
+  .panel{display:none}
+  .top{background:var(--card);padding:14px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10;border-bottom:.5px solid var(--line)}
+  .top .logo{width:38px;height:38px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;color:#FCEBEB;font-weight:700;font-size:15px}
+  .top .nm{font-size:16px;font-weight:600}
+  .top .live{font-size:11px;color:var(--mint);display:flex;align-items:center;gap:5px}
+  .top .live .dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 1.6s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+  .top .out{margin-left:auto;background:var(--card2);border:none;color:var(--txt2);border-radius:8px;padding:7px 12px;font-size:12px;cursor:pointer}
+
+  .stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:14px}
+  .stat{background:var(--card);border-radius:12px;padding:12px;text-align:center}
+  .stat .v{font-size:22px;font-weight:600}
+  .stat .l{font-size:11px;color:var(--txt3);margin-top:2px}
+
+  .list{padding:0 14px}
+  .ord{background:var(--card);border-radius:14px;padding:14px;margin-bottom:10px;border-left:4px solid var(--line)}
+  .ord.s-yeni{border-left-color:var(--red)}
+  .ord.s-hazir{border-left-color:var(--amber)}
+  .ord.s-yolda{border-left-color:var(--blue)}
+  .ord.s-teslim{border-left-color:var(--green);opacity:.65}
+  .ord.s-iptal{border-left-color:var(--muted);opacity:.5}
+  .ord .hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+  .ord .no{font-size:15px;font-weight:600}
+  .ord .tm{font-size:11px;color:var(--txt3)}
+  .ord .det{font-size:14px;color:var(--txt);margin-bottom:6px;line-height:1.5}
+  .ord .meta{font-size:12px;color:var(--txt2);line-height:1.7}
+  .ord .meta b{color:var(--mint);font-weight:600}
+  .ord .tot{font-size:16px;font-weight:600;color:var(--mint);margin-top:4px}
+  .pill{display:inline-block;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px}
+  .pill.yeni{background:#3a1715;color:#F09595}
+  .pill.hazir{background:#3a2c10;color:#FAC775}
+  .pill.yolda{background:#10243a;color:#85B7EB}
+  .pill.teslim{background:#10302a;color:#9FE1CB}
+  .pill.iptal{background:#2a2a28;color:#B4B2A9}
+  .acts{display:flex;gap:7px;margin-top:11px;flex-wrap:wrap}
+  .acts button{flex:1;min-width:90px;border:none;border-radius:9px;padding:10px;font-size:13px;font-weight:600;cursor:pointer}
+  .b-next{background:var(--green);color:var(--greenDark)}
+  .b-call{background:var(--card2);color:var(--mint)}
+  .b-cancel{background:var(--card2);color:#F09595}
+
+  .empty{text-align:center;padding:50px 20px;color:var(--txt3);font-size:14px}
+</style>
+</head>
+<body>
+
+  <div class="login" id="loginScr">
+    <div class="logo">YC</div>
+    <h1>Restoran Paneli</h1>
+    <p>Siparişlerini görmek için giriş yap</p>
+    <input id="inRest" placeholder="Restoran adı" autocomplete="off">
+    <input id="inPass" type="password" placeholder="Şifre">
+    <div class="err" id="loginErr"></div>
+    <button id="btnLogin">Giriş yap</button>
+  </div>
+
+  <div class="panel" id="panelScr">
+    <div class="top">
+      <div class="logo">YC</div>
+      <div>
+        <div class="nm" id="pName">Restoran</div>
+        <div class="live"><span class="dot"></span>Canlı · otomatik yenileniyor</div>
+      </div>
+      <button class="out" id="btnOut">Çıkış</button>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="v" id="stYeni">0</div><div class="l">Yeni</div></div>
+      <div class="stat"><div class="v" id="stAktif">0</div><div class="l">Hazırlanan</div></div>
+      <div class="stat"><div class="v" id="stCiro">0₺</div><div class="l">Bugün ciro</div></div>
+    </div>
+
+    <div class="list" id="ordList"></div>
+  </div>
+
+<script>
+// ===================== AYAR =====================
+const API = {
+  LOGIN:  "https://webhook.yemekchat.com/webhook/panel-login",
+  ORDERS: "https://webhook.yemekchat.com/webhook/panel-orders",
+  STATUS: "https://webhook.yemekchat.com/webhook/panel-status"
+};
+const REFRESH_MS = 12000;
+// ================================================
+
+const FLOW = ["Yeni Sipariş","Hazırlanıyor","Yolda","Teslim Edildi"];
+let REST = null, timer = null, lastCount = 0;
+
+// --- otomatik giriş (hatırla) ---
+const saved = localStorage.getItem("yc_rest");
+if(saved){ REST = saved; startPanel(); }
+
+document.getElementById("btnLogin").onclick = login;
+document.getElementById("inPass").addEventListener("keydown", e => { if(e.key==="Enter") login(); });
+document.getElementById("btnOut").onclick = () => {
+  localStorage.removeItem("yc_rest");
+  clearInterval(timer);
+  location.reload();
+};
+
+async function login(){
+  const restaurant = document.getElementById("inRest").value.trim();
+  const sifre = document.getElementById("inPass").value.trim();
+  const err = document.getElementById("loginErr");
+  err.textContent = "";
+  if(!restaurant || !sifre){ err.textContent = "Restoran adı ve şifre gerekli."; return; }
+  try{
+    const r = await fetch(API.LOGIN, {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ restaurant, sifre })
+    });
+    const res = await r.json();
+    if(res.ok){
+      REST = res.restaurant;
+      localStorage.setItem("yc_rest", REST);
+      startPanel();
+    } else {
+      err.textContent = "Restoran adı veya şifre hatalı.";
+    }
+  }catch(e){ err.textContent = "Bağlantı hatası, tekrar dene."; }
+}
+
+function startPanel(){
+  document.getElementById("loginScr").style.display = "none";
+  document.getElementById("panelScr").style.display = "block";
+  document.getElementById("pName").textContent = REST;
+  loadOrders();
+  timer = setInterval(loadOrders, REFRESH_MS);
+}
+
+async function loadOrders(){
+  try{
+    const r = await fetch(API.ORDERS + "?restaurant=" + encodeURIComponent(REST));
+    let orders = await r.json();
+    if(!Array.isArray(orders)) orders = orders.data || [];
+    render(orders);
+  }catch(e){ /* sessizce geç, sonraki turda dener */ }
+}
+
+function statusClass(s){
+  s = (s||"").toLowerCase();
+  if(s.includes("yeni")) return {cls:"s-yeni", pill:"yeni", lbl:"Yeni Sipariş"};
+  if(s.includes("hazır")) return {cls:"s-hazir", pill:"hazir", lbl:"Hazırlanıyor"};
+  if(s.includes("yol")) return {cls:"s-yolda", pill:"yolda", lbl:"Yolda"};
+  if(s.includes("teslim")) return {cls:"s-teslim", pill:"teslim", lbl:"Teslim Edildi"};
+  if(s.includes("iptal")) return {cls:"s-iptal", pill:"iptal", lbl:"İptal"};
+  return {cls:"s-yeni", pill:"yeni", lbl:"Yeni Sipariş"};
+}
+
+function nextStatus(s){
+  const st = statusClass(s).lbl;
+  const i = FLOW.indexOf(st);
+  return (i >= 0 && i < FLOW.length-1) ? FLOW[i+1] : null;
+}
+
+function render(orders){
+  // istatistik
+  let yeni=0, aktif=0, ciro=0;
+  const today = new Date().toISOString().slice(0,10);
+  orders.forEach(o => {
+    const sc = statusClass(o.status);
+    if(sc.pill==="yeni") yeni++;
+    if(sc.pill==="hazir"||sc.pill==="yolda") aktif++;
+    if(sc.pill!=="iptal" && (o.created_at||"").slice(0,10)===today) ciro += Number(o.total_amount)||0;
+  });
+  document.getElementById("stYeni").textContent = yeni;
+  document.getElementById("stAktif").textContent = aktif;
+  document.getElementById("stCiro").textContent = Math.round(ciro) + "₺";
+
+  // yeni sipariş bildirimi (ses)
+  if(yeni > lastCount && lastCount !== 0) beep();
+  lastCount = yeni;
+
+  const list = document.getElementById("ordList");
+  if(!orders.length){ list.innerHTML = '<div class="empty">Henüz sipariş yok.</div>'; return; }
+
+  list.innerHTML = orders.map(o => {
+    const sc = statusClass(o.status);
+    const tm = o.created_at ? new Date(o.created_at).toLocaleString("tr-TR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}) : "";
+    const nx = nextStatus(o.status);
+    const done = sc.pill==="teslim" || sc.pill==="iptal";
+    return `<div class="ord ${sc.cls}">
+      <div class="hd">
+        <span class="no">#${o.id} <span class="pill ${sc.pill}">${sc.lbl}</span></span>
+        <span class="tm">${tm}</span>
+      </div>
+      <div class="det">${o.order_details||"-"}</div>
+      <div class="meta">
+        <b>Adres:</b> ${o.address||"-"}<br>
+        <b>Ödeme:</b> ${o.payment_method||"-"} &nbsp;·&nbsp; <b>Tel:</b> ${o.customer_phone||"-"}
+      </div>
+      <div class="tot">${Math.round(Number(o.total_amount)||0)} TL</div>
+      ${done ? "" : `<div class="acts">
+        ${nx ? `<button class="b-next" onclick="setStatus(${o.id},'${nx}')">${nx} →</button>` : ""}
+        <button class="b-call" onclick="window.open('https://wa.me/${o.customer_phone}','_blank')">Müşteriye yaz</button>
+        <button class="b-cancel" onclick="setStatus(${o.id},'İptal')">İptal</button>
+      </div>`}
+    </div>`;
+  }).join("");
+}
+
+async function setStatus(id, status){
+  try{
+    await fetch(API.STATUS, {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ order_id:id, status })
+    });
+    loadOrders();
+  }catch(e){ alert("Güncellenemedi, tekrar dene."); }
+}
+
+function beep(){
+  try{
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.frequency.value = 880; o.type = "sine";
+    g.gain.setValueAtTime(0.3, ctx.currentTime);
+    o.start(); o.stop(ctx.currentTime + 0.25);
+  }catch(e){}
+}
+</script>
+</body>
+</html>
