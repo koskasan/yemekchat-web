@@ -331,8 +331,7 @@ async function saveItem(){
   if(!name || isNaN(price)){ alert("Ürün adı ve geçerli fiyat gerekli."); return; }
   const cur = editId ? menuItems.find(m=>m.id==editId) : null;
   const is_available = cur ? (cur.is_available===true||cur.is_available==="true") : true;
-  const payload = { restaurant: REST, name, description, price, category, is_available };
-  if(editId) payload.id = editId;
+  const payload = { restaurant: REST, name, description, price, category, is_available, id: editId || "" };
   try{
     await fetch(API.MENU_SAVE, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload) });
     closeForm(); loadMenu();
