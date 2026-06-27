@@ -76,6 +76,14 @@
 
   .empty,.spin{text-align:center;padding:44px 20px;color:var(--txt3);font-size:14px}
 
+  /* maskot */
+  .mascot{display:flex;justify-content:center;padding:8px 0 0}
+  .mascot img{height:84px;object-fit:contain;animation:ycbob 1.4s ease-in-out infinite}
+  @keyframes ycbob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-7px) rotate(2deg)}}
+  @keyframes ycrun{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-12px) rotate(4deg)}}
+  .runwrap{display:flex;justify-content:center;margin-bottom:18px}
+  .runwrap img{width:120px;animation:ycrun .45s ease-in-out infinite}
+
   .ok{position:fixed;inset:0;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;padding:30px;text-align:center;z-index:50}
   .ok .ring{width:80px;height:80px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:44px;color:var(--greenDark);margin-bottom:20px}
   .ok h2{font-size:20px;margin-bottom:8px}
@@ -96,6 +104,7 @@
 
   <!-- EKRAN 1: RESTORANLAR -->
   <div class="screen on" id="scr1">
+    <div class="mascot" id="mascotTop"></div>
     <div class="chips" id="chips"></div>
     <div class="rlist" id="rlist"><div class="spin">Yakındaki restoranlar yükleniyor…</div></div>
   </div>
@@ -128,7 +137,7 @@
   </div>
 
   <div class="ok" id="okScreen">
-    <div class="ring">✓</div>
+    <div id="okVisual"><div class="ring">✓</div></div>
     <h2>Siparişin alındı!</h2>
     <p>Mutfağa ilettik, hazırlanmaya başlıyor.<br>Onayı WhatsApp'tan göndereceğiz.</p>
     <div class="no" id="okNo"></div>
@@ -142,6 +151,19 @@ const CONFIG = {
   ORDER:  "https://webhook.yemekchat.com/webhook/order",
   CATERING_INFO:  "https://webhook.yemekchat.com/webhook/catering-info",
   CATERING_ORDER: "https://webhook.yemekchat.com/webhook/catering-order"
+};
+
+// Maskot görselleri — arkadaşın hazırlayınca URL'leri buraya yapıştır (boşsa görünmez)
+const MASCOT_URL = "";       // üstte karşılama maskotu (restoran listesi ekranı)
+const MASCOT_RUN_URL = "";   // sipariş sonrası koşan maskot (başarı ekranı)
+
+// Kategoriye göre kart arka plan görseli (restoran resmi olmayınca kategori resmi)
+const CATEGORY_IMG = {
+  burger: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600",
+  pizza:  "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600",
+  kebab:  "https://images.unsplash.com/photo-1561651823-34feb02250e4?w=600",
+  "içecek": "https://images.unsplash.com/photo-1437418747212-8d9709afab22?w=600",
+  "i̇çecek": "https://images.unsplash.com/photo-1437418747212-8d9709afab22?w=600"
 };
 // ================================================
 
@@ -157,6 +179,10 @@ const cart = {};  // id -> {item, qty}
 
 const $ = id => document.getElementById(id);
 $("back").onclick = goBack;
+
+// maskotları yerleştir (URL boşsa görünmez)
+if(MASCOT_URL) $("mascotTop").innerHTML = `<img src="${MASCOT_URL}" alt="">`;
+if(MASCOT_RUN_URL) $("okVisual").innerHTML = `<div class="runwrap"><img src="${MASCOT_RUN_URL}" alt=""></div>`;
 
 /* ---------- başlangıç ---------- */
 if(CATERING){ cateringInit(); }
@@ -182,14 +208,17 @@ function renderNearby(){
   const list = $("rlist");
   const arr = catFilter==="Tümü" ? nearby : nearby.filter(r => r.category===catFilter);
   if(!arr.length){ list.innerHTML = '<div class="empty">Bu konuma yakın restoran yok.</div>'; return; }
-  list.innerHTML = arr.map(r => `<div class="rc" onclick="openRestaurant('${r.name.replace(/'/g,"\\'")}')">
+  list.innerHTML = arr.map(r => {
+    const img = CATEGORY_IMG[(r.category||"").toLowerCase()] || "";
+    const bg = img ? `background-image:linear-gradient(90deg, rgba(28,42,32,0.97) 45%, rgba(28,42,32,0.55)), url('${img}');background-size:cover;background-position:right center;` : "";
+    return `<div class="rc" style="${bg}" onclick="openRestaurant('${r.name.replace(/'/g,"\\'")}')">
     <div class="rinfo">
       <div class="rn">${r.name}</div>
       <div class="rm"><span class="star">★</span> ${r.rating||"-"} &nbsp;·&nbsp; ${r.dist_km} km &nbsp;·&nbsp; ${r.min_order_amount?("Min "+r.min_order_amount+"₺"):"Min yok"}</div>
       ${r.category?`<div class="rcat">${r.category}</div>`:""}
     </div>
     <div class="arrow">›</div>
-  </div>`).join("");
+  </div>`; }).join("");
 }
 
 /* ---------- EKRAN 2: menü ---------- */
