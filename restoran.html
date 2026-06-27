@@ -48,6 +48,7 @@
   .ord.s-yolda{border-left-color:var(--blue)}
   .ord.s-teslim{border-left-color:var(--green);opacity:.65}
   .ord.s-iptal{border-left-color:var(--muted);opacity:.5}
+  .ord.cat{border-left-color:#7F77DD;background:#1d1b2e}
   .ord .hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
   .ord .no{font-size:15px;font-weight:600}
   .ord .tm{font-size:11px;color:var(--txt3)}
@@ -61,6 +62,7 @@
   .pill.yolda{background:#10243a;color:#85B7EB}
   .pill.teslim{background:#10302a;color:#9FE1CB}
   .pill.iptal{background:#2a2a28;color:#B4B2A9}
+  .pill.kurumsal{background:#3a2c54;color:#CECBF6}
   .acts{display:flex;gap:7px;margin-top:11px;flex-wrap:wrap}
   .acts button{flex:1;min-width:90px;border:none;border-radius:9px;padding:10px;font-size:13px;font-weight:600;cursor:pointer}
   .b-next{background:var(--green);color:var(--greenDark)}
@@ -251,8 +253,9 @@ function renderOrders(orders){
     const sc=statusClass(o.status);
     const tm=o.created_at?new Date(o.created_at).toLocaleString("tr-TR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}):"";
     const nx=nextStatus(o.status); const done=sc.pill==="teslim"||sc.pill==="iptal";
-    return `<div class="ord ${sc.cls}">
-      <div class="hd"><span class="no">#${o.id} <span class="pill ${sc.pill}">${sc.lbl}</span></span><span class="tm">${tm}</span></div>
+    const isCatOrder=(o.payment_method||"").toLowerCase().includes("kurumsal");
+    return `<div class="ord ${sc.cls} ${isCatOrder?"cat":""}">
+      <div class="hd"><span class="no">#${o.id} <span class="pill ${sc.pill}">${sc.lbl}</span>${isCatOrder?' <span class="pill kurumsal">Kurumsal</span>':""}</span><span class="tm">${tm}</span></div>
       <div class="det">${o.order_details||"-"}</div>
       <div class="meta"><b>Adres:</b> ${o.address||"-"}<br><b>Ödeme:</b> ${o.payment_method||"-"} &nbsp;·&nbsp; <b>Tel:</b> ${o.customer_phone||"-"}</div>
       <div class="tot">${Math.round(Number(o.total_amount)||0)} TL</div>
