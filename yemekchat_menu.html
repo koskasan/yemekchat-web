@@ -150,7 +150,8 @@ const CONFIG = {
   MENU:   "https://webhook.yemekchat.com/webhook/menu",
   ORDER:  "https://webhook.yemekchat.com/webhook/order",
   CATERING_INFO:  "https://webhook.yemekchat.com/webhook/catering-info",
-  CATERING_ORDER: "https://webhook.yemekchat.com/webhook/catering-order"
+  CATERING_ORDER: "https://webhook.yemekchat.com/webhook/catering-order",
+  DRAFT: "https://webhook.yemekchat.com/webhook/draft"
 };
 
 // Maskot görselleri — arkadaşın hazırlayınca URL'leri buraya yapıştır (boşsa görünmez)
@@ -172,9 +173,10 @@ const TEL = p.get("tel") || "";
 const LAT = p.get("lat"); const LNG = p.get("lng");
 const DIRECT_REST = p.get("restaurant");  // tek restoran modu (yazarak/eski)
 const CATERING = p.get("catering");       // kurumsal mod (çalışan kodu)
+const DRAFT = p.get("draft");             // yazarak sipariş taslağı (Path B)
 
 let screen = 1, nearby = [], menu = [], rest = null, pay = null, catFilter = "Tümü";
-let isCat = false, catInfo = null;
+let isCat = false, catInfo = null, isDraft = false;
 const cart = {};  // id -> {item, qty}
 
 const $ = id => document.getElementById(id);
@@ -185,7 +187,8 @@ if(MASCOT_URL) $("mascotTop").innerHTML = `<img src="${MASCOT_URL}" alt="">`;
 if(MASCOT_RUN_URL) $("okVisual").innerHTML = `<div class="runwrap"><img src="${MASCOT_RUN_URL}" alt=""></div>`;
 
 /* ---------- başlangıç ---------- */
-if(CATERING){ cateringInit(); }
+if(DRAFT){ draftInit(); }
+else if(CATERING){ cateringInit(); }
 else if(DIRECT_REST){ openRestaurant(DIRECT_REST); }
 else if(LAT && LNG){ loadNearby(); }
 else { $("rlist").innerHTML = '<div class="empty">Konum bulunamadı. WhatsApp\'tan tekrar başla.</div>'; }
@@ -294,8 +297,8 @@ function show(){
   $("scr1").classList.toggle("on", screen===1);
   $("scr2").classList.toggle("on", screen===2);
   $("scr3").classList.toggle("on", screen===3);
-  $("back").style.display = (isCat || screen===1 || (screen===2&&DIRECT_REST)) ? "none" : "block";
-  if(!isCat){
+  $("back").style.display = (isCat || isDraft || screen===1 || (screen===2&&DIRECT_REST)) ? "none" : "block";
+  if(!isCat && !isDraft){
     $("hdName").textContent = screen===1 ? "Yakındaki Restoranlar" : (rest||"YemekChat");
     $("hdSub").textContent = screen===1 ? "konumuna göre" : (screen===3?"sepet & ödeme":"menü");
   }
@@ -334,6 +337,25 @@ async function submitOrder(){
     $("okScreen").style.display="flex";
     setTimeout(()=>{ try{window.close();}catch(e){} }, 3500);
   }catch(e){ alert("Bağlantı hatası, tekrar dene."); go.disabled=false; updateBar(); }
+}
+
+/* ---------- YAZARAK SİPARİŞ (DRAFT / Path B) ---------- */
+async function draftInit(){
+  isDraft = true;
+  try{
+    const r = await fetch(`${CONFIG.DRAFT}?id=${encodeURIComponent(DRAFT)}`);
+    const d = await r.json();
+    if(!d || !d.restaurant_name){
+      document.body.innerHTML = '<div class="empty" style="padding-top:90px">Taslak bulunamadı ustam.</div>'; return;
+    }
+    rest = d.restaurant_name;
+    let items = d.items;
+    if(typeof items === "string") items = JSON.parse(items);
+    items.forEach((it,i)=>{ cart["d"+i] = { item:{ name:it.name, price:Number(it.price) }, qty:Number(it.qty)||1 }; });
+    $("hdName").textContent = d.restaurant_name;
+    $("hdSub").textContent = "sepetin hazır · ödeme & adres";
+    screen = 3; renderCart(); show();
+  }catch(e){ document.body.innerHTML = '<div class="empty" style="padding-top:90px">Bağlantı hatası.</div>'; }
 }
 
 /* ---------- KURUMSAL (CATERING) ---------- */
