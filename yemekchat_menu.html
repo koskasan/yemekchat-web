@@ -356,6 +356,7 @@ async function draftInit(){
     if(typeof items === "string") items = JSON.parse(items);
     items.forEach((it,i)=>{ cart["d"+i] = { item:{ name:it.name, price:Number(it.price) }, qty:Number(it.qty)||1 }; });
     draftNote = (d.note||"").trim();
+    if(["null","undefined","="].includes(draftNote.toLowerCase())) draftNote = "";
     $("hdName").textContent = d.restaurant_name;
     $("hdSub").textContent = "sepetin hazır · ödeme & adres";
     screen = 3; renderCart(); show();
