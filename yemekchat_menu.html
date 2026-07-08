@@ -177,7 +177,7 @@ const CATERING = p.get("catering");       // kurumsal mod (çalışan kodu)
 const DRAFT = p.get("draft");             // yazarak sipariş taslağı (Path B)
 
 let screen = 1, nearby = [], menu = [], rest = null, pay = null, catFilter = "Tümü";
-let isCat = false, catInfo = null, isDraft = false;
+let isCat = false, catInfo = null, isDraft = false, draftNote = "";
 const cart = {};  // id -> {item, qty}
 
 const $ = id => document.getElementById(id);
@@ -329,7 +329,8 @@ async function submitOrder(){
   if(!bina){ alert("Lütfen bina adı / adres gir."); return; }
   const kat=$("kat").value.trim(), daire=$("daire").value.trim(), nt=$("adnot").value.trim();
   const address = `${bina}${kat?", Kat "+kat:""}${daire?", Daire "+daire:""}${nt?" ("+nt+")":""}`;
-  const details = Object.values(cart).map(c=>`${c.item.name} x${c.qty}`).join(", ");
+  let details = Object.values(cart).map(c=>`${c.item.name} x${c.qty}`).join(", ");
+  if(draftNote) details += ` — 📝 ${draftNote}`;
   const payload = { restaurant_name:rest, customer_phone:TEL, order_details:details, total_amount:total(), payment_method:pay, address };
   const go=$("go"); go.disabled=true; go.textContent="Gönderiliyor…";
   try{
@@ -354,9 +355,13 @@ async function draftInit(){
     let items = d.items;
     if(typeof items === "string") items = JSON.parse(items);
     items.forEach((it,i)=>{ cart["d"+i] = { item:{ name:it.name, price:Number(it.price) }, qty:Number(it.qty)||1 }; });
+    draftNote = (d.note||"").trim();
     $("hdName").textContent = d.restaurant_name;
     $("hdSub").textContent = "sepetin hazır · ödeme & adres";
     screen = 3; renderCart(); show();
+    if(draftNote){
+      $("cartLines").innerHTML += `<div class="cartline" style="border:none"><span class="cn" style="color:var(--amber)">📝 Not: ${draftNote}</span></div>`;
+    }
   }catch(e){ document.body.innerHTML = '<div class="empty" style="padding-top:90px">Bağlantı hatası.</div>'; }
 }
 
