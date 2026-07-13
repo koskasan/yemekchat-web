@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YemekChat · Yasal Metinler</title>
+<style>
+  :root{
+    --bg:#111B14; --card:#1C2A20; --card2:#243530; --line:#2C3E32;
+    --txt:#F1EFE8; --txt2:#B4B2A9; --txt3:#888780; --muted:#5F5E5A;
+    --green:#1D9E75; --greenDark:#04342C; --mint:#9FE1CB; --red:#E24B4A; --amber:#EF9F27;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{background:var(--bg);color:var(--txt);font-family:-apple-system,"Segoe UI",Roboto,sans-serif}
+  body{max-width:680px;margin:0 auto;padding-bottom:60px}
+
+  .top{background:var(--card);padding:12px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10;border-bottom:.5px solid var(--line)}
+  .logo{width:34px;height:34px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;color:#FCEBEB;font-weight:600;font-size:14px;flex-shrink:0}
+  .top .name{font-size:15px;font-weight:600}
+  .top .sub{font-size:11px;color:var(--mint)}
+
+  .tabs{display:flex;gap:7px;overflow-x:auto;padding:12px 16px;position:sticky;top:59px;background:var(--bg);z-index:9;scrollbar-width:none}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{flex-shrink:0;background:var(--card);border:1px solid var(--line);color:var(--txt2);border-radius:18px;padding:8px 15px;font-size:13px;cursor:pointer;white-space:nowrap}
+  .tab.on{background:var(--green);border-color:var(--green);color:var(--greenDark);font-weight:600}
+
+  .doc{display:none;padding:6px 16px 30px}
+  .doc.on{display:block}
+  .doc h1{font-size:17px;line-height:1.45;margin:12px 0 4px;color:var(--txt)}
+  .doc .upd{font-size:11px;color:var(--muted);margin-bottom:14px}
+  .doc h2{font-size:13px;color:var(--mint);font-weight:600;margin:20px 0 8px;letter-spacing:.3px}
+  .doc p{font-size:13.5px;line-height:1.75;color:var(--txt2);margin-bottom:10px}
+  .doc p b{color:var(--txt)}
+  .doc ul{margin:0 0 10px 18px}
+  .doc li{font-size:13.5px;line-height:1.75;color:var(--txt2);margin-bottom:5px}
+  .doc a{color:var(--mint)}
+  .box{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 15px;margin:14px 0}
+  .box p{margin-bottom:6px}
+  .box p:last-child{margin-bottom:0}
+
+  .foot{padding:18px 16px;text-align:center;font-size:11px;color:var(--muted);line-height:1.8;border-top:.5px solid var(--line)}
+  .foot a{color:var(--txt3)}
+</style>
+</head>
+<body>
+
+  <div class="top">
+    <div class="logo">YC</div>
+    <div>
+      <div class="name">YemekChat</div>
+      <div class="sub">yasal metinler</div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab" data-d="kvkk">KVKK &amp; Gizlilik</div>
+    <div class="tab" data-d="kullanici">Kullanıcı Sözleşmesi</div>
+    <div class="tab" data-d="ticari">Ticari İleti Onayı</div>
+  </div>
+
+  <!-- ============ KVKK ============ -->
+  <div class="doc" id="kvkk">
+    <h1>YemekChat Kişisel Verilerin Korunması Aydınlatma Metni ve Gizlilik Politikası</h1>
+    <div class="upd">Son güncelleme: 13.07.2026</div>
+
+    <h2>1. VERİ SORUMLUSU</h2>
+    <p>6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") uyarınca kişisel verileriniz; veri sorumlusu sıfatıyla, "YemekChat" markası altında faaliyet gösteren <b>Atilla Alperen Ülker (Şahıs İşletmesi)</b> tarafından aşağıda açıklanan kapsamda işlenmektedir. İletişim: <a href="mailto:yemekchat.yonetim@gmail.com">yemekchat.yonetim@gmail.com</a></p>
+
+    <h2>2. İŞLENEN KİŞİSEL VERİLER</h2>
+    <ul>
+      <li><b>Kimlik bilgileri:</b> ad, soyad.</li>
+      <li><b>İletişim bilgileri:</b> telefon numarası, teslimat adresi.</li>
+      <li><b>Sipariş ve işlem bilgileri:</b> sipariş içerikleri ve geçmişi, iptal ve iade kayıtları, fatura bilgileri.</li>
+      <li><b>Mesajlaşma bilgileri:</b> sipariş ve şikâyet süreçlerinde YemekChat hatlarıyla yapılan yazışma içerikleri.</li>
+      <li><b>İşlem güvenliği bilgileri:</b> web arayüzü kullanılması hâlinde IP adresi ve cihaz bilgileri.</li>
+      <li><b>Finansal bilgiler:</b> kart bilgileri YemekChat sistemlerinde işlenmez ve saklanmaz; online ödemeler lisanslı ödeme kuruluşu (PayTR) altyapısında gerçekleştirilir.</li>
+    </ul>
+
+    <h2>3. İŞLEME AMAÇLARI VE HUKUKİ SEBEPLER</h2>
+    <p>Kişisel verileriniz KVKK'nın 5. maddesinde yer alan aşağıdaki hukuki sebeplere dayanılarak işlenir:</p>
+    <p><b>a) Sözleşmenin kurulması ve ifası (KVKK m. 5/2-c):</b> siparişin alınması, ilgili restorana iletilmesi, teslimat sürecinin yürütülmesi, ödeme ve iade işlemlerinin gerçekleştirilmesi.</p>
+    <p><b>b) Hukuki yükümlülüğün yerine getirilmesi (KVKK m. 5/2-ç):</b> elektronik ticaret ve vergi mevzuatı gereği işlem kayıtlarının saklanması ve yetkili mercilere yasal bildirimlerin yapılması.</p>
+    <p><b>c) Meşru menfaat (KVKK m. 5/2-f):</b> şikâyet yönetimi, sahtekârlığın ve kötüye kullanımın önlenmesi, hizmet kalitesinin ölçülmesi ve geliştirilmesi, platform güvenliğinin sağlanması.</p>
+    <p><b>d) Açık rıza:</b> kampanya, indirim ve duyuru amaçlı ticari elektronik iletiler, yalnızca ayrıca onay vermeniz hâlinde gönderilir (bkz. Ticari Elektronik İleti Aydınlatma ve Onay Metni). Onay vermemeniz sipariş vermenize engel değildir.</p>
+
+    <h2>4. KİŞİSEL VERİLERİN AKTARILMASI</h2>
+    <p><b>Restoranlar:</b> Siparişinizin hazırlanması ve teslim edilmesi amacıyla ad, telefon, adres ve sipariş bilgileriniz yalnızca ilgili restoranla paylaşılır. Restoranlar bu verileri sadece siparişin ifası amacıyla kullanmakla yükümlüdür; verilerin pazarlama gibi başka amaçlarla kullanılması restoranlarla yapılan sözleşmelerle yasaklanmıştır.</p>
+    <p><b>Ödeme kuruluşu:</b> Online ödeme işlemlerinin güvenli biçimde gerçekleştirilmesi amacıyla PayTR ile paylaşım yapılır.</p>
+    <p><b>Altyapı sağlayıcıları:</b> Mesajlaşma, barındırma ve veri tabanı hizmetleri kapsamında teknoloji iş ortaklarıyla sınırlı paylaşım yapılır.</p>
+    <p><b>Yetkili merciler:</b> Kanunen talep edilmesi hâlinde mahkemeler, savcılıklar ve idari kurumlarla sınırlı paylaşım yapılır.</p>
+    <p>Kişisel verileriniz, açık rızanız olmaksızın pazarlama veya reklam amacıyla üçüncü kişilere satılmaz ve devredilmez.</p>
+
+    <h2>5. YURT DIŞINA AKTARIM</h2>
+    <p>Hizmet, doğası gereği WhatsApp (Meta Platforms) altyapısı üzerinde çalışmakta; ayrıca bulut tabanlı barındırma ve veri tabanı hizmetlerinden yararlanılmaktadır. Bu nedenle mesajlaşma ve sipariş verileriniz, ilgili hizmet sağlayıcıların yurt dışında bulunan sunucularında işlenebilmektedir. Söz konusu aktarımlar, KVKK'nın 9. maddesinde öngörülen usul ve güvencelere uygun olarak yürütülür.</p>
+
+    <h2>6. SAKLAMA SÜRELERİ</h2>
+    <p>Sipariş ve işlem kayıtları, vergi ve elektronik ticaret mevzuatında öngörülen süreler boyunca; şikâyet ve yazışma kayıtları, olası uyuşmazlıklarda ispat yükümlülüğünün gerektirdiği makul süre boyunca saklanır. Saklama süresi dolan veriler silinir, yok edilir veya anonim hâle getirilir.</p>
+
+    <h2>7. HAKLARINIZ (KVKK MADDE 11)</h2>
+    <p>KVKK'nın 11. maddesi uyarınca; kişisel verilerinizin işlenip işlenmediğini öğrenme, işlenmişse buna ilişkin bilgi talep etme, işlenme amacını ve amacına uygun kullanılıp kullanılmadığını öğrenme, yurt içinde veya yurt dışında aktarıldığı üçüncü kişileri bilme, eksik veya yanlış işlenmişse düzeltilmesini isteme, KVKK'nın 7. maddesindeki şartlar çerçevesinde silinmesini veya yok edilmesini isteme, bu işlemlerin verilerin aktarıldığı üçüncü kişilere bildirilmesini isteme, münhasıran otomatik sistemlerle analiz edilmesi suretiyle aleyhinize bir sonucun ortaya çıkmasına itiraz etme ve kanuna aykırı işleme sebebiyle zarara uğramanız hâlinde zararın giderilmesini talep etme haklarına sahipsiniz.</p>
+    <div class="box"><p>Başvurularınızı <a href="mailto:yemekchat.yonetim@gmail.com">yemekchat.yonetim@gmail.com</a> adresine iletebilirsiniz; talepleriniz en geç <b>30 (otuz) gün</b> içinde ücretsiz olarak sonuçlandırılır.</p></div>
+
+    <h2>8. VERİ GÜVENLİĞİ</h2>
+    <p>Kişisel verileriniz; erişim kontrolü ve şifreleme dâhil olmak üzere makul teknik ve idari tedbirlerle yetkisiz erişime karşı korunur. Kart verileri Platform nezdinde saklanmadığından bu verilere ilişkin risk Platform sistemlerinde oluşmaz.</p>
+  </div>
+
+  <!-- ============ KULLANICI SÖZLEŞMESİ ============ -->
+  <div class="doc" id="kullanici">
+    <h1>YemekChat Kullanıcı Sözleşmesi ve Kullanım Koşulları</h1>
+    <div class="upd">Son güncelleme: 13.07.2026</div>
+
+    <h2>1. TARAFLAR VE KONU</h2>
+    <p><b>1.1.</b> İşbu sözleşme; "YemekChat" markası altında faaliyet gösteren Atilla Alperen Ülker (Şahıs İşletmesi) ("Platform" veya "YemekChat") ile Platform üzerinden sipariş veren gerçek kişi ("Kullanıcı") arasında, Platform'un kullanım şartlarını düzenlemek üzere kurulmuştur. İletişim: <a href="mailto:yemekchat.yonetim@gmail.com">yemekchat.yonetim@gmail.com</a></p>
+    <p><b>1.2.</b> Kullanıcı, Platform'a sipariş vermek üzere mesaj göndermekle işbu koşulları ve Kişisel Verilerin Korunması Aydınlatma Metni'ni okuduğunu ve kabul ettiğini beyan eder.</p>
+
+    <h2>2. HİZMETİN NİTELİĞİ</h2>
+    <p><b>2.1.</b> YemekChat, 6563 sayılı Elektronik Ticaretin Düzenlenmesi Hakkında Kanun kapsamında "aracı hizmet sağlayıcı"dır; Kullanıcı siparişlerini restoranlarla buluşturur. Platformda listelenen restoranlar bağımsız satıcılardır.</p>
+    <p><b>2.2.</b> Her siparişte mesafeli satış sözleşmesi, Kullanıcı ile ilgili restoran arasında kurulur; YemekChat bu satış sözleşmesinin tarafı değildir. Ürünün hazırlanması, gıda güvenliği ve teslimatı ilgili restoranın sorumluluğundadır. YemekChat'in kurye ağı yoktur; teslimat restoran tarafından gerçekleştirilir.</p>
+    <p><b>2.3.</b> Sipariş onayı öncesinde ürün, fiyat ve tahmini teslim süresine ilişkin bilgiler Kullanıcıya sunulur; Kullanıcı, siparişi onaylamakla bu bilgileri ve ön bilgilendirmeyi kabul etmiş sayılır.</p>
+
+    <h2>3. KULLANIM ŞARTLARI</h2>
+    <p><b>3.1.</b> Platform'u kullanabilmek için 18 yaşını doldurmuş ve fiil ehliyetine sahip olmak gerekir.</p>
+    <p><b>3.2.</b> Kullanıcı; ad, telefon ve teslimat adresi bilgilerinin doğru ve güncel olduğunu taahhüt eder. Yanlış veya eksik bilgiden kaynaklanan teslimat aksaklıklarından YemekChat sorumlu tutulamaz.</p>
+    <p><b>3.3.</b> Hizmet, Kullanıcının WhatsApp hattı üzerinden yürütülür; hattın güvenliği ve hat üzerinden verilen siparişler Kullanıcının sorumluluğundadır.</p>
+
+    <h2>4. ÖDEME</h2>
+    <p><b>4.1.</b> Sipariş bedeli; teslimat sırasında nakit veya banka/kredi kartıyla ya da online ödeme seçeneğiyle ödenebilir.</p>
+    <p><b>4.2.</b> Online ödemeler, lisanslı ödeme kuruluşu (PayTR) altyapısı üzerinden gerçekleştirilir; kart bilgileri YemekChat sistemlerinde işlenmez ve saklanmaz. Sipariş bedeli ödeme kuruluşu nezdinde tahsil edilir ve YemekChat'in aracılık komisyonu ayrıldıktan sonra ilgili restorana aktarılır. Kullanıcı, online ödemeyi tamamlamakla ödeme yükümlülüğünü yerine getirmiş sayılır.</p>
+    <p><b>4.3.</b> YemekChat'in aracılık komisyonu restorandan alınır; Kullanıcıdan sipariş bedeli dışında ek bir ücret talep edilmez.</p>
+
+    <h2>5. İPTAL, CAYMA VE İADE</h2>
+    <p><b>5.1.</b> Sipariş, ilgili restoran hazırlığa başlamadan önce iptal edilebilir; hazırlık aşamasına geçen veya yola çıkan siparişler iptal edilemez.</p>
+    <p><b>5.2.</b> Çabuk bozulabilen gıda ürünlerinde, ilgili mevzuat uyarınca cayma hakkı bulunmamaktadır.</p>
+    <p><b>5.3.</b> Kusurlu, eksik veya hatalı ürün hâlinde sorumluluk ilgili restorana ait olup Kullanıcının ayıplı mal hükümlerinden doğan yasal hakları saklıdır.</p>
+    <p><b>5.4. İade Desteği:</b> Online ödemeli siparişlerde, restoranın iadeyi kabul etmesi veya kusurun kayıtlarla sabit olması hâlinde iade bedeli, restoran hakedişinden karşılanarak ödeme kuruluşu aracılığıyla Kullanıcıya iade edilir. Kapıda ödemeli siparişlerde iade ve değişim, teslimat anında veya sonrasında Kullanıcı ile restoran arasında çözülür; YemekChat bu süreçte iletişimi kolaylaştırır.</p>
+
+    <h2>6. ŞİKÂYET SÜRECİ</h2>
+    <p><b>6.1.</b> Sipariş ve ürün şikâyetleri YemekChat hattına yazılır; şikâyet, Kullanıcının iletişim bilgileri ifşa edilmeden ilgili restorana iletilir ve restoranın yanıtı aynı kanaldan Kullanıcıya aktarılır.</p>
+    <p><b>6.2.</b> YemekChat, satış sözleşmesinin tarafı olmadığından uyuşmazlığın esasını karara bağlamaz; çözüm sürecini kolaylaştırır. Kullanıcının tüketici mevzuatından doğan başvuru hakları saklıdır.</p>
+
+    <h2>7. KULLANICI YÜKÜMLÜLÜKLERİ VE YASAKLAR</h2>
+    <p><b>7.1.</b> Sahte, asılsız veya teslim alınmamak üzere sipariş verilmesi ile sistemin veya restoranların zarara uğratılması yasaktır. Bu tür eylemlerden doğan bedel ve masraflar Kullanıcıdan talep edilir; YemekChat'in yasal yollara başvurma hakkı saklıdır.</p>
+    <p><b>7.2.</b> YemekChat; sahte sipariş, kötüye kullanım, tekrarlayan asılsız iade talebi veya hattın hukuka aykırı kullanımı hâllerinde Kullanıcının Platform'a erişimini geçici veya kalıcı olarak durdurabilir.</p>
+
+    <h2>8. SORUMLULUĞUN SINIRLARI</h2>
+    <p><b>8.1.</b> Teslimat gecikmesi, eksik veya hatalı teslim ya da teslim edilmeme hâllerinde sorumluluk ilgili restorana aittir. YemekChat, emredici tüketici koruması hükümleri saklı kalmak kaydıyla, aracılık ettiği satış işleminden sorumlu tutulamaz.</p>
+    <p><b>8.2.</b> WhatsApp/Meta, internet altyapısı, ödeme kuruluşu veya bulut hizmetlerinden kaynaklanan kesintiler ile mücbir sebep hâllerinden YemekChat sorumlu değildir. Bakım ve teknik zorunluluk hâllerinde hizmete geçici olarak ara verilebilir.</p>
+
+    <h2>9. FİKRİ MÜLKİYET</h2>
+    <p>YemekChat markası, logosu, maskotu ve Platform'daki tüm içerikler Platform'a aittir; yazılı izin olmaksızın kullanılamaz, kopyalanamaz ve çoğaltılamaz.</p>
+
+    <h2>10. DEĞİŞİKLİKLER</h2>
+    <p>İşbu koşullarda yapılacak değişiklikler, Platform kanallarında yayımlandığı tarihte yürürlüğe girer; Kullanıcı haklarını esaslı biçimde etkileyen değişiklikler ayrıca makul araçlarla duyurulur. Değişiklik sonrasında Platform'un kullanılmaya devam edilmesi, güncel koşulların kabulü anlamına gelir.</p>
+
+    <h2>11. UYGULANACAK HUKUK VE YETKİ</h2>
+    <p>İşbu sözleşme Türk hukukuna tabidir. Kullanıcı ile restoran arasındaki tüketici uyuşmazlıklarında, Kullanıcının yerleşim yerindeki veya tüketici işleminin yapıldığı yerdeki Tüketici Hakem Heyetleri ve Tüketici Mahkemeleri yetkilidir.</p>
+  </div>
+
+  <!-- ============ TİCARİ İLETİ ============ -->
+  <div class="doc" id="ticari">
+    <h1>YemekChat Ticari Elektronik İleti Aydınlatma ve Onay Metni</h1>
+    <div class="upd">Son güncelleme: 13.07.2026</div>
+
+    <h2>1. KAPSAM</h2>
+    <p>İşbu onay; YemekChat'in kampanya, indirim, yeni restoran ve yeni hizmet bölgesi duyurularını (hizmete açılan bölge bildirimleri dâhil) WhatsApp ve benzeri elektronik iletişim kanallarından tarafınıza iletmesini kapsar.</p>
+
+    <h2>2. ONAY GEREKTİRMEYEN İLETİLER</h2>
+    <p>Verdiğiniz siparişin durumu, teslimatı, iadesi ve şikâyet süreçlerine ilişkin operasyonel bildirimler, 6563 sayılı Kanun ve ilgili mevzuat uyarınca onay gerektirmez ve işbu metinden bağımsız olarak gönderilir.</p>
+
+    <h2>3. ONAY</h2>
+    <div class="box"><p>YemekChat hattına <b>"EVET"</b> yazarak ticari elektronik ileti almayı kabul edebilirsiniz. Onayınız, ilgili mevzuat uyarınca İleti Yönetim Sistemi (İYS) üzerinden kayıt altına alınır.</p></div>
+
+    <h2>4. RET HAKKI</h2>
+    <div class="box"><p>Dilediğiniz zaman aynı hatta <b>"İptal"</b> yazarak onayınızı geri alabilirsiniz; ret talebiniz derhâl işleme alınır ve tarafınıza başkaca ticari ileti gönderilmez.</p></div>
+
+    <h2>5. DİĞER</h2>
+    <p>Ticari elektronik ileti onayı vermemeniz, YemekChat üzerinden sipariş vermenize engel değildir. Kişisel verilerinizin işlenmesine ilişkin ayrıntılı bilgi için <a href="#kvkk" onclick="openDoc('kvkk')">YemekChat Kişisel Verilerin Korunması Aydınlatma Metni</a>'ne bakınız.</p>
+  </div>
+
+  <div class="foot">
+    YemekChat · Atilla Alperen Ülker (Şahıs İşletmesi)<br>
+    <a href="mailto:yemekchat.yonetim@gmail.com">yemekchat.yonetim@gmail.com</a> · WhatsApp: @YemekChat
+  </div>
+
+<script>
+function openDoc(id){
+  document.querySelectorAll(".doc").forEach(d => d.classList.toggle("on", d.id===id));
+  document.querySelectorAll(".tab").forEach(t => t.classList.toggle("on", t.dataset.d===id));
+  history.replaceState(null, "", "#"+id);
+  window.scrollTo(0,0);
+}
+document.querySelectorAll(".tab").forEach(t => t.onclick = () => openDoc(t.dataset.d));
+const h = location.hash.replace("#","");
+openDoc(["kvkk","kullanici","ticari"].includes(h) ? h : "kvkk");
+</script>
+</body>
+</html>
