@@ -73,6 +73,8 @@
   .addmore{width:100%;background:var(--card2);border:1px dashed var(--line);color:var(--mint);border-radius:11px;padding:11px;font-size:13px;font-weight:600;cursor:pointer;margin-top:10px}
   .legal{padding:4px 14px 10px;font-size:10px;color:var(--muted);text-align:center;line-height:1.7}
   .legal a{color:var(--txt3)}
+  #payWrap{padding:10px 10px 24px}
+  #payFrame{width:100%;min-height:calc(100vh - 130px);border:none;border-radius:12px;background:#fff}
 
   .bar{position:fixed;bottom:0;left:0;right:0;max-width:520px;margin:0 auto;background:var(--bg);padding:10px 14px 16px;border-top:.5px solid var(--line);display:none}
   .bar.on{display:block}
@@ -371,7 +373,7 @@ async function submitOrder(){
       try{
         const pr = await fetch(`${CONFIG.PAYTR}?order_id=${oid}&amount=${total()}&tel=${encodeURIComponent(TEL)}`);
         const pd = await pr.json();
-        if(pd.link){ location.href = pd.link; return; }
+        if(pd.link){ showPayFrame(pd.link); return; }
       }catch(e){}
       alert("Ödeme sayfası açılamadı — siparişin alındı, kapıda ödeyebilirsin ustam.");
     }
@@ -379,6 +381,20 @@ async function submitOrder(){
     $("okScreen").style.display="flex";
     setTimeout(()=>{ try{window.close();}catch(e){} }, 3500);
   }catch(e){ alert("Bağlantı hatası, tekrar dene."); go.disabled=false; updateBar(); }
+}
+
+/* ---------- GÖMÜLÜ ÖDEME (PayTR iFrame) ---------- */
+function showPayFrame(link){
+  ["scr1","scr2","scr3"].forEach(s => $(s).classList.remove("on"));
+  $("bar").classList.remove("on");
+  $("back").style.display = "none";
+  $("hdName").textContent = rest || "YemekChat";
+  $("hdSub").textContent = "güvenli ödeme · PayTR 🔒";
+  const w = document.createElement("div");
+  w.id = "payWrap";
+  w.innerHTML = `<iframe id="payFrame" src="${link}"></iframe>`;
+  document.body.appendChild(w);
+  window.scrollTo(0,0);
 }
 
 /* ---------- YAZARAK SİPARİŞ (DRAFT / Path B) ---------- */
