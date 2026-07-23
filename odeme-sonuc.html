@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YemekChat · Ödeme Sonucu</title>
+<style>
+  :root{
+    --bg:#111B14; --card:#1C2A20; --txt:#F1EFE8; --txt2:#B4B2A9;
+    --green:#1D9E75; --greenDark:#04342C; --mint:#9FE1CB; --red:#E24B4A;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--txt);font-family:-apple-system,"Segoe UI",Roboto,sans-serif;height:100%}
+  .wrap{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;text-align:center}
+  .ring{width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:42px;margin-bottom:20px}
+  .ok .ring{background:var(--green);color:var(--greenDark)}
+  .fail .ring{background:var(--red);color:#FCEBEB}
+  h2{font-size:20px;margin-bottom:10px}
+  p{color:var(--txt2);font-size:14px;line-height:1.7;max-width:300px}
+</style>
+</head>
+<body>
+  <div class="wrap ok" id="okBox" style="display:none">
+    <div class="ring">✓</div>
+    <h2>Ödemen alındı! 🎉</h2>
+    <p>Siparişin mutfağa iletildi. Onay mesajı WhatsApp'tan geliyor — bu pencereyi kapatabilirsin.</p>
+  </div>
+  <div class="wrap fail" id="failBox" style="display:none">
+    <div class="ring">✕</div>
+    <h2>Ödeme tamamlanamadı 😕</h2>
+    <p>Kartından para çekilmedi. WhatsApp'a dönüp tekrar deneyebilir ya da siparişini kapıda ödemeli verebilirsin ustam.</p>
+  </div>
+<script>
+  const durum = new URLSearchParams(location.search).get("durum");
+  document.getElementById(durum === "ok" ? "okBox" : "failBox").style.display = "flex";
+  setTimeout(() => { try { window.close(); } catch(e) {} }, 6000);
+</script>
+</body>
+</html>
