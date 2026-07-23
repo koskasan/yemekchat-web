@@ -369,7 +369,7 @@ async function submitOrder(){
     if(pay==="Online" && oid){
       go.textContent = "Ödeme sayfası açılıyor…";
       try{
-        const pr = await fetch(`${CONFIG.PAYTR}?order_id=${oid}&amount=${total()}`);
+        const pr = await fetch(`${CONFIG.PAYTR}?order_id=${oid}&amount=${total()}&tel=${encodeURIComponent(TEL)}`);
         const pd = await pr.json();
         if(pd.link){ location.href = pd.link; return; }
       }catch(e){}
