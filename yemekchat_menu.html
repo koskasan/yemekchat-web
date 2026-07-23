@@ -56,7 +56,7 @@
   .add{background:var(--card2);border:none;color:var(--mint);border-radius:9px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer}
 
   /* ödeme + adres */
-  .pay{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+  .pay{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
   .pay .opt{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:11px 4px;text-align:center;cursor:pointer}
   .pay .opt .ic{font-size:20px;color:var(--txt2)}
   .pay .opt .lb{font-size:11px;color:var(--txt2);margin-top:3px}
@@ -127,6 +127,7 @@
       <div class="pay">
         <div class="opt" data-pay="Nakit"><div class="ic">₺</div><div class="lb">Nakit</div></div>
         <div class="opt" data-pay="Kredi Kartı"><div class="ic">▭</div><div class="lb">Kart</div></div>
+        <div class="opt" data-pay="Online"><div class="ic">💳</div><div class="lb">Online Öde</div></div>
       </div>
     </div>
     <div class="sec"><h3>Teslimat adresi</h3>
@@ -157,7 +158,8 @@ const CONFIG = {
   ORDER:  "https://webhook.yemekchat.com/webhook/order",
   CATERING_INFO:  "https://webhook.yemekchat.com/webhook/catering-info",
   CATERING_ORDER: "https://webhook.yemekchat.com/webhook/catering-order",
-  DRAFT: "https://webhook.yemekchat.com/webhook/draft"
+  DRAFT: "https://webhook.yemekchat.com/webhook/draft",
+  PAYTR: "https://webhook.yemekchat.com/webhook/paytr-create"
 };
 
 // Maskot görselleri — arkadaşın hazırlayınca URL'leri buraya yapıştır (boşsa görünmez)
@@ -358,12 +360,22 @@ async function submitOrder(){
   const address = `${bina}${kat?", Kat "+kat:""}${daire?", Daire "+daire:""}${nt?" ("+nt+")":""}`;
   let details = Object.values(cart).map(c=>`${c.item.name} x${c.qty}`).join(", ");
   if(draftNote) details += ` — 📝 ${draftNote}`;
-  const payload = { restaurant_name:rest, customer_phone:TEL, order_details:details, total_amount:total(), payment_method:pay, address };
+  const payload = { restaurant_name:rest, customer_phone:TEL, order_details:details, total_amount:total(), payment_method:(pay==="Online"?"Online (bekliyor)":pay), address };
   const go=$("go"); go.disabled=true; go.textContent="Gönderiliyor…";
   try{
     const r = await fetch(CONFIG.ORDER,{ method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload) });
     const res = await r.json().catch(()=>({}));
-    $("okNo").textContent = (res.order_id||res.id) ? "Sipariş No: #"+(res.order_id||res.id) : "";
+    const oid = res.order_id || res.id;
+    if(pay==="Online" && oid){
+      go.textContent = "Ödeme sayfası açılıyor…";
+      try{
+        const pr = await fetch(`${CONFIG.PAYTR}?order_id=${oid}&amount=${total()}`);
+        const pd = await pr.json();
+        if(pd.link){ location.href = pd.link; return; }
+      }catch(e){}
+      alert("Ödeme sayfası açılamadı — siparişin alındı, kapıda ödeyebilirsin ustam.");
+    }
+    $("okNo").textContent = oid ? "Sipariş No: #"+oid : "";
     $("okScreen").style.display="flex";
     setTimeout(()=>{ try{window.close();}catch(e){} }, 3500);
   }catch(e){ alert("Bağlantı hatası, tekrar dene."); go.disabled=false; updateBar(); }
