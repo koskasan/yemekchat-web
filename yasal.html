@@ -55,6 +55,7 @@
   <div class="tabs">
     <div class="tab" data-d="kvkk">KVKK &amp; Gizlilik</div>
     <div class="tab" data-d="kullanici">Kullanıcı Sözleşmesi</div>
+    <div class="tab" data-d="teslimat">Teslimat &amp; İade</div>
     <div class="tab" data-d="ticari">Ticari İleti Onayı</div>
   </div>
 
@@ -156,6 +157,31 @@
     <p>İşbu sözleşme Türk hukukuna tabidir. Kullanıcı ile restoran arasındaki tüketici uyuşmazlıklarında, Kullanıcının yerleşim yerindeki veya tüketici işleminin yapıldığı yerdeki Tüketici Hakem Heyetleri ve Tüketici Mahkemeleri yetkilidir.</p>
   </div>
 
+  <!-- ============ TESLİMAT & İADE ============ -->
+  <div class="doc" id="teslimat">
+    <h1>YemekChat Teslimat, İptal ve İade Koşulları</h1>
+    <div class="upd">Son güncelleme: 23.07.2026</div>
+
+    <h2>1. TESLİMAT KOŞULLARI</h2>
+    <p>YemekChat, 6563 sayılı Kanun kapsamında aracı hizmet sağlayıcıdır; satış, Kullanıcı ile ilgili restoran arasında kurulur. <b>YemekChat'in kurye ağı yoktur; siparişin hazırlanması, paketlenmesi ve teslimatı ilgili restoran tarafından, restoranın kendi imkânlarıyla gerçekleştirilir.</b></p>
+    <p>Tahmini teslim süresi ve varsa minimum sepet tutarı, sipariş onayı öncesinde Kullanıcıya sunulur. Teslimat, Kullanıcının sipariş sırasında bildirdiği adrese yapılır; adresin doğru ve eksiksiz olması Kullanıcının sorumluluğundadır.</p>
+    <p>Fiziksel bir ürün kargolanmamaktadır; hizmet, hazır yemek siparişinin restorandan alıcı adresine tesliminden ibarettir. Bu nedenle kargo firması kullanılmaz ve ayrıca kargo ücreti talep edilmez.</p>
+
+    <h2>2. SİPARİŞ İPTALİ</h2>
+    <p>Sipariş, ilgili restoran <b>hazırlığa başlamadan önce</b> YemekChat WhatsApp hattına yazılarak iptal edilebilir. Hazırlık aşamasına geçen veya yola çıkan siparişler iptal edilemez.</p>
+
+    <h2>3. CAYMA HAKKI</h2>
+    <p>6502 sayılı Tüketicinin Korunması Hakkında Kanun ve Mesafeli Sözleşmeler Yönetmeliği uyarınca; <b>çabuk bozulabilen veya son kullanma tarihi geçebilecek gıda ürünlerinde cayma hakkı bulunmamaktadır.</b></p>
+
+    <h2>4. İADE KOŞULLARI</h2>
+    <p><b>Kusurlu, eksik veya hatalı ürün</b> tesliminde sorumluluk ilgili restorana aittir; Kullanıcının ayıplı mal hükümlerinden doğan yasal hakları saklıdır.</p>
+    <p><b>Online ödemeli siparişlerde:</b> restoranın iadeyi kabul etmesi veya kusurun kayıtlarla sabit olması hâlinde iade bedeli, restoran hakedişinden karşılanarak ödeme kuruluşu aracılığıyla, ödemede kullanılan yönteme iade edilir. İade süresi, bankaya bağlı olarak ortalama 2-7 iş günüdür.</p>
+    <p><b>Kapıda ödemeli siparişlerde:</b> iade ve değişim, teslimat anında veya sonrasında Kullanıcı ile restoran arasında çözülür; YemekChat bu süreçte iletişimi kolaylaştırır.</p>
+
+    <h2>5. ŞİKÂYET VE DESTEK</h2>
+    <div class="box"><p>Sipariş, teslimat ve iade talepleriniz için: YemekChat WhatsApp hattı <b>@YemekChat (+90 505 489 88 26)</b> veya <a href="mailto:yemekchat.yonetim@gmail.com">yemekchat.yonetim@gmail.com</a>. Talepler en geç 24 saat içinde ilgili restorana iletilir. Kullanıcının Tüketici Hakem Heyetleri ve Tüketici Mahkemelerine başvuru hakları saklıdır.</p></div>
+  </div>
+
   <!-- ============ TİCARİ İLETİ ============ -->
   <div class="doc" id="ticari">
     <h1>YemekChat Ticari Elektronik İleti Aydınlatma ve Onay Metni</h1>
@@ -179,7 +205,8 @@
 
   <div class="foot">
     YemekChat · Atilla Alperen Ülker (Şahıs İşletmesi)<br>
-    <a href="mailto:yemekchat.yonetim@gmail.com">yemekchat.yonetim@gmail.com</a> · WhatsApp: @YemekChat
+    Kızılırmak Mah. 1450. Sok. No:16 İç Kapı No:22, Çankaya / Ankara<br>
+    <a href="mailto:yemekchat.yonetim@gmail.com">yemekchat.yonetim@gmail.com</a> · WhatsApp: @YemekChat (+90 505 489 88 26)
   </div>
 
 <script>
@@ -191,7 +218,7 @@ function openDoc(id){
 }
 document.querySelectorAll(".tab").forEach(t => t.onclick = () => openDoc(t.dataset.d));
 const h = location.hash.replace("#","");
-openDoc(["kvkk","kullanici","ticari"].includes(h) ? h : "kvkk");
+openDoc(["kvkk","kullanici","teslimat","ticari"].includes(h) ? h : "kvkk");
 </script>
 </body>
 </html>
