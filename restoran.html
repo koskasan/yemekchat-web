@@ -97,6 +97,28 @@
   .form .cancel{background:var(--card2);color:var(--txt2)}
 
   .empty{text-align:center;padding:50px 20px;color:var(--txt3);font-size:14px}
+
+  /* yardım & yenilikler */
+  .hbtn{margin-left:auto;background:var(--card2);border:none;color:var(--mint);width:32px;height:32px;border-radius:50%;font-size:15px;font-weight:700;cursor:pointer;flex-shrink:0}
+  .top .out{margin-left:8px}
+  .loginhint{font-size:12px;color:var(--txt3)}
+  .loginhint a{color:var(--mint);cursor:pointer;text-decoration:underline}
+  .hmodal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:100;padding:16px;overflow-y:auto}
+  .hmodal.show{display:flex;align-items:flex-start;justify-content:center}
+  .hbox{background:var(--card);border:1px solid var(--line);border-radius:16px;max-width:560px;width:100%;margin-top:26px;overflow:hidden}
+  .hhead{display:flex;align-items:center;gap:6px;padding:10px 12px;border-bottom:1px solid var(--line)}
+  .htab{background:none;border:none;color:var(--txt3);font-size:13px;font-weight:600;padding:8px 10px;cursor:pointer;border-radius:8px}
+  .htab.on{background:var(--card2);color:var(--mint)}
+  .hclose{margin-left:auto;background:none;border:none;color:var(--txt3);font-size:18px;cursor:pointer;padding:4px 8px}
+  .hbody{padding:16px 18px 22px;font-size:13.5px;line-height:1.75;color:var(--txt2);max-height:72vh;overflow-y:auto}
+  .hbody h4{color:var(--mint);font-size:13px;margin:16px 0 6px}
+  .hbody h4:first-child{margin-top:0}
+  .hbody b{color:var(--txt)}
+  .hbody .warn{background:#2e2415;border:1px solid #4a3a1a;border-radius:10px;padding:10px 12px;margin:10px 0;color:#EFC98A}
+  .news-item{border-bottom:1px solid var(--line);padding:11px 0}
+  .news-item:last-child{border-bottom:none}
+  .news-item .nd{font-size:11px;color:var(--txt3)}
+  .news-item .nt{font-weight:600;color:var(--txt);margin:3px 0}
 </style>
 </head>
 <body>
@@ -109,6 +131,7 @@
     <input id="inPass" type="password" placeholder="Şifre">
     <div class="err" id="loginErr"></div>
     <button id="btnLogin">Giriş yap</button>
+    <div class="loginhint"><a onclick="openHelp('guide')">Nasıl kullanılır?</a></div>
   </div>
 
   <div class="panel" id="panelScr">
@@ -118,6 +141,7 @@
         <div class="nm" id="pName">Restoran</div>
         <div class="live"><span class="dot"></span><span id="liveTxt">Canlı · otomatik yenileniyor</span></div>
       </div>
+      <button class="hbtn" id="btnHelp" onclick="openHelp('guide')">?</button>
       <button class="out" id="btnOut">Çıkış</button>
     </div>
 
@@ -152,6 +176,34 @@
         </div>
       </div>
       <div id="menuList"></div>
+    </div>
+  </div>
+
+  <!-- YARDIM & YENİLİKLER -->
+  <div class="hmodal" id="helpModal">
+    <div class="hbox">
+      <div class="hhead">
+        <button class="htab on" id="htGuide" onclick="helpTab('guide')">📖 Nasıl Kullanılır</button>
+        <button class="htab" id="htNews" onclick="helpTab('news')">🆕 Yenilikler</button>
+        <button class="hclose" onclick="closeHelp()">✕</button>
+      </div>
+      <div class="hbody" id="helpGuide">
+        <h4>🔑 Giriş</h4>
+        <p><b>yemekchat.com/restoran.html</b> adresinden restoran adınız ve şifrenizle girersiniz. Telefon, tablet veya bilgisayardan çalışır; sayfayı açık tutmanız yeterlidir — siparişler kendiliğinden düşer ve <b>bip sesi</b> ile haber verir.</p>
+        <h4>🧾 Siparişler</h4>
+        <p>Yeni sipariş <b>kırmızı şeritle</b> en üstte belirir. Hazırlamaya başlayınca <b>"Hazırlanıyor →"</b> düğmesine, yola çıkınca <b>"Yolda →"</b>, teslim edilince <b>"Teslim ✓"</b> düğmesine basın. Böylece müşteri de süreci bilir, gün sonu cironuz doğru hesaplanır.</p>
+        <p><b>Müşteriye yaz:</b> siparişle ilgili soru olursa (ör. ürün bitti, adres belirsiz) müşteriyle WhatsApp'tan yazışmanızı sağlar. <b>İptal:</b> karşılayamayacağınız siparişi iptal eder — mümkünse önce müşteriye yazın.</p>
+        <div class="warn">⚠️ <b>Ödeme "Online (bekliyor)"</b> görünen siparişi HAZIRLAMAYIN — müşteri kart ödemesini henüz tamamlamadı. <b>"Online ✓ Ödendi"</b> yazısını görünce hazırlayın. Nakit/Kart (kapıda) siparişler ise hemen hazırlanır.</div>
+        <p><b>Mor renkli siparişler</b> kurumsal (anlaşmalı şirket) siparişleridir — ödemesi şirket üzerinden yapılır, kapıda ücret alınmaz.</p>
+        <p>📝 <b>Not satırı</b> olan siparişlerde müşterinin özel isteği vardır (soğansız, acısız vb.) — hazırlarken mutlaka kontrol edin.</p>
+        <h4>🍔 Menü Yönetimi</h4>
+        <p><b>Menü</b> sekmesinden ürün ekleyebilir, fiyat güncelleyebilir, düzenleyebilirsiniz. Biten ürünü <b>aç/kapa anahtarıyla</b> kapatın — müşteri "Tükendi" görür, siparişe ekleyemez; ürün gelince tekrar açarsınız. Fiyat değişikliklerinizi buradan anında yapabilirsiniz.</p>
+        <h4>🛵 Getirme Ücreti</h4>
+        <p>Teslimat tarifeniz mesafeye göre çalışır: <b>taban ücret + km başına ücret</b>, ve belirlediğiniz <b>maksimum mesafenin</b> dışındaki müşterilere hiç görünmezsiniz. Tarifenizi belirlemek veya değiştirmek için bize yazın.</p>
+        <h4>💬 Destek</h4>
+        <p>Her konu için: <b>yemekchat.yonetim@gmail.com</b> ya da WhatsApp <b>@YemekChat (+90 505 489 88 26)</b></p>
+      </div>
+      <div class="hbody" id="helpNews" style="display:none"></div>
     </div>
   </div>
 
@@ -362,6 +414,30 @@ function beep(){
     g.gain.setValueAtTime(0.3,ctx.currentTime); o.start(); o.stop(ctx.currentTime+0.25);
   }catch(e){}
 }
+
+/* ---------- YARDIM & YENİLİKLER ---------- */
+const NEWS = [
+  { d:"26.07.2026", t:"🛵 Mesafeye göre getirme ücreti", x:"Artık her restoran kendi teslimat tarifesini belirleyebiliyor: taban ücret + km başı ücret + maksimum teslimat mesafesi. Ücret, müşterinin sepetine otomatik eklenir ve sipariş detayında görünür. Tarifenizi belirlemek için bize yazın." },
+  { d:"23.07.2026", t:"💳 Online ödeme başladı", x:"Müşteriler siparişlerini uygulama içinden kartla ödeyebiliyor. ÖNEMLİ: 'Online (bekliyor)' görünen siparişi hazırlamayın — 'Online ✓ Ödendi' olunca hazırlayın. Kapıda ödemede değişen bir şey yok." },
+  { d:"13.07.2026", t:"📝 Sipariş notları", x:"Müşterilerin özel istekleri (soğansız, acısız, az pişmiş...) siparişte 📝 not olarak görünüyor — hazırlarken kontrol etmeyi unutmayın." }
+];
+function openHelp(tab){
+  document.getElementById("helpModal").classList.add("show");
+  helpTab(tab || "guide");
+}
+function closeHelp(){ document.getElementById("helpModal").classList.remove("show"); }
+function helpTab(t){
+  document.getElementById("helpGuide").style.display = t==="guide" ? "block" : "none";
+  document.getElementById("helpNews").style.display  = t==="news"  ? "block" : "none";
+  document.getElementById("htGuide").classList.toggle("on", t==="guide");
+  document.getElementById("htNews").classList.toggle("on", t==="news");
+  if(t==="news"){
+    document.getElementById("helpNews").innerHTML = NEWS.map(n =>
+      `<div class="news-item"><div class="nd">${n.d}</div><div class="nt">${n.t}</div><div>${n.x}</div></div>`
+    ).join("");
+  }
+}
+document.getElementById("helpModal").addEventListener("click", e => { if(e.target.id==="helpModal") closeHelp(); });
 </script>
 </body>
 </html>
