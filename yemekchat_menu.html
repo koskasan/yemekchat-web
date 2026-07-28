@@ -224,7 +224,7 @@ function renderNearby(){
   const arr = catFilter==="Tümü" ? nearby : nearby.filter(r => r.category===catFilter);
   if(!arr.length){ list.innerHTML = '<div class="empty">Bu konuma yakın restoran yok.</div>'; return; }
   list.innerHTML = arr.map(r => {
-    const img = CATEGORY_IMG[(r.category||"").trim().toLowerCase()] || "";
+    const img = CATEGORY_IMG[(r.category||"").toLowerCase()] || "";
     const bg = img ? `background-image:linear-gradient(90deg, rgba(28,42,32,0.97) 45%, rgba(28,42,32,0.55)), url('${img}');background-size:cover;background-position:right center;` : "";
     return `<div class="rc" style="${bg}" onclick="openRestaurant('${r.name.replace(/'/g,"\\'")}')">
     <div class="rinfo">
