@@ -173,8 +173,8 @@ const CATEGORY_IMG = {
   burger: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600",
   pizza:  "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600",
   kebab:  "https://images.unsplash.com/photo-1561651823-34feb02250e4?w=600",
-  döner: "https://images.unsplash.com/photo-1561651823-34feb02250e4?w=600",
-  doner: "https://images.unsplash.com/photo-1561651823-34feb02250e4?w=600",
+  "döner": "https://images.unsplash.com/photo-1561651823-34feb02250e4?w=600",
+  "doner": "https://images.unsplash.com/photo-1561651823-34feb02250e4?w=600",
   "içecek": "https://images.unsplash.com/photo-1437418747212-8d9709afab22?w=600",
   "i̇çecek": "https://images.unsplash.com/photo-1437418747212-8d9709afab22?w=600"
 };
@@ -188,7 +188,7 @@ const CATERING = p.get("catering");       // kurumsal mod (çalışan kodu)
 const DRAFT = p.get("draft");             // yazarak sipariş taslağı (Path B)
 
 let screen = 1, nearby = [], menu = [], rest = null, pay = null, catFilter = "Tümü";
-let isCat = false, catInfo = null, isDraft = false, draftNote = "";
+let isCat = false, catInfo = null, isDraft = false, draftNote = "", deliveryFee = 0;
 const cart = {};  // id -> {item, qty}
 
 const $ = id => document.getElementById(id);
@@ -224,12 +224,12 @@ function renderNearby(){
   const arr = catFilter==="Tümü" ? nearby : nearby.filter(r => r.category===catFilter);
   if(!arr.length){ list.innerHTML = '<div class="empty">Bu konuma yakın restoran yok.</div>'; return; }
   list.innerHTML = arr.map(r => {
-    const img = CATEGORY_IMG[(r.category||"").toLowerCase()] || "";
+    const img = CATEGORY_IMG[(r.category||"").trim().toLowerCase()] || "";
     const bg = img ? `background-image:linear-gradient(90deg, rgba(28,42,32,0.97) 45%, rgba(28,42,32,0.55)), url('${img}');background-size:cover;background-position:right center;` : "";
     return `<div class="rc" style="${bg}" onclick="openRestaurant('${r.name.replace(/'/g,"\\'")}')">
     <div class="rinfo">
       <div class="rn">${r.name}</div>
-      <div class="rm"><span class="star">★</span> ${r.rating||"-"} &nbsp;·&nbsp; ${r.dist_km} km &nbsp;·&nbsp; ${r.min_order_amount?("Min "+r.min_order_amount+"₺"):"Min yok"}</div>
+      <div class="rm"><span class="star">★</span> ${r.rating||"-"} &nbsp;·&nbsp; ${r.dist_km} km &nbsp;·&nbsp; ${r.min_order_amount?("Min "+r.min_order_amount+"₺"):"Min yok"} &nbsp;·&nbsp; 🛵 ${Number(r.teslimat_ucreti)>0 ? r.teslimat_ucreti+"₺" : "Ücretsiz"}</div>
       ${r.category?`<div class="rcat">${r.category}</div>`:""}
     </div>
     <div class="arrow">›</div>
@@ -243,6 +243,8 @@ async function openRestaurant(name){
     for(const k in cart) delete cart[k];
   }
   rest = name;
+  const nb = nearby.find(x => x.name === name);
+  if(nb) deliveryFee = Math.max(0, Math.round(Number(nb.teslimat_ucreti) || 0));
   $("menuWrap").innerHTML = '<div class="spin">Menü yükleniyor…</div>';
   go2();
   try{
@@ -296,9 +298,12 @@ function renderCart(){
       <div class="stp" data-k="${k}"><button>−</button><span class="qt">${c.qty}</span><button>+</button></div>
       <span class="cl-t">${c.item.price*c.qty} TL</span></div>`;
   }).join("");
-  html = keys.length
-    ? html + `<div class="cartline" style="border:none;font-weight:600"><span class="cn">Toplam</span><span style="color:var(--mint)">${total()} TL</span></div>`
-    : '<div class="empty" style="padding:22px">Sepet boş.</div>';
+  if(keys.length){
+    if(deliveryFee > 0) html += `<div class="cartline"><span class="cn">🛵 Getirme ücreti</span><span class="cl-t">${deliveryFee} TL</span></div>`;
+    html += `<div class="cartline" style="border:none;font-weight:600"><span class="cn">Toplam</span><span style="color:var(--mint)">${grand()} TL</span></div>`;
+  } else {
+    html = '<div class="empty" style="padding:22px">Sepet boş.</div>';
+  }
   if(draftNote) html += `<div class="cartline" style="border:none"><span class="cn" style="color:var(--amber)">📝 Not: ${draftNote}</span></div>`;
   if(isDraft) html += `<button class="addmore" id="addMore">➕ Menüden başka bir şey ekle</button>`;
   $("cartLines").innerHTML = html;
@@ -320,6 +325,7 @@ document.querySelectorAll(".pay .opt").forEach(o => o.onclick = () => {
 
 /* ---------- ortak ---------- */
 function total(){ return Object.values(cart).reduce((s,c)=>s+c.item.price*c.qty,0); }
+function grand(){ return total() + (Object.keys(cart).length ? deliveryFee : 0); }
 function go1(){ screen=1; show(); }
 function go2(){ screen=2; show(); }
 function go3(){ if(!Object.keys(cart).length) return; screen=3; renderCart(); show(); }
@@ -352,8 +358,8 @@ function updateBar(){
   } else if(screen===3){
     go.onclick = submitOrder;
     if(n===0){ go.disabled=true; go.textContent="Sepet boş — menüden ürün ekle"; }
-    else if(!pay){ go.disabled=true; go.textContent=`Ödeme yöntemi seç · ${t} TL`; }
-    else { go.disabled=false; go.innerHTML=`✓ Siparişi tamamla · ${t} TL`; }
+    else if(!pay){ go.disabled=true; go.textContent=`Ödeme yöntemi seç · ${grand()} TL`; }
+    else { go.disabled=false; go.innerHTML=`✓ Siparişi tamamla · ${grand()} TL`; }
   }
 }
 
@@ -364,7 +370,8 @@ async function submitOrder(){
   const address = `${bina}${kat?", Kat "+kat:""}${daire?", Daire "+daire:""}${nt?" ("+nt+")":""}`;
   let details = Object.values(cart).map(c=>`${c.item.name} x${c.qty}`).join(", ");
   if(draftNote) details += ` — 📝 ${draftNote}`;
-  const payload = { restaurant_name:rest, customer_phone:TEL, order_details:details, total_amount:total(), payment_method:(pay==="Online"?"Online (bekliyor)":pay), address };
+  if(deliveryFee > 0) details += ` — 🛵 Getirme: ${deliveryFee} TL`;
+  const payload = { restaurant_name:rest, customer_phone:TEL, order_details:details, total_amount:grand(), payment_method:(pay==="Online"?"Online (bekliyor)":pay), address };
   const go=$("go"); go.disabled=true; go.textContent="Gönderiliyor…";
   try{
     const r = await fetch(CONFIG.ORDER,{ method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload) });
@@ -373,7 +380,7 @@ async function submitOrder(){
     if(pay==="Online" && oid){
       go.textContent = "Ödeme sayfası açılıyor…";
       try{
-        const pr = await fetch(`${CONFIG.PAYTR}?order_id=${oid}&amount=${total()}&tel=${encodeURIComponent(TEL)}`);
+        const pr = await fetch(`${CONFIG.PAYTR}?order_id=${oid}&amount=${grand()}&tel=${encodeURIComponent(TEL)}`);
         const pd = await pr.json();
         if(pd.link){ showPayFrame(pd.link); return; }
       }catch(e){}
