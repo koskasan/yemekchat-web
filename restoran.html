@@ -119,6 +119,31 @@
   .news-item:last-child{border-bottom:none}
   .news-item .nd{font-size:11px;color:var(--txt3)}
   .news-item .nt{font-weight:600;color:var(--txt);margin:3px 0}
+
+  /* ayarlar + toplu fiyat */
+  .sbox{background:var(--card);border-radius:14px;padding:16px;margin:0 14px 12px}
+  .sbox h4{font-size:13px;color:var(--mint);margin-bottom:4px}
+  .sbox .hint{font-size:11.5px;color:var(--txt3);line-height:1.6;margin-bottom:10px}
+  .sbox label{display:block;font-size:12px;color:var(--txt2);margin:8px 0 4px}
+  .sbox input{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:11px;font-size:14px;color:var(--txt);font-family:inherit}
+  .s2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .s3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .sbtn{width:100%;background:var(--green);border:none;border-radius:11px;padding:13px;font-size:14px;font-weight:600;color:var(--greenDark);cursor:pointer;margin-top:12px}
+  .sok{font-size:12px;color:var(--mint);text-align:center;min-height:16px;margin-top:6px}
+  .cls{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--bg);border:1px solid var(--line);border-radius:11px;padding:12px}
+  .cls .t{font-size:13px}
+  .cls .t small{display:block;font-size:11px;color:var(--txt3);margin-top:2px}
+  .sw{width:48px;height:26px;border-radius:14px;background:var(--card2);border:none;position:relative;cursor:pointer;flex-shrink:0}
+  .sw::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:var(--muted);transition:.2s}
+  .sw.on{background:var(--red)}
+  .sw.on::after{left:25px;background:#fff}
+  .bulk{background:var(--card);border-radius:12px;padding:12px;margin-bottom:10px}
+  .bulk .br{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+  .bulk select,.bulk input{background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:9px;font-size:13px;color:var(--txt);font-family:inherit}
+  .bulk input{width:82px}
+  .bulk button{background:var(--amber);border:none;border-radius:9px;padding:9px 14px;font-size:13px;font-weight:600;color:#2b1d05;cursor:pointer}
+  .bulk .lb{font-size:11.5px;color:var(--txt3);margin-bottom:8px}
+  .ord.geciken{box-shadow:0 0 0 2px var(--red)}
 </style>
 </head>
 <body>
@@ -148,6 +173,7 @@
     <div class="tabs">
       <button class="tab on" data-tab="orders">Siparişler</button>
       <button class="tab" data-tab="menu">Menü</button>
+      <button class="tab" data-tab="settings">Ayarlar</button>
     </div>
 
     <div id="tabOrders">
@@ -164,6 +190,18 @@
         <h3>Menü</h3>
         <button class="new" id="btnNewItem">+ Yeni Ürün</button>
       </div>
+      <div style="padding:0 14px 4px">
+        <div class="bulk">
+          <div class="lb">💰 Toplu fiyat güncelleme — zam için pozitif, indirim için negatif sayı yaz</div>
+          <div class="br">
+            <select id="bkCat"><option value="">Tüm ürünler</option></select>
+            <select id="bkMode"><option value="tl">TL ekle/çıkar</option><option value="pct">Yüzde (%)</option></select>
+            <input id="bkVal" type="number" inputmode="decimal" placeholder="20">
+            <button id="bkGo">Uygula</button>
+          </div>
+          <div class="sok" id="bkMsg"></div>
+        </div>
+      </div>
       <div class="form" id="itemForm">
         <h4 id="formTitle">Yeni Ürün</h4>
         <input id="fNm" placeholder="Ürün adı">
@@ -176,6 +214,33 @@
         </div>
       </div>
       <div id="menuList"></div>
+    </div>
+
+    <div id="tabSettings" style="display:none">
+      <div class="sbox">
+        <h4>🕒 Çalışma Saatleri</h4>
+        <div class="hint">Bu saatler arasında restoranınız müşterilere <b>otomatik açılır</b>, dışında "kapalı" görünür ve sipariş alınmaz. Gece yarısını aşan saatler de yazılabilir (örn. 11:00 – 03:00).</div>
+        <div class="s2">
+          <div><label>Açılış</label><input id="sAcilis" type="time"></div>
+          <div><label>Kapanış</label><input id="sKapanis" type="time"></div>
+        </div>
+        <label style="margin-top:14px">Acil durum</label>
+        <div class="cls">
+          <div class="t">Şu an siparişe kapalıyım
+            <small>Yoğunluk, arıza veya erken kapanışta aç. Saatlerinizi bozmaz.</small>
+          </div>
+          <button class="sw" id="sKapali" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <h4 style="margin-top:20px">🛵 Teslimat Tarifeniz</h4>
+        <div class="hint">Getirme ücreti = <b>taban + (mesafe × km ücreti)</b>. Ücretsiz teslimat için ikisini de 0 yazın. Maksimum mesafenin dışındaki müşterilere hiç görünmezsiniz.</div>
+        <div class="s3">
+          <div><label>Taban (₺)</label><input id="sTaban" type="number" inputmode="decimal" placeholder="20"></div>
+          <div><label>Km ücreti (₺)</label><input id="sKm" type="number" inputmode="decimal" placeholder="10"></div>
+          <div><label>Maks. km</label><input id="sMax" type="number" inputmode="decimal" placeholder="6"></div>
+        </div>
+        <button class="sbtn" id="sSave">Ayarları kaydet</button>
+        <div class="sok" id="sMsg"></div>
+      </div>
     </div>
   </div>
 
@@ -198,8 +263,13 @@
         <p>📝 <b>Not satırı</b> olan siparişlerde müşterinin özel isteği vardır (soğansız, acısız vb.) — hazırlarken mutlaka kontrol edin.</p>
         <h4>🍔 Menü Yönetimi</h4>
         <p><b>Menü</b> sekmesinden ürün ekleyebilir, fiyat güncelleyebilir, düzenleyebilirsiniz. Biten ürünü <b>aç/kapa anahtarıyla</b> kapatın — müşteri "Tükendi" görür, siparişe ekleyemez; ürün gelince tekrar açarsınız. Fiyat değişikliklerinizi buradan anında yapabilirsiniz.</p>
+        <p><b>⏰ BEKLİYOR</b> etiketi ve kırmızı çerçeve: 3 dakikadan uzun süredir onaylanmamış sipariş. Bu sırada panel sesli uyarmaya devam eder; müşteriyi bekletmemek için "Hazırlanıyor" deyin ya da karşılayamıyorsanız iptal edin.</p>
+        <h4>💰 Toplu Fiyat Güncelleme</h4>
+        <p>Menü sekmesinin üstündeki araçla tek seferde zam/indirim yapabilirsiniz: kategori seçin (ya da "Tüm ürünler"), <b>TL</b> veya <b>yüzde</b> seçin, sayıyı yazın. <b>Zam için 20</b>, <b>indirim için -20</b> gibi. Örnek: tüm ürünlere %10 zam → Tüm ürünler + Yüzde + 10.</p>
+        <h4>🕒 Çalışma Saatleri</h4>
+        <p><b>Ayarlar</b> sekmesinden açılış-kapanış saatinizi girin — restoranınız o saatlerde <b>otomatik açılır</b>, dışında müşteriye "kapalı" görünür ve sipariş gelmez. Gece yarısını aşan saatler desteklenir (11:00 – 03:00). Yoğunluk veya arıza durumunda <b>"Şu an siparişe kapalıyım"</b> anahtarını açın; saatlerinizi bozmadan geçici olarak kapanırsınız, unutmayın açmayı 🙂</p>
         <h4>🛵 Getirme Ücreti</h4>
-        <p>Teslimat tarifeniz mesafeye göre çalışır: <b>taban ücret + km başına ücret</b>, ve belirlediğiniz <b>maksimum mesafenin</b> dışındaki müşterilere hiç görünmezsiniz. Tarifenizi belirlemek veya değiştirmek için bize yazın.</p>
+        <p>Tarifenizi <b>Ayarlar</b> sekmesinden kendiniz belirlersiniz: <b>taban ücret + km başına ücret</b>. Örnek: taban 20₺ + km 10₺ ise 2 km'deki müşteri 40₺ öder. Ücretsiz teslimat için ikisini de 0 yapın. <b>Maksimum km</b> dışındaki müşterilere hiç görünmezsiniz.</p>
         <h4>💬 Destek</h4>
         <p>Her konu için: <b>yemekchat.yonetim@gmail.com</b> ya da WhatsApp <b>@YemekChat (+90 505 489 88 26)</b></p>
       </div>
@@ -215,13 +285,17 @@ const API = {
   STATUS: "https://webhook.yemekchat.com/webhook/panel-status",
   MENU:        "https://webhook.yemekchat.com/webhook/panel-menu",
   MENU_SAVE:   "https://webhook.yemekchat.com/webhook/panel-menu-save",
-  MENU_DELETE: "https://webhook.yemekchat.com/webhook/panel-menu-delete"
+  MENU_DELETE: "https://webhook.yemekchat.com/webhook/panel-menu-delete",
+  SETTINGS:      "https://webhook.yemekchat.com/webhook/panel-settings",
+  SETTINGS_SAVE: "https://webhook.yemekchat.com/webhook/panel-settings-save",
+  BULK:          "https://webhook.yemekchat.com/webhook/panel-bulk-price"
 };
 const REFRESH_MS = 12000;
 // ================================================
 
 const FLOW = ["Yeni Sipariş","Hazırlanıyor","Yolda","Teslim Edildi"];
 let REST = null, timer = null, lastCount = 0, menuItems = [], editId = null;
+let alarmTimer = null, gecikenIds = [];
 
 const saved = localStorage.getItem("yc_rest");
 if(saved){ REST = saved; startPanel(); }
@@ -240,8 +314,10 @@ document.querySelectorAll(".tab").forEach(t => {
     const tab = t.dataset.tab;
     document.getElementById("tabOrders").style.display = tab==="orders" ? "block" : "none";
     document.getElementById("tabMenu").style.display = tab==="menu" ? "block" : "none";
-    document.getElementById("liveTxt").textContent = tab==="orders" ? "Canlı · otomatik yenileniyor" : "Menü yönetimi";
+    document.getElementById("tabSettings").style.display = tab==="settings" ? "block" : "none";
+    document.getElementById("liveTxt").textContent = tab==="orders" ? "Canlı · otomatik yenileniyor" : (tab==="menu" ? "Menü yönetimi" : "Ayarlar");
     if(tab==="menu") loadMenu();
+    if(tab==="settings") loadSettings();
   };
 });
 
@@ -299,6 +375,11 @@ function renderOrders(orders){
   document.getElementById("stCiro").textContent = Math.round(ciro)+"₺";
   if(yeni>lastCount && lastCount!==0) beep();
   lastCount = yeni;
+  // 3 dakikadan uzun süredir onaylanmayan sipariş varsa alarmı sürdür
+  const geciken = orders.filter(o => statusClass(o.status).pill==="yeni" && o.created_at && (Date.now()-new Date(o.created_at).getTime()) > 180000);
+  gecikenIds = geciken.map(o => String(o.id));
+  if(geciken.length && !alarmTimer){ alarm(); alarmTimer = setInterval(alarm, 20000); }
+  if(!geciken.length && alarmTimer){ clearInterval(alarmTimer); alarmTimer = null; }
   const list = document.getElementById("ordList");
   if(!orders.length){ list.innerHTML='<div class="empty">Henüz sipariş yok.</div>'; return; }
   list.innerHTML = orders.map(o => {
@@ -306,8 +387,9 @@ function renderOrders(orders){
     const tm=o.created_at?new Date(o.created_at).toLocaleString("tr-TR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}):"";
     const nx=nextStatus(o.status); const done=sc.pill==="teslim"||sc.pill==="iptal";
     const isCatOrder=(o.payment_method||"").toLowerCase().includes("kurumsal");
-    return `<div class="ord ${sc.cls} ${isCatOrder?"cat":""}">
-      <div class="hd"><span class="no">#${o.id} <span class="pill ${sc.pill}">${sc.lbl}</span>${isCatOrder?' <span class="pill kurumsal">Kurumsal</span>':""}</span><span class="tm">${tm}</span></div>
+    const gec = gecikenIds.includes(String(o.id));
+    return `<div class="ord ${sc.cls} ${isCatOrder?"cat":""} ${gec?"geciken":""}">
+      <div class="hd"><span class="no">#${o.id} <span class="pill ${sc.pill}">${sc.lbl}</span>${isCatOrder?' <span class="pill kurumsal">Kurumsal</span>':""}${gec?' <span class="pill yeni">⏰ BEKLİYOR</span>':""}</span><span class="tm">${tm}</span></div>
       <div class="det">${o.order_details||"-"}</div>
       <div class="meta"><b>Adres:</b> ${o.address||"-"}<br><b>Ödeme:</b> ${o.payment_method||"-"} &nbsp;·&nbsp; <b>Tel:</b> ${o.customer_phone||"-"}</div>
       <div class="tot">${Math.round(Number(o.total_amount)||0)} TL</div>
@@ -332,7 +414,7 @@ async function loadMenu(){
     let m = await r.json();
     if(!Array.isArray(m)) m = m.data || [];
     menuItems = m;
-    renderMenu();
+    renderMenu(); fillBulkCats();
   }catch(e){ list.innerHTML = '<div class="empty">Menü yüklenemedi.</div>'; }
 }
 function renderMenu(){
@@ -415,8 +497,70 @@ function beep(){
   }catch(e){}
 }
 
+function alarm(){ beep(); setTimeout(beep,300); setTimeout(beep,600); }
+
+/* ---------- AYARLAR (mesai + teslimat) ---------- */
+async function loadSettings(){
+  try{
+    const r = await fetch(API.SETTINGS + "?restaurant=" + encodeURIComponent(REST));
+    const s = await r.json();
+    document.getElementById("sAcilis").value  = s.acilis || "";
+    document.getElementById("sKapanis").value = s.kapanis || "";
+    document.getElementById("sTaban").value   = s.taban ?? "";
+    document.getElementById("sKm").value      = s.km_ucreti ?? "";
+    document.getElementById("sMax").value     = s.max_km ?? "";
+    document.getElementById("sKapali").classList.toggle("on", s.kapali===true || s.kapali==="true");
+  }catch(e){ document.getElementById("sMsg").textContent = "Ayarlar yüklenemedi."; }
+}
+document.getElementById("sSave").onclick = async () => {
+  const msg = document.getElementById("sMsg"); msg.textContent = "Kaydediliyor…";
+  const payload = {
+    restaurant: REST,
+    acilis:  document.getElementById("sAcilis").value,
+    kapanis: document.getElementById("sKapanis").value,
+    kapali:  document.getElementById("sKapali").classList.contains("on") ? "true" : "false",
+    taban:   document.getElementById("sTaban").value,
+    km_ucreti: document.getElementById("sKm").value,
+    max_km:  document.getElementById("sMax").value
+  };
+  try{
+    const r = await fetch(API.SETTINGS_SAVE, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload) });
+    const res = await r.json();
+    msg.textContent = res.ok ? "✓ Kaydedildi" : "Kaydedilemedi.";
+  }catch(e){ msg.textContent = "Bağlantı hatası."; }
+  setTimeout(()=>{ msg.textContent=""; }, 3000);
+};
+
+/* ---------- TOPLU FİYAT ---------- */
+function fillBulkCats(){
+  const sel = document.getElementById("bkCat");
+  const cats = [...new Set(menuItems.map(m => m.category).filter(Boolean))];
+  sel.innerHTML = '<option value="">Tüm ürünler</option>' + cats.map(c => `<option value="${c}">${c}</option>`).join("");
+}
+document.getElementById("bkGo").onclick = async () => {
+  const msg = document.getElementById("bkMsg");
+  const category = document.getElementById("bkCat").value;
+  const mode = document.getElementById("bkMode").value;
+  const value = parseFloat(document.getElementById("bkVal").value);
+  if(!value){ msg.textContent = "Bir sayı gir (zam için 20, indirim için -20)."; return; }
+  const ne = mode==="tl" ? `${value>0?"+":""}${value} TL` : `${value>0?"+":""}${value}%`;
+  if(!confirm(`${category||"TÜM ürünlerde"} fiyatlara ${ne} uygulanacak. Onaylıyor musun?`)) return;
+  msg.textContent = "Uygulanıyor…";
+  try{
+    const r = await fetch(API.BULK, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ restaurant:REST, category, mode, value }) });
+    const res = await r.json();
+    msg.textContent = res.ok ? `✓ ${res.adet||0} ürün güncellendi` : "Güncellenemedi.";
+    document.getElementById("bkVal").value = "";
+    loadMenu();
+  }catch(e){ msg.textContent = "Bağlantı hatası."; }
+  setTimeout(()=>{ msg.textContent=""; }, 4000);
+};
+
 /* ---------- YARDIM & YENİLİKLER ---------- */
 const NEWS = [
+  { d:"29.07.2026", t:"🕒 Otomatik açılış-kapanış + kendi tarifeniz", x:"Ayarlar sekmesi geldi: çalışma saatlerinizi yazın, restoranınız o saatlerde otomatik açılıp kapanıyor. Acil durumlar için 'Şu an siparişe kapalıyım' anahtarı var. Teslimat tarifenizi (taban + km ücreti + maksimum mesafe) artık kendiniz belirliyorsunuz." },
+  { d:"29.07.2026", t:"💰 Toplu fiyat güncelleme", x:"Menü sekmesinden tek seferde zam veya indirim: kategori seçin, TL ya da yüzde girin, uygula. Zam için 20, indirim için -20 yazmanız yeterli." },
+  { d:"29.07.2026", t:"⏰ Geciken sipariş alarmı", x:"3 dakikadan uzun süredir onaylanmayan siparişler kırmızı çerçeveyle işaretlenir ve panel sesli uyarmaya devam eder — sipariş kaçırmayın. Yakında bu durumda telefonla arama uyarısı da devreye girecek." },
   { d:"26.07.2026", t:"🛵 Mesafeye göre getirme ücreti", x:"Artık her restoran kendi teslimat tarifesini belirleyebiliyor: taban ücret + km başı ücret + maksimum teslimat mesafesi. Ücret, müşterinin sepetine otomatik eklenir ve sipariş detayında görünür. Tarifenizi belirlemek için bize yazın." },
   { d:"23.07.2026", t:"💳 Online ödeme başladı", x:"Müşteriler siparişlerini uygulama içinden kartla ödeyebiliyor. ÖNEMLİ: 'Online (bekliyor)' görünen siparişi hazırlamayın — 'Online ✓ Ödendi' olunca hazırlayın. Kapıda ödemede değişen bir şey yok." },
   { d:"13.07.2026", t:"📝 Sipariş notları", x:"Müşterilerin özel istekleri (soğansız, acısız, az pişmiş...) siparişte 📝 not olarak görünüyor — hazırlarken kontrol etmeyi unutmayın." }
