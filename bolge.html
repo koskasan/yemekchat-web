@@ -34,6 +34,9 @@
   .palbar::-webkit-scrollbar{display:none}
   .pchip{flex-shrink:0;border:2px solid transparent;border-radius:16px;padding:7px 13px;font-size:13px;font-weight:700;cursor:pointer;color:#10231a;line-height:1}
   .pchip.on{border-color:#fff;box-shadow:0 0 0 2px rgba(0,0,0,.35)}
+  .mchip{flex-shrink:0;background:var(--bg);border:1px solid var(--line);color:var(--txt3);border-radius:16px;padding:8px 12px;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap}
+  .mchip.on{background:var(--card2);border-color:var(--mint);color:var(--mint)}
+  .ayirac{flex-shrink:0;width:1px;height:24px;background:var(--line);margin:0 3px}
   .pedit{flex-shrink:0;margin-left:auto;background:var(--bg);border:1px solid var(--line);color:var(--mint);border-radius:16px;padding:8px 12px;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap}
   .pbox{position:absolute;left:10px;right:10px;top:10px;z-index:1200;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;display:none;max-height:80%;overflow-y:auto}
   .pbox.on{display:block}
@@ -149,8 +152,8 @@
   </div>
 
   <div class="pbox" id="pbox">
-    <h4>🎨 Renk paletin</h4>
-    <div class="ph">Her renge bir getirme ücreti verirsin; haritayı o renkle boyarsın. Bir rengin ücretini değiştirirsen o renkle boyadığın tüm bölgeler de güncellenir.</div>
+    <h4 id="pboxBaslik">🎨 Renk paleti</h4>
+    <div class="ph" id="pboxAcik"></div>
     <div id="prows"></div>
     <div class="pfoot">
       <button class="ek" onclick="paletSatirEkle()">+ Renk</button>
@@ -190,28 +193,43 @@ const HINTS = {
 };
 
 /* ---------- RENK PALETİ (restoran kendi düzenler) ---------- */
-const PALET_VARSAYILAN = [
-  { c:"#22C55E", u:0  },
-  { c:"#A3E635", u:20 },
-  { c:"#FACC15", u:30 },
-  { c:"#FB923C", u:45 },
-  { c:"#F43F5E", u:60 },
-  { c:"#A855F7", u:90 }
-];
-const PALET_KEY = "yc_palet_" + REST;
-let PALET = [], aktifRenk = 1;
+const PALET_VARSAYILAN = {
+  min: [
+    { c:"#22C55E", u:100 },
+    { c:"#A3E635", u:200 },
+    { c:"#FACC15", u:300 },
+    { c:"#FB923C", u:400 },
+    { c:"#F43F5E", u:500 },
+    { c:"#A855F7", u:600 }
+  ],
+  ucret: [
+    { c:"#22C55E", u:0  },
+    { c:"#A3E635", u:20 },
+    { c:"#FACC15", u:30 },
+    { c:"#FB923C", u:45 },
+    { c:"#F43F5E", u:60 },
+    { c:"#A855F7", u:90 }
+  ]
+};
+const MOD_ETIKET = { min:"🧺 Min. sepet", ucret:"🛵 Getirme" };
+const PALET_KEY = "yc_palet2_" + REST;
+let PALETLER = JSON.parse(JSON.stringify(PALET_VARSAYILAN));
+let boyaMod = "min", aktifRenk = { min:0, ucret:1 };
 try{
   const kayit = JSON.parse(localStorage.getItem(PALET_KEY) || "null");
-  PALET = (Array.isArray(kayit) && kayit.length >= 2) ? kayit : PALET_VARSAYILAN.map(x => Object.assign({}, x));
-}catch(e){ PALET = PALET_VARSAYILAN.map(x => Object.assign({}, x)); }
+  if(kayit && Array.isArray(kayit.min) && Array.isArray(kayit.ucret)) PALETLER = kayit;
+}catch(e){}
 
-function paletYaz(){ try{ localStorage.setItem(PALET_KEY, JSON.stringify(PALET)); }catch(e){} }
+function palet(){ return PALETLER[boyaMod]; }
+function paletYaz(){ try{ localStorage.setItem(PALET_KEY, JSON.stringify(PALETLER)); }catch(e){} }
+function zDeger(z){ return Number(boyaMod === "min" ? z.min_sepet : z.ucret) || 0; }
 function feeColor(u){
   u = Number(u)||0;
-  const tam = PALET.find(p => Number(p.u) === u);
+  const P = palet();
+  const tam = P.find(p => Number(p.u) === u);
   if(tam) return tam.c;
-  let en = PALET[0];
-  PALET.forEach(p => { if(Math.abs(Number(p.u)-u) < Math.abs(Number(en.u)-u)) en = p; });
+  let en = P[0];
+  P.forEach(p => { if(Math.abs(Number(p.u)-u) < Math.abs(Number(en.u)-u)) en = p; });
   return en ? en.c : "#9FE1CB";
 }
 function koyuMu(hex){
@@ -220,40 +238,66 @@ function koyuMu(hex){
 }
 function paletCiz(){
   const el = $("palbar");
-  el.innerHTML = PALET.map((p,i) =>
-    `<div class="pchip ${i===aktifRenk?"on":""}" style="background:${p.c};color:${koyuMu(p.c)?"#fff":"#10231a"}" onclick="renkSec(${i})">${Number(p.u)===0?"Ücretsiz":Number(p.u)+"₺"}</div>`
-  ).join("") + `<button class="pedit" onclick="paletAc()">🎨 Renkleri düzenle</button>`;
+  const modBtn = ["min","ucret"].map(m =>
+    `<div class="mchip ${m===boyaMod?"on":""}" onclick="boyaModSec('${m}')">${MOD_ETIKET[m]}</div>`
+  ).join("");
+  el.innerHTML = modBtn + `<span class="ayirac"></span>` + palet().map((p,i) =>
+    `<div class="pchip ${i===aktifRenk[boyaMod]?"on":""}" style="background:${p.c};color:${koyuMu(p.c)?"#fff":"#10231a"}" onclick="renkSec(${i})">${chipYazi(p.u)}</div>`
+  ).join("") + `<button class="pedit" onclick="paletAc()">🎨 Düzenle</button>`;
 }
-function renkSec(i){ aktifRenk = i; paletCiz(); }
+function chipYazi(u){
+  u = Number(u)||0;
+  if(boyaMod === "min") return u === 0 ? "Yok" : u + "₺";
+  return u === 0 ? "Ücretsiz" : u + "₺";
+}
+function renkSec(i){ aktifRenk[boyaMod] = i; paletCiz(); }
+function boyaModSec(m){
+  boyaMod = m; paletCiz();
+  zones.forEach(z => { const c = feeColor(zDeger(z)); z.layer.setStyle({ color:c, fillColor:c }); etiketYaz(z); });
+  renderList();
+  toast(m === "min" ? "Minimum sepet tutarını boyuyorsun" : "Getirme ücretini boyuyorsun");
+}
 function paletAc(){
-  $("prows").innerHTML = PALET.map((p,i) =>
-    `<div class="prow"><span>${i+1}</span><input type="color" value="${p.c}" onchange="PALET[${i}].c=this.value">
-     <input type="number" inputmode="numeric" value="${p.u}" placeholder="Ücret ₺" data-i="${i}" class="pu">
-     ${PALET.length>2?`<button class="sil" onclick="paletSatirSil(${i})">🗑</button>`:""}</div>`
+  $("pboxBaslik").textContent = boyaMod === "min" ? "🧺 Minimum sepet paleti" : "🛵 Getirme ücreti paleti";
+  $("pboxAcik").textContent = boyaMod === "min"
+    ? "Her renk bir minimum sepet tutarını gösterir. Bölgeyi o renkle boyarsan, oradaki müşteri o tutarın altında sipariş veremez. Bir rengin tutarını değiştirirsen o renkle boyadığın tüm bölgeler güncellenir."
+    : "Her renk bir getirme ücretini gösterir. Ücretsiz teslimat için 0 yaz. Bir rengin ücretini değiştirirsen o renkle boyadığın tüm bölgeler güncellenir.";
+  $("prows").innerHTML = palet().map((p,i) =>
+    `<div class="prow"><span>${i+1}</span><input type="color" value="${p.c}" onchange="PALETLER['${boyaMod}'][${i}].c=this.value">
+     <input type="number" inputmode="numeric" value="${p.u}" placeholder="${boyaMod==="min"?"Min. sepet ₺":"Ücret ₺"}" data-i="${i}" class="pu">
+     ${palet().length>2?`<button class="sil" onclick="paletSatirSil(${i})">🗑</button>`:""}</div>`
   ).join("");
   $("pbox").classList.add("on");
 }
 function paletSatirEkle(){
-  if(PALET.length >= 8){ toast("En fazla 8 renk"); return; }
-  PALET.push({ c:"#38BDF8", u: (Number(PALET[PALET.length-1].u)||0) + 15 });
+  const P = palet();
+  if(P.length >= 8){ toast("En fazla 8 renk"); return; }
+  P.push({ c:"#38BDF8", u: (Number(P[P.length-1].u)||0) + (boyaMod === "min" ? 100 : 15) });
   paletAc();
 }
-function paletSatirSil(i){ PALET.splice(i,1); if(aktifRenk >= PALET.length) aktifRenk = PALET.length-1; paletAc(); }
-function paletSifirla(){ PALET = PALET_VARSAYILAN.map(x => Object.assign({}, x)); aktifRenk = 1; paletAc(); }
+function paletSatirSil(i){
+  palet().splice(i,1);
+  if(aktifRenk[boyaMod] >= palet().length) aktifRenk[boyaMod] = palet().length-1;
+  paletAc();
+}
+function paletSifirla(){
+  PALETLER[boyaMod] = PALET_VARSAYILAN[boyaMod].map(x => Object.assign({}, x));
+  aktifRenk[boyaMod] = 0; paletAc();
+}
 function paletKaydet(){
-  const eski = PALET.map(p => Number(p.u));
+  const P = palet();
+  const eski = P.map(p => Number(p.u));
   document.querySelectorAll("#prows .pu").forEach(inp => {
     const i = +inp.dataset.i;
-    if(PALET[i]) PALET[i].u = Math.max(0, Math.round(Number(inp.value)||0));
+    if(P[i]) P[i].u = Math.max(0, Math.round(Number(inp.value)||0));
   });
-  // ücreti değişen renklerle boyanmış bölgeleri güncelle
   let guncel = 0;
-  PALET.forEach((p,i) => {
+  P.forEach((p,i) => {
     const yeni = Number(p.u), onceki = eski[i];
     if(onceki === undefined || yeni === onceki) return;
     zones.forEach(z => {
-      if(Number(z.ucret) === onceki){
-        z.ucret = yeni;
+      if(zDeger(z) === onceki){
+        if(boyaMod === "min") z.min_sepet = yeni; else z.ucret = yeni;
         const col = feeColor(yeni);
         z.layer.setStyle({ color:col, fillColor:col }); etiketYaz(z);
         guncel++; dirty = true;
@@ -265,7 +309,9 @@ function paletKaydet(){
   toast(guncel ? `Palet kaydedildi · ${guncel} bölge güncellendi` : "Palet kaydedildi");
 }
 function toast(t){ const el=$("toast"); el.textContent=t; el.classList.add("on"); setTimeout(()=>el.classList.remove("on"), 2200); }
-function curFee(){ const p = PALET[aktifRenk] || PALET[0]; return Math.max(0, Math.round(Number(p && p.u) || 0)); }
+function seciliDeger(){ const p = palet()[aktifRenk[boyaMod]] || palet()[0]; return Math.max(0, Math.round(Number(p && p.u) || 0)); }
+function yeniDegerler(){ return boyaMod === "min" ? { min_sepet: seciliDeger(), ucret: 0 } : { min_sepet: 0, ucret: seciliDeger() }; }
+function degerYazi(v){ return boyaMod === "min" ? (v === 0 ? "min. yok" : "min " + v + "₺") : (v === 0 ? "ücretsiz" : v + "₺"); }
 
 /* ---------- başlat (çağrı en altta) ---------- */
 async function init(){
@@ -285,7 +331,7 @@ async function init(){
       gj = l.toGeoJSON().geometry;
     }
     map.removeLayer(l);
-    addZone(gj, curFee(), "Çizim bölgesi");
+    addZone(gj, yeniDegerler(), "Çizim bölgesi");
     toast("Bölge eklendi");
   });
 
@@ -301,7 +347,7 @@ async function init(){
     $("rSub").textContent = (d.zones && d.zones.length) ? `${d.zones.length} bölge kayıtlı` : "henüz bölge yok — mesafeye göre ücret geçerli";
     (d.zones||[]).forEach(z => {
       const gj = typeof z.geom === "string" ? JSON.parse(z.geom) : z.geom;
-      addZone(gj, z.ucret, z.ad || "Bölge", true);
+      addZone(gj, { min_sepet: z.min_sepet, ucret: z.ucret }, z.ad || "Bölge", true);
     });
     dirty = false;
   }catch(e){ $("rSub").textContent = "bölgeler yüklenemedi"; }
@@ -375,7 +421,7 @@ function drawHexGrid(){
           if(turf.booleanPointInPolygon(turf.centroid(zones[k].gj), f.geometry)){ removeZone(k); temizlenen++; }
         }
         if(dolu){ toast(temizlenen > 1 ? `Petek temizlendi (${temizlenen} parça)` : "Petek çıkarıldı"); }
-        else { addZone(f.geometry, curFee(), "Petek"); toast(`Petek eklendi · ${curFee()}₺`); }
+        else { addZone(f.geometry, yeniDegerler(), "Petek"); toast(`Petek eklendi · ${degerYazi(seciliDeger())}`); }
       });
     }
   }).addTo(map);
@@ -383,19 +429,24 @@ function drawHexGrid(){
 }
 
 /* ---------- bölge ekle/çıkar ---------- */
-function zEtiket(u){ return Number(u) === 0 ? "Ücretsiz" : (Number(u)||0) + "₺"; }
+function zEtiket(z){
+  const v = zDeger(z);
+  if(boyaMod === "min") return v === 0 ? "min yok" : "Min " + v + "₺";
+  return v === 0 ? "Ücretsiz" : v + "₺";
+}
 function etiketYaz(z){
-  const t = zEtiket(z.ucret);
+  const t = zEtiket(z);
   const tt = z.layer.getTooltip();
   if(tt) tt.setContent(t);
   else z.layer.bindTooltip(t, { permanent:true, direction:"center", className:"ftag" });
 }
-function addZone(gj, ucret, ad, sessiz){
-  const col = feeColor(ucret);
-  const u = Number(ucret)||0;
+function addZone(gj, degerler, ad, sessiz){
+  const d = (typeof degerler === "object" && degerler !== null) ? degerler : { min_sepet:0, ucret:Number(degerler)||0 };
+  const z = { gj, min_sepet: Math.max(0, Math.round(Number(d.min_sepet)||0)), ucret: Math.max(0, Math.round(Number(d.ucret)||0)), ad: ad||"Bölge", layer: null };
+  const col = feeColor(zDeger(z));
   const layer = L.geoJSON(gj, { style:{ color:col, weight:2.5, fillColor:col, fillOpacity:.45, opacity:.95 } }).addTo(map);
-  layer.bindTooltip(zEtiket(u), { permanent:true, direction:"center", className:"ftag" });
-  const z = { gj, ucret:u, ad:ad||"Bölge", layer };
+  z.layer = layer;
+  layer.bindTooltip(zEtiket(z), { permanent:true, direction:"center", className:"ftag" });
   zones.push(z);
   layer.on("click", ev => { L.DomEvent.stopPropagation(ev); openZonePopup(z, ev.latlng); });
   if(!sessiz) dirty = true;
@@ -415,20 +466,26 @@ function tumunuTemizle(){
 }
 function openZonePopup(z, latlng){
   const i = zones.indexOf(z); if(i<0) return;
-  const html = `<div class="pop"><b>${z.ad}</b> · ${z.ucret}₺<br>
-    <button onclick="setZoneFee(${i})">Ücreti değiştir</button>
+  const html = `<div class="pop"><b>${z.ad}</b><br>
+    🧺 Min. sepet: <b>${z.min_sepet ? z.min_sepet+"₺" : "yok"}</b> &nbsp; 🛵 Getirme: <b>${z.ucret ? z.ucret+"₺" : "ücretsiz"}</b><br>
+    <button onclick="setZoneVal(${i},'min')">🧺 Min. sepeti değiştir</button>
+    <button onclick="setZoneVal(${i},'ucret')">🛵 Getirme ücreti</button>
     <button onclick="splitZone(${i})">🍯 Böl</button>
     <button class="d" onclick="removeZone(${i});map.closePopup()">🗑 Sil</button></div>`;
   L.popup().setLatLng(latlng).setContent(html).openOn(map);
 }
-function setZoneFee(i){
+function setZoneVal(i, hangi){
   const z = zones[i]; if(!z) return;
-  const v = prompt(`"${z.ad}" bölgesinin getirme ücreti (₺):`, z.ucret);
+  const min = hangi === "min";
+  const simdi = min ? z.min_sepet : z.ucret;
+  const v = prompt(min ? `"${z.ad}" bölgesinde minimum sepet tutarı (₺, 0 = sınır yok):` : `"${z.ad}" bölgesinin getirme ücreti (₺, 0 = ücretsiz):`, simdi);
   if(v === null) return;
   const u = Math.max(0, Math.round(Number(v)||0));
-  const col = feeColor(u);
-  z.ucret = u; z.layer.setStyle({ color:col, fillColor:col }); etiketYaz(z);
-  dirty = true; renderList(); map.closePopup(); toast(`Ücret ${u}₺ yapıldı`);
+  if(min) z.min_sepet = u; else z.ucret = u;
+  const col = feeColor(zDeger(z));
+  z.layer.setStyle({ color:col, fillColor:col }); etiketYaz(z);
+  dirty = true; renderList(); map.closePopup();
+  toast(min ? `Min. sepet ${u}₺ yapıldı` : `Getirme ücreti ${u}₺ yapıldı`);
 }
 function splitZone(i){
   const z = zones[i]; if(!z) return;
@@ -445,9 +502,9 @@ function splitZone(i){
     else if(g.type === "MultiPolygon") g.coordinates.forEach(c => ekle({ type:"Polygon", coordinates:c }));
   });
   if(parts.length < 2){ toast("Bu bölge daha fazla bölünemiyor"); return; }
-  const eskiUcret = z.ucret;
+  const eski = { min_sepet: z.min_sepet, ucret: z.ucret };
   removeZone(i);
-  parts.forEach(p => addZone(p, eskiUcret, "Alt bölge", true));
+  parts.forEach(p => addZone(p, eski, "Alt bölge", true));
   dirty = true; renderList(); map.closePopup();
   toast(`${parts.length} parçaya bölündü — ücretlerini tek tek değiştirebilirsin`);
 }
@@ -458,8 +515,8 @@ paletCiz();
 function renderList(){
   $("zCnt").textContent = zones.length;
   $("zList").innerHTML = zones.length ? zones.map((z,i) =>
-    `<div class="zr"><span class="sw" style="background:${feeColor(z.ucret)}"></span>
-      <span class="zn">${z.ad}</span><span class="zu">${z.ucret}₺</span>
+    `<div class="zr"><span class="sw" style="background:${feeColor(zDeger(z))}"></span>
+      <span class="zn">${z.ad}</span><span class="zu">${z.min_sepet?("min "+z.min_sepet+"₺"):"min yok"}${z.ucret?(" · 🛵 "+z.ucret+"₺"):""}</span>
       <button onclick="map.fitBounds(zones[${i}].layer.getBounds())">🔍</button>
       <button onclick="removeZone(${i})">🗑</button></div>`
   ).join("") : '<div style="color:var(--txt3);font-size:12.5px;padding:8px 0 4px;line-height:1.7">Henüz bölge yok. Bölge eklemezsen <b style="color:var(--mint)">Ayarlar</b>\'daki mesafeye göre ücret (taban + km) geçerli olmaya devam eder.</div>';
@@ -488,9 +545,9 @@ function pickHood(i){
   const x = window._hood[i]; if(!x) return;
   const ad = x.display_name.split(",")[0];
   let gj = x.geojson;
-  if(gj && gj.type === "Polygon"){ addZone(gj, curFee(), ad); }
-  else if(gj && gj.type === "MultiPolygon"){ gj.coordinates.forEach(c => addZone({ type:"Polygon", coordinates:c }, curFee(), ad, true)); dirty=true; renderList(); }
-  else { addZone(turf.circle([Number(x.lon), Number(x.lat)], 1, { steps:48, units:"kilometers" }).geometry, curFee(), ad + " (1 km)"); }
+  if(gj && gj.type === "Polygon"){ addZone(gj, yeniDegerler(), ad); }
+  else if(gj && gj.type === "MultiPolygon"){ gj.coordinates.forEach(c => addZone({ type:"Polygon", coordinates:c }, yeniDegerler(), ad, true)); dirty=true; renderList(); }
+  else { addZone(turf.circle([Number(x.lon), Number(x.lat)], 1, { steps:48, units:"kilometers" }).geometry, yeniDegerler(), ad + " (1 km)"); }
   $("qres").classList.remove("on"); $("qh").value = "";
   const last = zones[zones.length-1]; if(last) map.fitBounds(last.layer.getBounds());
   toast(`${ad} eklendi · ${curFee()}₺`);
@@ -500,7 +557,7 @@ function pickHood(i){
 $("btnSave").onclick = async () => {
   const btn = $("btnSave"); btn.disabled = true; btn.textContent = "Kaydediliyor…";
   try{
-    const payload = { restaurant: REST, zones: zones.map(z => ({ ad:z.ad, ucret:z.ucret, geom:z.gj })) };
+    const payload = { restaurant: REST, zones: zones.map(z => ({ ad:z.ad, ucret:z.ucret, min_sepet:z.min_sepet, geom:z.gj })) };
     const r = await fetch(API.SAVE, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload) });
     const res = await r.json();
     if(res.ok){ dirty = false; toast(`✓ ${res.adet ?? zones.length} bölge kaydedildi`); $("rSub").textContent = `${zones.length} bölge kayıtlı`; }
