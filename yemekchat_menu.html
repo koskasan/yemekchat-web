@@ -436,6 +436,8 @@ async function draftInit(){
     items.forEach((it,i)=>{ cart["d"+i] = { item:{ name:it.name, price:Number(it.price) }, qty:Number(it.qty)||1 }; });
     draftNote = (d.note||"").trim();
     if(["null","undefined","="].includes(draftNote.toLowerCase())) draftNote = "";
+    minSepet   = Math.max(0, Math.round(Number(d.min_sepet) || 0));
+    deliveryFee = Math.max(0, Math.round(Number(d.teslimat_ucreti) || 0));
     $("hdName").textContent = d.restaurant_name;
     $("hdSub").textContent = "sepetin hazır · ödeme & adres";
     screen = 3; renderCart(); show();
