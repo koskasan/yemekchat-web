@@ -37,7 +37,7 @@
   .wrap{position:relative;height:calc(100% - 106px)}
   .leaflet-container{background:#0d140f}
 
-  .hint{position:absolute;left:10px;right:10px;bottom:10px;z-index:500;background:rgba(28,42,32,.94);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:12px;color:var(--txt2);line-height:1.6}
+  .hint{position:absolute;left:10px;right:10px;bottom:116px;z-index:500;background:rgba(28,42,32,.94);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:12px;color:var(--txt2);line-height:1.6}
   .hint b{color:var(--mint)}
   .hint .x{float:right;color:var(--txt3);cursor:pointer;font-size:14px;margin-left:8px}
 
@@ -54,7 +54,7 @@
   .zr .zu{color:var(--mint);font-weight:600}
   .zr button{background:none;border:none;color:var(--red);cursor:pointer;font-size:14px;padding:2px 4px}
 
-  .srch{position:absolute;left:10px;right:10px;top:10px;z-index:550;display:none}
+  .srch{position:absolute;left:56px;right:10px;top:10px;z-index:1100;display:none}
   .srch.on{display:block}
   .srch .row{display:flex;gap:7px}
   .srch input{flex:1;background:rgba(28,42,32,.96);border:1px solid var(--line);border-radius:11px;padding:12px;font-size:14px;color:var(--txt);font-family:inherit}
@@ -74,8 +74,11 @@
   .ftag::before{display:none}
 
   /* renk açıklaması */
-  .lgnd{position:absolute;left:10px;bottom:58px;z-index:500;background:rgba(28,42,32,.94);border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:11px;color:var(--txt2);line-height:1.9}
-  .lgnd i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+  .lgnd{position:absolute;left:10px;bottom:56px;z-index:500;background:rgba(28,42,32,.94);border:1px solid var(--line);border-radius:10px;padding:7px 9px;font-size:10.5px;color:var(--txt2);line-height:1.75}
+  .lgnd i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+  .lgnd .att{color:var(--muted);font-size:9.5px;margin-top:3px;padding-top:3px;border-top:1px solid var(--line)}
+  .lgnd.kapali{padding:6px 9px}
+  .lgnd .tgl{color:var(--txt3);cursor:pointer;font-weight:700}
 
   .pop b{color:#04342C}
   .leaflet-popup-content{margin:10px 12px;font-size:13px}
@@ -171,12 +174,11 @@ function feeColor(u){
 function toast(t){ const el=$("toast"); el.textContent=t; el.classList.add("on"); setTimeout(()=>el.classList.remove("on"), 2200); }
 function curFee(){ return Math.max(0, Math.round(Number($("fee").value)||0)); }
 
-/* ---------- başlat ---------- */
-init();
+/* ---------- başlat (çağrı en altta) ---------- */
 async function init(){
   $("rName").textContent = REST;
-  map = L.map("map", { zoomControl:true, attributionControl:true }).setView([39.925, 32.866], 14);
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom:19, attribution:"© OpenStreetMap" }).addTo(map);
+  map = L.map("map", { zoomControl:true, attributionControl:false }).setView([39.925, 32.866], 14);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom:19 }).addTo(map);
   setMode("hex");
 
   map.pm.setGlobalOptions({ pathOptions:{ color:"#9FE1CB", weight:2, fillOpacity:.28 } });
@@ -336,8 +338,18 @@ function splitZone(i){
   toast(`${parts.length} alt peteğe bölündü — ücretlerini tek tek değiştirebilirsin`);
 }
 
-/* ---------- renk açıklaması ---------- */
-$("lgnd").innerHTML = FEE_TIERS.map(t => `<div><i style="background:${t.c}"></i>${t.t}</div>`).join("");
+/* ---------- renk açıklaması (dokununca kapanır) ---------- */
+let lgndAcik = true;
+function lgndCiz(){
+  const el = $("lgnd");
+  el.classList.toggle("kapali", !lgndAcik);
+  el.innerHTML = lgndAcik
+    ? FEE_TIERS.map(t => `<div><i style="background:${t.c}"></i>${t.t}</div>`).join("") +
+      `<div class="att">© OpenStreetMap · <span class="tgl" onclick="lgndAcKapa()">gizle ✕</span></div>`
+    : `<div class="tgl" onclick="lgndAcKapa()">🎨 Renkler</div>`;
+}
+function lgndAcKapa(){ lgndAcik = !lgndAcik; lgndCiz(); }
+lgndCiz();
 
 /* ---------- liste ---------- */
 function renderList(){
@@ -394,7 +406,10 @@ $("btnSave").onclick = async () => {
   btn.disabled = false; btn.textContent = "💾 Kaydet";
 };
 window.addEventListener("beforeunload", e => { if(dirty){ e.preventDefault(); e.returnValue = ""; } });
-map.on("moveend zoomend", () => { if(mode==="hex") drawHexGrid(); });
+/* ---------- HER ŞEY TANIMLANDIKTAN SONRA BAŞLAT ---------- */
+init().then(() => {
+  map.on("moveend zoomend", () => { if(mode==="hex") drawHexGrid(); });
+});
 </script>
 </body>
 </html>
