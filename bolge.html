@@ -274,9 +274,14 @@ function drawHexGrid(){
     style:{ color:"#4a6b57", weight:1, fillOpacity:.05, fillColor:"#9FE1CB" },
     onEachFeature: (f, layer) => {
       layer.on("click", () => {
-        const c = turf.centroid(f).geometry.coordinates;
-        const hit = zones.findIndex(z => turf.booleanPointInPolygon(turf.point(c), z.gj));
-        if(hit >= 0){ removeZone(hit); toast("Petek çıkarıldı"); }
+        const c = turf.centroid(f);
+        const dolu = zones.some(z => turf.booleanPointInPolygon(c, z.gj));
+        // bu peteğin içinde kalan her şeyi (alt bölgeler dahil) temizle
+        let temizlenen = 0;
+        for(let k = zones.length - 1; k >= 0; k--){
+          if(turf.booleanPointInPolygon(turf.centroid(zones[k].gj), f.geometry)){ removeZone(k); temizlenen++; }
+        }
+        if(dolu){ toast(temizlenen > 1 ? `Petek temizlendi (${temizlenen} parça)` : "Petek çıkarıldı"); }
         else { addZone(f.geometry, curFee(), "Petek"); toast(`Petek eklendi · ${curFee()}₺`); }
       });
     }
@@ -328,14 +333,24 @@ function setZoneFee(i){
 }
 function splitZone(i){
   const z = zones[i]; if(!z) return;
-  const small = hexesInBounds(z.layer.getBounds(), HEX_R / SUB_DIVIDE, 400);
-  const parts = small.filter(f => turf.booleanPointInPolygon(turf.centroid(f), z.gj));
-  if(!parts.length){ toast("Bu bölge bölünemedi"); return; }
+  const ust = { type:"Feature", properties:{}, geometry: z.gj };
+  const cells = hexesInBounds(z.layer.getBounds(), HEX_R / SUB_DIVIDE, 600);
+  const parts = [];
+  cells.forEach(f => {
+    let kesisim = null;
+    try{ kesisim = turf.intersect(f, ust); }catch(e){ kesisim = null; }
+    if(!kesisim) return;
+    const g = kesisim.geometry;
+    const ekle = poly => { if(turf.area({ type:"Feature", properties:{}, geometry:poly }) > 1) parts.push(poly); };
+    if(g.type === "Polygon") ekle(g);
+    else if(g.type === "MultiPolygon") g.coordinates.forEach(c => ekle({ type:"Polygon", coordinates:c }));
+  });
+  if(parts.length < 2){ toast("Bu bölge daha fazla bölünemiyor"); return; }
   const eskiUcret = z.ucret;
   removeZone(i);
-  parts.forEach(p => addZone(p.geometry, eskiUcret, "Alt petek", true));
+  parts.forEach(p => addZone(p, eskiUcret, "Alt bölge", true));
   dirty = true; renderList(); map.closePopup();
-  toast(`${parts.length} alt peteğe bölündü — ücretlerini tek tek değiştirebilirsin`);
+  toast(`${parts.length} parçaya bölündü — ücretlerini tek tek değiştirebilirsin`);
 }
 
 /* ---------- renk açıklaması (dokununca kapanır) ---------- */
