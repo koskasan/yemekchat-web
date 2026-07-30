@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>YemekChat - Teslimat Bölgeleri</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.14.2/dist/leaflet-geoman.css">
+<style>
+  :root{
+    --bg:#111B14; --card:#1C2A20; --card2:#243530; --line:#2C3E32;
+    --txt:#F1EFE8; --txt2:#B4B2A9; --txt3:#888780; --muted:#5F5E5A;
+    --green:#1D9E75; --greenDark:#04342C; --mint:#9FE1CB; --red:#E24B4A;
+    --amber:#EF9F27; --blue:#378ADD;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%;background:var(--bg);color:var(--txt);font-family:-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
+
+  .top{background:var(--card);padding:10px 12px;display:flex;align-items:center;gap:10px;border-bottom:.5px solid var(--line)}
+  .top .logo{width:32px;height:32px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;color:#FCEBEB;font-weight:700;font-size:13px;flex-shrink:0}
+  .top .nm{font-size:14px;font-weight:600}
+  .top .sb{font-size:11px;color:var(--mint)}
+  .top .sp{margin-left:auto;display:flex;gap:7px}
+  .btn{background:var(--card2);border:none;color:var(--txt2);border-radius:9px;padding:9px 13px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+  .btn.pri{background:var(--green);color:var(--greenDark)}
+  .btn.gh{background:none;color:var(--txt3)}
+
+  .bar{background:var(--card);padding:9px 12px;display:flex;gap:7px;align-items:center;overflow-x:auto;border-bottom:.5px solid var(--line);scrollbar-width:none}
+  .bar::-webkit-scrollbar{display:none}
+  .mode{flex-shrink:0;background:var(--bg);border:1px solid var(--line);color:var(--txt2);border-radius:18px;padding:8px 14px;font-size:13px;cursor:pointer;white-space:nowrap}
+  .mode.on{background:var(--green);border-color:var(--green);color:var(--greenDark);font-weight:600}
+  .fee{flex-shrink:0;display:flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--line);border-radius:18px;padding:5px 8px 5px 12px;margin-left:auto}
+  .fee span{font-size:12px;color:var(--txt3)}
+  .fee input{width:64px;background:var(--card2);border:none;border-radius:12px;padding:7px;font-size:13px;color:var(--txt);text-align:center;font-family:inherit}
+
+  #map{position:absolute;left:0;right:0;top:0;bottom:0;background:#0d140f}
+  .wrap{position:relative;height:calc(100% - 106px)}
+  .leaflet-container{background:#0d140f}
+
+  .hint{position:absolute;left:10px;right:10px;bottom:10px;z-index:500;background:rgba(28,42,32,.94);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:12px;color:var(--txt2);line-height:1.6}
+  .hint b{color:var(--mint)}
+  .hint .x{float:right;color:var(--txt3);cursor:pointer;font-size:14px;margin-left:8px}
+
+  .sheet{position:absolute;left:0;right:0;bottom:0;z-index:600;background:var(--card);border-top:1px solid var(--line);border-radius:16px 16px 0 0;max-height:56%;display:flex;flex-direction:column;transform:translateY(calc(100% - 46px));transition:transform .22s}
+  .sheet.open{transform:translateY(0)}
+  .sheet .hd{padding:14px 16px;display:flex;align-items:center;gap:8px;cursor:pointer;flex-shrink:0}
+  .sheet .hd h4{font-size:13px;font-weight:600}
+  .sheet .hd .cnt{font-size:11px;color:var(--mint);background:var(--card2);padding:2px 8px;border-radius:10px}
+  .sheet .hd .ar{margin-left:auto;color:var(--txt3)}
+  .sheet .bd{padding:0 16px 18px;overflow-y:auto}
+  .zr{display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:.5px solid var(--line);font-size:13px}
+  .zr .sw{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+  .zr .zn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .zr .zu{color:var(--mint);font-weight:600}
+  .zr button{background:none;border:none;color:var(--red);cursor:pointer;font-size:14px;padding:2px 4px}
+
+  .srch{position:absolute;left:10px;right:10px;top:10px;z-index:550;display:none}
+  .srch.on{display:block}
+  .srch .row{display:flex;gap:7px}
+  .srch input{flex:1;background:rgba(28,42,32,.96);border:1px solid var(--line);border-radius:11px;padding:12px;font-size:14px;color:var(--txt);font-family:inherit}
+  .srch .res{background:rgba(28,42,32,.98);border:1px solid var(--line);border-radius:11px;margin-top:6px;overflow:hidden;display:none}
+  .srch .res.on{display:block}
+  .srch .res div{padding:11px 13px;font-size:13px;border-bottom:.5px solid var(--line);cursor:pointer}
+  .srch .res div:last-child{border-bottom:none}
+
+  .toast{position:absolute;left:50%;top:14px;transform:translateX(-50%);z-index:700;background:var(--greenDark);color:var(--mint);border:1px solid var(--green);padding:10px 16px;border-radius:20px;font-size:13px;font-weight:600;display:none}
+  .toast.on{display:block}
+  .pop b{color:#04342C}
+  .leaflet-popup-content{margin:10px 12px;font-size:13px}
+  .leaflet-popup-content button{background:var(--card2);border:none;color:var(--txt);border-radius:8px;padding:7px 10px;font-size:12px;margin:6px 4px 0 0;cursor:pointer}
+  .leaflet-popup-content button.d{background:#3a1715;color:#F09595}
+  .leaflet-popup-content-wrapper{background:var(--card);color:var(--txt)}
+  .leaflet-popup-tip{background:var(--card)}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="logo">YC</div>
+  <div>
+    <div class="nm" id="rName">Teslimat Bölgeleri</div>
+    <div class="sb" id="rSub">yükleniyor…</div>
+  </div>
+  <div class="sp">
+    <button class="btn gh" onclick="location.href='restoran.html'">← Panel</button>
+    <button class="btn pri" id="btnSave">💾 Kaydet</button>
+  </div>
+</div>
+
+<div class="bar">
+  <div class="mode on" data-m="hex">🍯 Petek</div>
+  <div class="mode" data-m="draw">✏️ Çizim</div>
+  <div class="mode" data-m="hood">🏘️ Mahalle</div>
+  <div class="fee"><span>Ücret</span><input id="fee" type="number" inputmode="numeric" value="20"><span>₺</span></div>
+</div>
+
+<div class="wrap">
+  <div id="map"></div>
+
+  <div class="srch" id="srch">
+    <div class="row"><input id="qh" placeholder="Mahalle / semt adı yaz (örn. Kızılay, Etlik)"></div>
+    <div class="res" id="qres"></div>
+  </div>
+
+  <div class="hint" id="hint"><span class="x" onclick="document.getElementById('hint').style.display='none'">✕</span><span id="hintTxt"></span></div>
+
+  <div class="sheet" id="sheet">
+    <div class="hd" onclick="document.getElementById('sheet').classList.toggle('open')">
+      <h4>Bölgelerim</h4><span class="cnt" id="zCnt">0</span><span class="ar">⌃</span>
+    </div>
+    <div class="bd" id="zList"></div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
+<script src="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.14.2/dist/leaflet-geoman.min.js"></script>
+<script>
+// ===================== AYAR =====================
+const API = {
+  ZONES: "https://webhook.yemekchat.com/webhook/panel-zones",
+  SAVE:  "https://webhook.yemekchat.com/webhook/panel-zones-save"
+};
+const HEX_SIDE_KM = 0.25;   // ~500 m genişlikte petek
+const SUB_DIVIDE   = 3;     // "Böl" ile kaça bölünsün (kenar/3 → ~170 m)
+// ================================================
+
+const REST = localStorage.getItem("yc_rest");
+if(!REST){ location.href = "restoran.html"; }
+
+let map, zones = [], mode = "hex", hexLayer = null, dirty = false;
+const $ = id => document.getElementById(id);
+
+const HINTS = {
+  hex:  "<b>🍯 Petek modu:</b> haritayı yaklaştır, altıgenlere dokunarak bölgeni boya. Bir peteğe tekrar dokunursan çıkarır. Boyalı peteğe dokunup <b>Böl</b> dersen daha küçük peteklere ayrılır — sokak sokak ücret verebilirsin.",
+  draw: "<b>✏️ Çizim modu:</b> sağdaki araçlarla poligon, daire veya dikdörtgen çiz. Çizdiğin alan üstteki ücretle bölge olur. Şekli sonradan sürükleyip düzenleyebilirsin.",
+  hood: "<b>🏘️ Mahalle modu:</b> yukarıya mahalle/semt adı yaz, listeden seç — sınırları otomatik çizilir. Sınır bulunamazsa 1 km'lik daire eklenir, sen düzeltirsin."
+};
+
+function feeColor(u){
+  u = Number(u)||0;
+  if(u === 0)  return "#1D9E75";
+  if(u <= 25)  return "#9FE1CB";
+  if(u <= 50)  return "#EF9F27";
+  if(u <= 90)  return "#E2864A";
+  return "#E24B4A";
+}
+function toast(t){ const el=$("toast"); el.textContent=t; el.classList.add("on"); setTimeout(()=>el.classList.remove("on"), 2200); }
+function curFee(){ return Math.max(0, Math.round(Number($("fee").value)||0)); }
+
+/* ---------- başlat ---------- */
+init();
+async function init(){
+  $("rName").textContent = REST;
+  map = L.map("map", { zoomControl:true, attributionControl:true }).setView([39.925, 32.866], 14);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom:19, attribution:"© OpenStreetMap" }).addTo(map);
+  setMode("hex");
+
+  map.pm.setGlobalOptions({ pathOptions:{ color:"#9FE1CB", weight:2, fillOpacity:.28 } });
+  map.on("pm:create", e => {
+    const l = e.layer;
+    let gj;
+    if(l instanceof L.Circle){
+      const c = l.getLatLng();
+      gj = turf.circle([c.lng, c.lat], l.getRadius()/1000, { steps:48, units:"kilometers" }).geometry;
+    } else {
+      gj = l.toGeoJSON().geometry;
+    }
+    map.removeLayer(l);
+    addZone(gj, curFee(), "Çizim bölgesi");
+    toast("Bölge eklendi");
+  });
+
+  try{
+    const r = await fetch(`${API.ZONES}?restaurant=${encodeURIComponent(REST)}`);
+    const d = await r.json();
+    const lat = Number(d.latitude), lng = Number(d.longitude);
+    if(lat && lng){ map.setView([lat, lng], 15); L.circleMarker([lat,lng],{radius:7,color:"#E24B4A",fillColor:"#E24B4A",fillOpacity:1}).addTo(map).bindTooltip("Restoran"); }
+    $("rSub").textContent = (d.zones && d.zones.length) ? `${d.zones.length} bölge kayıtlı` : "henüz bölge yok — mesafeye göre ücret geçerli";
+    (d.zones||[]).forEach(z => {
+      const gj = typeof z.geom === "string" ? JSON.parse(z.geom) : z.geom;
+      addZone(gj, z.ucret, z.ad || "Bölge", true);
+    });
+    dirty = false;
+  }catch(e){ $("rSub").textContent = "bölgeler yüklenemedi"; }
+}
+
+/* ---------- mod ---------- */
+document.querySelectorAll(".mode").forEach(m => m.onclick = () => setMode(m.dataset.m));
+function setMode(m){
+  mode = m;
+  document.querySelectorAll(".mode").forEach(x => x.classList.toggle("on", x.dataset.m===m));
+  $("hintTxt").innerHTML = HINTS[m];
+  $("hint").style.display = "block";
+  $("srch").classList.toggle("on", m==="hood");
+  if(map){
+    map.pm.removeControls();
+    if(m==="draw"){
+      map.pm.addControls({ position:"topright", drawMarker:false, drawPolyline:false, drawText:false, drawCircleMarker:false, cutPolygon:false, rotateMode:false });
+    }
+    if(m==="hex") drawHexGrid(); else clearHexGrid();
+  }
+}
+
+/* ---------- petek ızgarası ---------- */
+function clearHexGrid(){ if(hexLayer){ map.removeLayer(hexLayer); hexLayer=null; } }
+function drawHexGrid(side){
+  clearHexGrid();
+  if(map.getZoom() < 13){ toast("Petekler için haritayı yaklaştır"); return; }
+  const b = map.getBounds();
+  const bbox = [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()];
+  const grid = turf.hexGrid(bbox, side || HEX_SIDE_KM, { units:"kilometers" });
+  if(grid.features.length > 1600){ toast("Alan çok geniş, biraz yaklaş"); return; }
+  hexLayer = L.geoJSON(grid, {
+    style:{ color:"#4a6b57", weight:1, fillOpacity:.05, fillColor:"#9FE1CB" },
+    onEachFeature: (f, layer) => {
+      layer.on("click", () => {
+        const c = turf.centroid(f).geometry.coordinates;
+        const hit = zones.findIndex(z => turf.booleanPointInPolygon(turf.point(c), z.gj));
+        if(hit >= 0){ removeZone(hit); toast("Petek çıkarıldı"); }
+        else { addZone(f.geometry, curFee(), "Petek"); toast(`Petek eklendi · ${curFee()}₺`); }
+      });
+    }
+  }).addTo(map);
+  hexLayer.bringToBack();
+}
+
+/* ---------- bölge ekle/çıkar ---------- */
+function addZone(gj, ucret, ad, sessiz){
+  const col = feeColor(ucret);
+  const layer = L.geoJSON(gj, { style:{ color:col, weight:2, fillColor:col, fillOpacity:.32 } }).addTo(map);
+  const z = { gj, ucret:Number(ucret)||0, ad:ad||"Bölge", layer };
+  zones.push(z);
+  layer.on("click", ev => { L.DomEvent.stopPropagation(ev); openZonePopup(z, ev.latlng); });
+  if(!sessiz) dirty = true;
+  renderList();
+  return z;
+}
+function removeZone(i){
+  if(!zones[i]) return;
+  map.removeLayer(zones[i].layer);
+  zones.splice(i,1); dirty = true; renderList();
+}
+function openZonePopup(z, latlng){
+  const i = zones.indexOf(z); if(i<0) return;
+  const html = `<div class="pop"><b>${z.ad}</b> · ${z.ucret}₺<br>
+    <button onclick="setZoneFee(${i})">Ücreti değiştir</button>
+    <button onclick="splitZone(${i})">🍯 Böl</button>
+    <button class="d" onclick="removeZone(${i});map.closePopup()">🗑 Sil</button></div>`;
+  L.popup().setLatLng(latlng).setContent(html).openOn(map);
+}
+function setZoneFee(i){
+  const z = zones[i]; if(!z) return;
+  const v = prompt(`"${z.ad}" bölgesinin getirme ücreti (₺):`, z.ucret);
+  if(v === null) return;
+  const u = Math.max(0, Math.round(Number(v)||0));
+  const col = feeColor(u);
+  z.ucret = u; z.layer.setStyle({ color:col, fillColor:col });
+  dirty = true; renderList(); map.closePopup(); toast(`Ücret ${u}₺ yapıldı`);
+}
+function splitZone(i){
+  const z = zones[i]; if(!z) return;
+  const b = turf.bbox(z.gj);
+  const small = turf.hexGrid(b, HEX_SIDE_KM/SUB_DIVIDE, { units:"kilometers" });
+  const parts = small.features.filter(f => turf.booleanPointInPolygon(turf.centroid(f), z.gj));
+  if(!parts.length){ toast("Bu bölge bölünemedi"); return; }
+  const eskiUcret = z.ucret;
+  removeZone(i);
+  parts.forEach(p => addZone(p.geometry, eskiUcret, "Alt petek", true));
+  dirty = true; renderList(); map.closePopup();
+  toast(`${parts.length} alt peteğe bölündü — ücretlerini tek tek değiştirebilirsin`);
+}
+
+/* ---------- liste ---------- */
+function renderList(){
+  $("zCnt").textContent = zones.length;
+  $("zList").innerHTML = zones.length ? zones.map((z,i) =>
+    `<div class="zr"><span class="sw" style="background:${feeColor(z.ucret)}"></span>
+      <span class="zn">${z.ad}</span><span class="zu">${z.ucret}₺</span>
+      <button onclick="map.fitBounds(zones[${i}].layer.getBounds())">🔍</button>
+      <button onclick="removeZone(${i})">🗑</button></div>`
+  ).join("") : '<div style="color:var(--txt3);font-size:12.5px;padding:8px 0 4px;line-height:1.7">Henüz bölge yok. Bölge eklemezsen <b style="color:var(--mint)">Ayarlar</b>\'daki mesafeye göre ücret (taban + km) geçerli olmaya devam eder.</div>';
+}
+
+/* ---------- mahalle arama (OpenStreetMap) ---------- */
+let qTimer = null;
+$("qh").addEventListener("input", () => {
+  clearTimeout(qTimer);
+  const q = $("qh").value.trim();
+  if(q.length < 3){ $("qres").classList.remove("on"); return; }
+  qTimer = setTimeout(() => searchHood(q), 700);
+});
+async function searchHood(q){
+  try{
+    const u = `https://nominatim.openstreetmap.org/search?format=json&polygon_geojson=1&countrycodes=tr&limit=6&q=${encodeURIComponent(q)}`;
+    const r = await fetch(u, { headers:{ "Accept-Language":"tr" } });
+    const d = await r.json();
+    if(!d.length){ $("qres").innerHTML = '<div style="color:var(--txt3)">Sonuç yok</div>'; $("qres").classList.add("on"); return; }
+    window._hood = d;
+    $("qres").innerHTML = d.map((x,i) => `<div onclick="pickHood(${i})">${x.display_name.split(",").slice(0,3).join(",")}</div>`).join("");
+    $("qres").classList.add("on");
+  }catch(e){ toast("Arama yapılamadı"); }
+}
+function pickHood(i){
+  const x = window._hood[i]; if(!x) return;
+  const ad = x.display_name.split(",")[0];
+  let gj = x.geojson;
+  if(gj && gj.type === "Polygon"){ addZone(gj, curFee(), ad); }
+  else if(gj && gj.type === "MultiPolygon"){ gj.coordinates.forEach(c => addZone({ type:"Polygon", coordinates:c }, curFee(), ad, true)); dirty=true; renderList(); }
+  else { addZone(turf.circle([Number(x.lon), Number(x.lat)], 1, { steps:48, units:"kilometers" }).geometry, curFee(), ad + " (1 km)"); }
+  $("qres").classList.remove("on"); $("qh").value = "";
+  const last = zones[zones.length-1]; if(last) map.fitBounds(last.layer.getBounds());
+  toast(`${ad} eklendi · ${curFee()}₺`);
+}
+
+/* ---------- kaydet ---------- */
+$("btnSave").onclick = async () => {
+  const btn = $("btnSave"); btn.disabled = true; btn.textContent = "Kaydediliyor…";
+  try{
+    const payload = { restaurant: REST, zones: zones.map(z => ({ ad:z.ad, ucret:z.ucret, geom:z.gj })) };
+    const r = await fetch(API.SAVE, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload) });
+    const res = await r.json();
+    if(res.ok){ dirty = false; toast(`✓ ${res.adet ?? zones.length} bölge kaydedildi`); $("rSub").textContent = `${zones.length} bölge kayıtlı`; }
+    else toast("Kaydedilemedi");
+  }catch(e){ toast("Bağlantı hatası"); }
+  btn.disabled = false; btn.textContent = "💾 Kaydet";
+};
+window.addEventListener("beforeunload", e => { if(dirty){ e.preventDefault(); e.returnValue = ""; } });
+map.on("moveend zoomend", () => { if(mode==="hex") drawHexGrid(); });
+</script>
+</body>
+</html>
