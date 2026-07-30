@@ -31,6 +31,8 @@
   .top .live .dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 1.6s infinite}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
   .top .out{margin-left:auto;background:var(--card2);border:none;color:var(--txt2);border-radius:8px;padding:7px 12px;font-size:12px;cursor:pointer}
+  #brandSel{background:var(--card2);border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:6px 8px;font-size:13.5px;font-weight:600;font-family:inherit;max-width:190px}
+  .pill.marka{background:#1b2b3a;color:#8FC4F5}
 
   .tabs{display:flex;gap:8px;padding:12px 14px 0}
   .tab{flex:1;background:var(--card);border:1px solid var(--line);color:var(--txt2);border-radius:10px;padding:11px;font-size:14px;font-weight:600;cursor:pointer}
@@ -164,6 +166,7 @@
       <div class="logo">YC</div>
       <div>
         <div class="nm" id="pName">Restoran</div>
+        <select id="brandSel" style="display:none"></select>
         <div class="live"><span class="dot"></span><span id="liveTxt">Canlı · otomatik yenileniyor</span></div>
       </div>
       <button class="hbtn" id="btnHelp" onclick="openHelp('guide')">?</button>
@@ -240,8 +243,10 @@
         </div>
         <button class="sbtn" id="sSave">Ayarları kaydet</button>
         <div class="sok" id="sMsg"></div>
-         <div class="hint" style="margin:16px 0 0;padding-top:14px;border-top:1px solid var(--line)">🗺️ <b style="color:var(--mint)">Haritadan bölge seçmek</b> istersen (petek, mahalle veya elle çizim) aşağıdaki butondan gir. Bölge tanımlarsan mesafeye göre ücret yerine <b style="color:var(--mint)">bölge ücretleri</b> geçerli olur.</div>
-        <button class="sbtn" style="background:var(--card2);color:var(--mint)" onclick="location.href='bolge.html'">🗺️ Teslimat bölgelerini haritada düzenle</button>
+        <div class="hint" style="margin:16px 0 0;padding-top:14px;border-top:1px solid var(--line)">🗺️ <b style="color:var(--mint)">Haritadan bölge seçmek</b> istersen (petek, mahalle veya elle çizim) aşağıdaki butondan gir. Bölge tanımlarsan mesafeye göre ücret yerine <b style="color:var(--mint)">bölge ücretleri</b> geçerli olur.</div>
+        <button class="sbtn" style="background:var(--card2);color:var(--mint)" onclick="haritaAc()">🗺️ Teslimat bölgelerini haritada düzenle</button>
+        <div class="hint" style="margin:16px 0 0;padding-top:14px;border-top:1px solid var(--line)">🔔 <b style="color:var(--mint)">Sipariş sesi</b> — cihazın sesini açık tut. Aşağıdaki butonla ne kadar duyulduğunu dene; mutfakta duyulmuyorsa tableti/telefonu hoparlöre yakın bir yere koy.</div>
+        <button class="sbtn" style="background:var(--card2);color:var(--amber)" onclick="siren(true)">🔔 Sipariş sesini test et</button>
       </div>
     </div>
   </div>
@@ -274,6 +279,10 @@
         <p><b>1) Mesafeye göre (basit):</b> Tarifenizi <b>Ayarlar</b> sekmesinden belirlersiniz: <b>taban ücret + km başına ücret</b>. Örnek: taban 20₺ + km 10₺ ise 2 km'deki müşteri 40₺ öder. Ücretsiz teslimat için ikisini de 0 yapın. <b>Maksimum km</b> dışındaki müşterilere hiç görünmezsiniz.</p>
         <p><b>2) Haritadan bölge seçerek (hassas):</b> Ayarlar sekmesindeki <b>"🗺️ Teslimat bölgelerini haritada düzenle"</b> butonuna girin. Üç yolla bölge tanımlayabilirsiniz: <b>🍯 Petek</b> (haritadaki altıgenlere dokunarak boyama; boyalı peteği "Böl" ile daha küçük peteklere ayırıp sokak sokak ücret verebilirsiniz), <b>✏️ Çizim</b> (poligon, daire, dikdörtgen çizme) ve <b>🏘️ Mahalle</b> (mahalle adı yazıp sınırını otomatik ekleme). Her bölgeye ayrı ücret yazarsınız; yakın mahalle 20₺, uzak mahalle 60₺ gibi. <b>Kaydet</b>'e basmayı unutmayın.</p>
         <div class="warn">💡 Bölge tanımladığınız anda mesafeye göre ücret devre dışı kalır ve <b>bölge ücretleri</b> geçerli olur. Çizdiğiniz bölgelerin <b>dışındaki</b> müşteriler sizi hiç görmez — teslimat yaptığınız her yeri boyadığınızdan emin olun.</div>
+        <h4>🗂️ Birden Fazla Markanız Varsa</h4>
+        <p>Aynı işletmede birden fazla markanız varsa (örn. pideci + tatlıcı + pizzacı) müşteriler bunları <b>ayrı restoranlar</b> olarak görür — her birinin kendi menüsü, saatleri ve teslimat bölgesi olur. Panelde ise <b>tek girişle hepsini</b> yönetirsiniz: üstteki listeden marka seçersiniz. <b>"🗂️ Tüm markalar"</b> seçilince bütün markaların siparişleri tek listede, üzerinde marka etiketiyle görünür. Menü, Ayarlar ve harita bölümleri tek markaya özeldir; oralarda üstten marka seçmeniz gerekir.</p>
+        <h4>🔔 Sipariş Sesi</h4>
+        <p>Yeni sipariş gelince güçlü bir <b>siren sesi</b> çalar ve telefonlarda cihaz titrer. Onaylanmayan sipariş varsa ses <b>tekrar tekrar</b> çalar (3 dakikayı geçen siparişlerde daha sık) — mutfak curcunasında kaçırmamanız için. Sesi <b>Ayarlar → "🔔 Sipariş sesini test et"</b> ile deneyebilirsiniz. Tarayıcı ilk açılışta sesi engellerse ekranın altında <b>"Sipariş sesini aç"</b> yazan turuncu bir düğme çıkar; ona bir kez dokunmanız yeterlidir.</p>
         <h4>💬 Destek</h4>
         <p>Her konu için: <b>yemekchat.yonetim@gmail.com</b> ya da WhatsApp <b>@YemekChat (+90 505 489 88 26)</b></p>
       </div>
@@ -290,6 +299,7 @@ const API = {
   MENU:        "https://webhook.yemekchat.com/webhook/panel-menu",
   MENU_SAVE:   "https://webhook.yemekchat.com/webhook/panel-menu-save",
   MENU_DELETE: "https://webhook.yemekchat.com/webhook/panel-menu-delete",
+  BRANDS:        "https://webhook.yemekchat.com/webhook/panel-brands",
   SETTINGS:      "https://webhook.yemekchat.com/webhook/panel-settings",
   SETTINGS_SAVE: "https://webhook.yemekchat.com/webhook/panel-settings-save",
   BULK:          "https://webhook.yemekchat.com/webhook/panel-bulk-price"
@@ -299,10 +309,15 @@ const REFRESH_MS = 12000;
 
 const FLOW = ["Yeni Sipariş","Hazırlanıyor","Yolda","Teslim Edildi"];
 let REST = null, timer = null, lastCount = 0, menuItems = [], editId = null;
-let alarmTimer = null, gecikenIds = [];
-
-const saved = localStorage.getItem("yc_rest");
-if(saved){ REST = saved; startPanel(); }
+let alarmTimer = null, gecikenIds = [], alarmMode = null, BRANDS = [];
+function setAlarm(mode){
+  if(alarmMode === mode) return;
+  alarmMode = mode;
+  if(alarmTimer){ clearInterval(alarmTimer); alarmTimer = null; }
+  if(!mode) return;
+  siren(true);
+  alarmTimer = setInterval(() => siren(alarmMode === "geciken"), alarmMode === "geciken" ? 9000 : 16000);
+}
 
 document.getElementById("btnLogin").onclick = login;
 document.getElementById("inPass").addEventListener("keydown", e => { if(e.key==="Enter") login(); });
@@ -343,18 +358,68 @@ function startPanel(){
   document.getElementById("loginScr").style.display = "none";
   document.getElementById("panelScr").style.display = "block";
   document.getElementById("pName").textContent = REST;
+  loadBrands();
   loadOrders();
   timer = setInterval(loadOrders, REFRESH_MS);
+  audioCtx(); if(!AC || AC.state === "suspended") showSesUyari();
+}
+
+/* ---------- ÇOKLU MARKA ---------- */
+const ALL = "__TUMU__";
+async function loadBrands(){
+  try{
+    const r = await fetch(API.BRANDS + "?restaurant=" + encodeURIComponent(REST));
+    const d = await r.json();
+    BRANDS = (d.markalar || d || []).filter(Boolean);
+    if(typeof BRANDS === "string") BRANDS = JSON.parse(BRANDS);
+  }catch(e){ BRANDS = []; }
+  if(BRANDS.length > 1){
+    const sel = document.getElementById("brandSel");
+    document.getElementById("pName").style.display = "none";
+    sel.style.display = "block";
+    const secili = localStorage.getItem("yc_brand") || ALL;
+    sel.innerHTML = `<option value="${ALL}">🗂️ Tüm markalar (${BRANDS.length})</option>` +
+      BRANDS.map(b => `<option value="${b}">${b}</option>`).join("");
+    sel.value = BRANDS.includes(secili) || secili === ALL ? secili : ALL;
+    sel.onchange = () => {
+      localStorage.setItem("yc_brand", sel.value);
+      if(sel.value !== ALL) localStorage.setItem("yc_rest", sel.value);
+      lastCount = 0; setAlarm(null);
+      loadOrders();
+      const t = document.querySelector(".tab.on").dataset.tab;
+      if(t === "menu") loadMenu();
+      if(t === "settings") loadSettings();
+    };
+  }
+}
+function aktifMarka(){
+  const sel = document.getElementById("brandSel");
+  return (BRANDS.length > 1 && sel.value) ? sel.value : REST;
+}
+function tumMarkaMi(){ return aktifMarka() === ALL; }
+function haritaAc(){
+  if(tumMarkaMi()){ document.getElementById("sMsg").textContent = "Önce üstten marka seç — bölgeler her marka için ayrıdır."; return; }
+  localStorage.setItem("yc_rest", aktifMarka());
+  location.href = "bolge.html";
+}
+function markaSec(neden){
+  return `<div class="empty">Bu bölüm tek marka için çalışır.<br>Üstteki listeden bir marka seç ${neden||""}</div>`;
 }
 
 /* ---------- SİPARİŞLER ---------- */
 async function loadOrders(){
-  try{
-    const r = await fetch(API.ORDERS + "?restaurant=" + encodeURIComponent(REST));
-    let orders = await r.json();
-    if(!Array.isArray(orders)) orders = orders.data || [];
-    renderOrders(orders);
-  }catch(e){}
+  const hedefler = tumMarkaMi() ? BRANDS : [aktifMarka()];
+  const listeler = await Promise.all(hedefler.map(async b => {
+    try{
+      const r = await fetch(API.ORDERS + "?restaurant=" + encodeURIComponent(b));
+      let o = await r.json();
+      if(!Array.isArray(o)) o = o.data || [];
+      return o.map(x => Object.assign({}, x, { _marka: b }));
+    }catch(e){ return []; }
+  }));
+  const orders = [].concat.apply([], listeler);
+  orders.sort((a,b) => new Date(b.created_at||0) - new Date(a.created_at||0));
+  renderOrders(orders);
 }
 function statusClass(s){
   s = (s||"").toLowerCase();
@@ -377,13 +442,12 @@ function renderOrders(orders){
   document.getElementById("stYeni").textContent = yeni;
   document.getElementById("stAktif").textContent = aktif;
   document.getElementById("stCiro").textContent = Math.round(ciro)+"₺";
-  if(yeni>lastCount && lastCount!==0) beep();
+  if(yeni>lastCount && lastCount!==0) siren(true);
   lastCount = yeni;
-  // 3 dakikadan uzun süredir onaylanmayan sipariş varsa alarmı sürdür
+  // onaylanmamış sipariş varsa alarmı sürdür (3 dk+ olanlar daha sık)
   const geciken = orders.filter(o => statusClass(o.status).pill==="yeni" && o.created_at && (Date.now()-new Date(o.created_at).getTime()) > 180000);
   gecikenIds = geciken.map(o => String(o.id));
-  if(geciken.length && !alarmTimer){ alarm(); alarmTimer = setInterval(alarm, 20000); }
-  if(!geciken.length && alarmTimer){ clearInterval(alarmTimer); alarmTimer = null; }
+  setAlarm(geciken.length ? "geciken" : (yeni > 0 ? "yeni" : null));
   const list = document.getElementById("ordList");
   if(!orders.length){ list.innerHTML='<div class="empty">Henüz sipariş yok.</div>'; return; }
   list.innerHTML = orders.map(o => {
@@ -393,7 +457,7 @@ function renderOrders(orders){
     const isCatOrder=(o.payment_method||"").toLowerCase().includes("kurumsal");
     const gec = gecikenIds.includes(String(o.id));
     return `<div class="ord ${sc.cls} ${isCatOrder?"cat":""} ${gec?"geciken":""}">
-      <div class="hd"><span class="no">#${o.id} <span class="pill ${sc.pill}">${sc.lbl}</span>${isCatOrder?' <span class="pill kurumsal">Kurumsal</span>':""}${gec?' <span class="pill yeni">⏰ BEKLİYOR</span>':""}</span><span class="tm">${tm}</span></div>
+      <div class="hd"><span class="no">#${o.id} <span class="pill ${sc.pill}">${sc.lbl}</span>${isCatOrder?' <span class="pill kurumsal">Kurumsal</span>':""}${gec?' <span class="pill yeni">⏰ BEKLİYOR</span>':""}${(tumMarkaMi()&&o._marka)?` <span class="pill marka">${o._marka}</span>`:""}</span><span class="tm">${tm}</span></div>
       <div class="det">${o.order_details||"-"}</div>
       <div class="meta"><b>Adres:</b> ${o.address||"-"}<br><b>Ödeme:</b> ${o.payment_method||"-"} &nbsp;·&nbsp; <b>Tel:</b> ${o.customer_phone||"-"}</div>
       <div class="tot">${Math.round(Number(o.total_amount)||0)} TL</div>
@@ -412,9 +476,10 @@ async function setStatus(id, status){
 /* ---------- MENÜ YÖNETİMİ ---------- */
 async function loadMenu(){
   const list = document.getElementById("menuList");
+  if(tumMarkaMi()){ list.innerHTML = markaSec("— her markanın menüsü ayrıdır."); menuItems = []; fillBulkCats(); return; }
   list.innerHTML = '<div class="empty">Menü yükleniyor…</div>';
   try{
-    const r = await fetch(API.MENU + "?restaurant=" + encodeURIComponent(REST));
+    const r = await fetch(API.MENU + "?restaurant=" + encodeURIComponent(aktifMarka()));
     let m = await r.json();
     if(!Array.isArray(m)) m = m.data || [];
     menuItems = m;
@@ -472,7 +537,7 @@ async function saveItem(){
   if(!name || isNaN(price)){ alert("Ürün adı ve geçerli fiyat gerekli."); return; }
   const cur = editId ? menuItems.find(m=>m.id==editId) : null;
   const is_available = cur ? (cur.is_available===true||cur.is_available==="true") : true;
-  const payload = { restaurant: REST, name, description, price, category, is_available, id: editId || "" };
+  const payload = { restaurant: aktifMarka(), name, description, price, category, is_available, id: editId || "" };
   try{
     await fetch(API.MENU_SAVE, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload) });
     closeForm(); loadMenu();
@@ -481,7 +546,7 @@ async function saveItem(){
 async function toggleItem(id){
   const m = menuItems.find(x=>x.id==id); if(!m) return;
   const cur = (m.is_available===true||m.is_available==="true");
-  const payload = { id:m.id, restaurant:REST, name:m.name, description:m.description||"", price:m.price, category:m.category||"", is_available: !cur };
+  const payload = { id:m.id, restaurant:aktifMarka(), name:m.name, description:m.description||"", price:m.price, category:m.category||"", is_available: !cur };
   try{ await fetch(API.MENU_SAVE, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload) }); loadMenu(); }
   catch(e){ alert("Güncellenemedi."); }
 }
@@ -492,21 +557,57 @@ async function deleteItem(id){
   catch(e){ alert("Silinemedi."); }
 }
 
-function beep(){
+/* ---------- SES: güçlü sipariş alarmı ---------- */
+let AC = null;
+function audioCtx(){
   try{
-    const ctx=new (window.AudioContext||window.webkitAudioContext)();
-    const o=ctx.createOscillator(), g=ctx.createGain();
-    o.connect(g); g.connect(ctx.destination); o.frequency.value=880; o.type="sine";
-    g.gain.setValueAtTime(0.3,ctx.currentTime); o.start(); o.stop(ctx.currentTime+0.25);
-  }catch(e){}
+    if(!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
+    if(AC.state === "suspended") AC.resume();
+    return AC;
+  }catch(e){ return null; }
 }
-
-function alarm(){ beep(); setTimeout(beep,300); setTimeout(beep,600); }
+function tone(ctx, freq, t0, dur, type, vol){
+  const o = ctx.createOscillator(), g = ctx.createGain();
+  o.type = type; o.frequency.setValueAtTime(freq, t0);
+  g.gain.setValueAtTime(0, t0);
+  g.gain.linearRampToValueAtTime(vol, t0 + 0.015);
+  g.gain.setValueAtTime(vol, t0 + dur - 0.04);
+  g.gain.linearRampToValueAtTime(0.0001, t0 + dur);
+  o.connect(g); g.connect(ctx.destination);
+  o.start(t0); o.stop(t0 + dur + 0.03);
+}
+function siren(strong){
+  const ctx = audioCtx();
+  if(!ctx){ return; }
+  if(ctx.state === "suspended"){ showSesUyari(); return; }
+  const t = ctx.currentTime, n = strong ? 9 : 5;
+  for(let i=0;i<n;i++){
+    const t0 = t + i*0.33, hi = i%2===1;
+    tone(ctx, hi ? 1480 : 990, t0, 0.27, "square", 0.85);      // tiz çağrı
+    tone(ctx, hi ? 740  : 495, t0, 0.27, "sawtooth", 0.42);    // kalın gövde
+    tone(ctx, hi ? 2960 : 1980, t0, 0.10, "square", 0.22);     // keskin uç
+  }
+  try{ navigator.vibrate && navigator.vibrate(strong ? [500,110,500,110,700] : [280,90,280]); }catch(e){}
+}
+function beep(){ siren(true); }
+function alarm(){ siren(true); }
+function showSesUyari(){
+  if(document.getElementById("sesUyari")) return;
+  const d = document.createElement("div");
+  d.id = "sesUyari";
+  d.style.cssText = "position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:900;background:var(--amber);color:#2b1d05;font-weight:700;font-size:14px;padding:13px 18px;border-radius:24px;box-shadow:0 6px 24px rgba(0,0,0,.5);cursor:pointer";
+  d.textContent = "🔔 Sipariş sesini aç (dokun)";
+  d.onclick = () => { siren(true); d.remove(); };
+  document.body.appendChild(d);
+}
 
 /* ---------- AYARLAR (mesai + teslimat) ---------- */
 async function loadSettings(){
+  const kutu = document.getElementById("tabSettings");
+  if(tumMarkaMi()){ document.getElementById("sMsg").textContent = "Ayarlar tek marka için — üstten marka seç."; return; }
+  document.getElementById("sMsg").textContent = "";
   try{
-    const r = await fetch(API.SETTINGS + "?restaurant=" + encodeURIComponent(REST));
+    const r = await fetch(API.SETTINGS + "?restaurant=" + encodeURIComponent(aktifMarka()));
     const s = await r.json();
     document.getElementById("sAcilis").value  = s.acilis || "";
     document.getElementById("sKapanis").value = s.kapanis || "";
@@ -517,9 +618,11 @@ async function loadSettings(){
   }catch(e){ document.getElementById("sMsg").textContent = "Ayarlar yüklenemedi."; }
 }
 document.getElementById("sSave").onclick = async () => {
-  const msg = document.getElementById("sMsg"); msg.textContent = "Kaydediliyor…";
+  const msg = document.getElementById("sMsg");
+  if(tumMarkaMi()){ msg.textContent = "Önce üstten marka seç."; return; }
+  msg.textContent = "Kaydediliyor…";
   const payload = {
-    restaurant: REST,
+    restaurant: aktifMarka(),
     acilis:  document.getElementById("sAcilis").value,
     kapanis: document.getElementById("sKapanis").value,
     kapali:  document.getElementById("sKapali").classList.contains("on") ? "true" : "false",
@@ -551,7 +654,7 @@ document.getElementById("bkGo").onclick = async () => {
   if(!confirm(`${category||"TÜM ürünlerde"} fiyatlara ${ne} uygulanacak. Onaylıyor musun?`)) return;
   msg.textContent = "Uygulanıyor…";
   try{
-    const r = await fetch(API.BULK, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ restaurant:REST, category, mode, value }) });
+    const r = await fetch(API.BULK, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ restaurant:aktifMarka(), category, mode, value }) });
     const res = await r.json();
     msg.textContent = res.ok ? `✓ ${res.adet||0} ürün güncellendi` : "Güncellenemedi.";
     document.getElementById("bkVal").value = "";
@@ -562,6 +665,8 @@ document.getElementById("bkGo").onclick = async () => {
 
 /* ---------- YARDIM & YENİLİKLER ---------- */
 const NEWS = [
+  { d:"30.07.2026", t:"🔔 Sipariş sesi çok daha güçlü", x:"Yeni siparişte artık kısa bir bip değil, güçlü bir siren çalıyor ve telefon titriyor. Onaylanmayan sipariş varsa ses tekrarlanıyor (3 dakikayı geçende daha sık). Ayarlar sekmesinden 'Sipariş sesini test et' ile deneyebilirsiniz." },
+  { d:"30.07.2026", t:"🗂️ Tek panelde birden fazla marka", x:"Birden fazla markanız varsa (pideci, tatlıcı, pizzacı gibi) hepsini tek girişle yönetiyorsunuz. Müşteriler markaları ayrı restoran olarak görür; siz üstteki listeden marka değiştirir ya da 'Tüm markalar' seçip bütün siparişleri tek listede takip edersiniz." },
   { d:"30.07.2026", t:"🗺️ Haritadan teslimat bölgesi seçimi", x:"Ayarlar sekmesindeki yeni harita ekranıyla teslimat bölgelerinizi kendiniz çiziyorsunuz: altıgen peteklere dokunarak boyayın (istediğiniz peteği 'Böl' ile daha küçük peteklere ayırıp sokak bazında ücret verin), mahalle adı yazıp sınırını ekleyin ya da elle poligon/daire çizin. Her bölgeye ayrı getirme ücreti yazılır — yakın mahalle 20₺, uzak mahalle 60₺ gibi. Bölge tanımlarsanız mesafeye göre ücret yerine bu ücretler geçerli olur." },
   { d:"29.07.2026", t:"🕒 Otomatik açılış-kapanış + kendi tarifeniz", x:"Ayarlar sekmesi geldi: çalışma saatlerinizi yazın, restoranınız o saatlerde otomatik açılıp kapanıyor. Acil durumlar için 'Şu an siparişe kapalıyım' anahtarı var. Teslimat tarifenizi (taban + km ücreti + maksimum mesafe) artık kendiniz belirliyorsunuz." },
   { d:"29.07.2026", t:"💰 Toplu fiyat güncelleme", x:"Menü sekmesinden tek seferde zam veya indirim: kategori seçin, TL ya da yüzde girin, uygula. Zam için 20, indirim için -20 yazmanız yeterli." },
@@ -587,6 +692,10 @@ function helpTab(t){
   }
 }
 document.getElementById("helpModal").addEventListener("click", e => { if(e.target.id==="helpModal") closeHelp(); });
+
+/* ---------- otomatik giriş (en sonda: tüm tanımlar hazır olsun) ---------- */
+const kayitliRest = localStorage.getItem("yc_rest");
+if(kayitliRest){ REST = kayitliRest; startPanel(); }
 </script>
 </body>
 </html>
