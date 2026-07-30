@@ -240,6 +240,8 @@
         </div>
         <button class="sbtn" id="sSave">Ayarları kaydet</button>
         <div class="sok" id="sMsg"></div>
+         <div class="hint" style="margin:16px 0 0;padding-top:14px;border-top:1px solid var(--line)">🗺️ <b style="color:var(--mint)">Haritadan bölge seçmek</b> istersen (petek, mahalle veya elle çizim) aşağıdaki butondan gir. Bölge tanımlarsan mesafeye göre ücret yerine <b style="color:var(--mint)">bölge ücretleri</b> geçerli olur.</div>
+        <button class="sbtn" style="background:var(--card2);color:var(--mint)" onclick="location.href='bolge.html'">🗺️ Teslimat bölgelerini haritada düzenle</button>
       </div>
     </div>
   </div>
@@ -268,8 +270,10 @@
         <p>Menü sekmesinin üstündeki araçla tek seferde zam/indirim yapabilirsiniz: kategori seçin (ya da "Tüm ürünler"), <b>TL</b> veya <b>yüzde</b> seçin, sayıyı yazın. <b>Zam için 20</b>, <b>indirim için -20</b> gibi. Örnek: tüm ürünlere %10 zam → Tüm ürünler + Yüzde + 10.</p>
         <h4>🕒 Çalışma Saatleri</h4>
         <p><b>Ayarlar</b> sekmesinden açılış-kapanış saatinizi girin — restoranınız o saatlerde <b>otomatik açılır</b>, dışında müşteriye "kapalı" görünür ve sipariş gelmez. Gece yarısını aşan saatler desteklenir (11:00 – 03:00). Yoğunluk veya arıza durumunda <b>"Şu an siparişe kapalıyım"</b> anahtarını açın; saatlerinizi bozmadan geçici olarak kapanırsınız, unutmayın açmayı 🙂</p>
-        <h4>🛵 Getirme Ücreti</h4>
-        <p>Tarifenizi <b>Ayarlar</b> sekmesinden kendiniz belirlersiniz: <b>taban ücret + km başına ücret</b>. Örnek: taban 20₺ + km 10₺ ise 2 km'deki müşteri 40₺ öder. Ücretsiz teslimat için ikisini de 0 yapın. <b>Maksimum km</b> dışındaki müşterilere hiç görünmezsiniz.</p>
+        <h4>🛵 Getirme Ücreti — 2 yöntem</h4>
+        <p><b>1) Mesafeye göre (basit):</b> Tarifenizi <b>Ayarlar</b> sekmesinden belirlersiniz: <b>taban ücret + km başına ücret</b>. Örnek: taban 20₺ + km 10₺ ise 2 km'deki müşteri 40₺ öder. Ücretsiz teslimat için ikisini de 0 yapın. <b>Maksimum km</b> dışındaki müşterilere hiç görünmezsiniz.</p>
+        <p><b>2) Haritadan bölge seçerek (hassas):</b> Ayarlar sekmesindeki <b>"🗺️ Teslimat bölgelerini haritada düzenle"</b> butonuna girin. Üç yolla bölge tanımlayabilirsiniz: <b>🍯 Petek</b> (haritadaki altıgenlere dokunarak boyama; boyalı peteği "Böl" ile daha küçük peteklere ayırıp sokak sokak ücret verebilirsiniz), <b>✏️ Çizim</b> (poligon, daire, dikdörtgen çizme) ve <b>🏘️ Mahalle</b> (mahalle adı yazıp sınırını otomatik ekleme). Her bölgeye ayrı ücret yazarsınız; yakın mahalle 20₺, uzak mahalle 60₺ gibi. <b>Kaydet</b>'e basmayı unutmayın.</p>
+        <div class="warn">💡 Bölge tanımladığınız anda mesafeye göre ücret devre dışı kalır ve <b>bölge ücretleri</b> geçerli olur. Çizdiğiniz bölgelerin <b>dışındaki</b> müşteriler sizi hiç görmez — teslimat yaptığınız her yeri boyadığınızdan emin olun.</div>
         <h4>💬 Destek</h4>
         <p>Her konu için: <b>yemekchat.yonetim@gmail.com</b> ya da WhatsApp <b>@YemekChat (+90 505 489 88 26)</b></p>
       </div>
