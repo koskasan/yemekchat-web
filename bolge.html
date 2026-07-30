@@ -65,6 +65,18 @@
 
   .toast{position:absolute;left:50%;top:14px;transform:translateX(-50%);z-index:700;background:var(--greenDark);color:var(--mint);border:1px solid var(--green);padding:10px 16px;border-radius:20px;font-size:13px;font-weight:600;display:none}
   .toast.on{display:block}
+  /* restoran konumu (mavi nokta) */
+  .me{width:16px;height:16px;border-radius:50%;background:#2E86FF;border:3px solid #fff;box-shadow:0 0 0 0 rgba(46,134,255,.6);animation:mepulse 2s infinite}
+  @keyframes mepulse{0%{box-shadow:0 0 0 0 rgba(46,134,255,.55)}70%{box-shadow:0 0 0 20px rgba(46,134,255,0)}100%{box-shadow:0 0 0 0 rgba(46,134,255,0)}}
+
+  /* ücret etiketi */
+  .ftag{background:rgba(10,16,12,.82);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:11px;font-weight:700;padding:1px 6px;border-radius:9px;white-space:nowrap;box-shadow:none}
+  .ftag::before{display:none}
+
+  /* renk açıklaması */
+  .lgnd{position:absolute;left:10px;bottom:58px;z-index:500;background:rgba(28,42,32,.94);border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:11px;color:var(--txt2);line-height:1.9}
+  .lgnd i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+
   .pop b{color:#04342C}
   .leaflet-popup-content{margin:10px 12px;font-size:13px}
   .leaflet-popup-content button{background:var(--card2);border:none;color:var(--txt);border-radius:8px;padding:7px 10px;font-size:12px;margin:6px 4px 0 0;cursor:pointer}
@@ -105,12 +117,16 @@
   <div class="hint" id="hint"><span class="x" onclick="document.getElementById('hint').style.display='none'">✕</span><span id="hintTxt"></span></div>
 
   <div class="sheet" id="sheet">
-    <div class="hd" onclick="document.getElementById('sheet').classList.toggle('open')">
-      <h4>Bölgelerim</h4><span class="cnt" id="zCnt">0</span><span class="ar">⌃</span>
+    <div class="hd">
+      <span onclick="document.getElementById('sheet').classList.toggle('open')" style="display:flex;align-items:center;gap:8px;flex:1">
+        <h4>Bölgelerim</h4><span class="cnt" id="zCnt">0</span><span class="ar">⌃</span>
+      </span>
+      <button class="btn gh" style="padding:6px 10px;font-size:12px" onclick="tumunuTemizle()">🗑 Tümünü temizle</button>
     </div>
     <div class="bd" id="zList"></div>
   </div>
 
+  <div class="lgnd" id="lgnd"></div>
   <div class="toast" id="toast"></div>
 </div>
 
@@ -123,8 +139,9 @@ const API = {
   ZONES: "https://webhook.yemekchat.com/webhook/panel-zones",
   SAVE:  "https://webhook.yemekchat.com/webhook/panel-zones-save"
 };
-const HEX_SIDE_KM = 0.25;   // ~500 m genişlikte petek
-const SUB_DIVIDE   = 3;     // "Böl" ile kaça bölünsün (kenar/3 → ~170 m)
+const HEX_GENISLIK_M = 500;  // petek genişliği (metre)
+const SUB_DIVIDE     = 3;    // "Böl" ile kaça bölünsün (~170 m)
+const REF_LAT        = 39;   // Türkiye ortalaması (ızgara ölçeği için)
 // ================================================
 
 const REST = localStorage.getItem("yc_rest");
@@ -139,13 +156,17 @@ const HINTS = {
   hood: "<b>🏘️ Mahalle modu:</b> yukarıya mahalle/semt adı yaz, listeden seç — sınırları otomatik çizilir. Sınır bulunamazsa 1 km'lik daire eklenir, sen düzeltirsin."
 };
 
+const FEE_TIERS = [
+  { max: 0,        c:"#22C55E", t:"Ücretsiz" },
+  { max: 20,       c:"#A3E635", t:"1 – 20 ₺" },
+  { max: 35,       c:"#FACC15", t:"21 – 35 ₺" },
+  { max: 50,       c:"#FB923C", t:"36 – 50 ₺" },
+  { max: 75,       c:"#F43F5E", t:"51 – 75 ₺" },
+  { max: Infinity, c:"#A855F7", t:"76 ₺ +" }
+];
 function feeColor(u){
   u = Number(u)||0;
-  if(u === 0)  return "#1D9E75";
-  if(u <= 25)  return "#9FE1CB";
-  if(u <= 50)  return "#EF9F27";
-  if(u <= 90)  return "#E2864A";
-  return "#E24B4A";
+  return (FEE_TIERS.find(t => u <= t.max) || FEE_TIERS[FEE_TIERS.length-1]).c;
 }
 function toast(t){ const el=$("toast"); el.textContent=t; el.classList.add("on"); setTimeout(()=>el.classList.remove("on"), 2200); }
 function curFee(){ return Math.max(0, Math.round(Number($("fee").value)||0)); }
@@ -177,7 +198,11 @@ async function init(){
     const r = await fetch(`${API.ZONES}?restaurant=${encodeURIComponent(REST)}`);
     const d = await r.json();
     const lat = Number(d.latitude), lng = Number(d.longitude);
-    if(lat && lng){ map.setView([lat, lng], 15); L.circleMarker([lat,lng],{radius:7,color:"#E24B4A",fillColor:"#E24B4A",fillOpacity:1}).addTo(map).bindTooltip("Restoran"); }
+    if(lat && lng){
+      map.setView([lat, lng], 15);
+      L.marker([lat, lng], { icon: L.divIcon({ className:"", html:'<div class="me"></div>', iconSize:[16,16], iconAnchor:[8,8] }), zIndexOffset:900, interactive:false })
+        .addTo(map).bindTooltip("📍 Restoranınız burada", { direction:"top", offset:[0,-10] });
+    }
     $("rSub").textContent = (d.zones && d.zones.length) ? `${d.zones.length} bölge kayıtlı` : "henüz bölge yok — mesafeye göre ücret geçerli";
     (d.zones||[]).forEach(z => {
       const gj = typeof z.geom === "string" ? JSON.parse(z.geom) : z.geom;
@@ -204,15 +229,45 @@ function setMode(m){
   }
 }
 
-/* ---------- petek ızgarası ---------- */
+/* ---------- petek ızgarası (dünyaya sabit — zoom/kaydırma ile KAYMAZ) ---------- */
+const HEX_R = (HEX_GENISLIK_M / 2) / Math.cos(REF_LAT * Math.PI / 180);  // EPSG:3857 metre
+const SQ3 = Math.sqrt(3);
+function prj(lat, lng){ const p = L.CRS.EPSG3857.project(L.latLng(lat, lng)); return [p.x, p.y]; }
+function unprj(x, y){ const ll = L.CRS.EPSG3857.unproject(L.point(x, y)); return [ll.lng, ll.lat]; }
+function hexPoly(q, r, R){
+  const cx = 1.5 * R * q;
+  const cy = SQ3 * R * (r + (((q % 2) + 2) % 2 === 1 ? 0.5 : 0));
+  const ring = [];
+  for(let i = 0; i < 6; i++){
+    const a = Math.PI / 3 * i;
+    ring.push(unprj(cx + R * Math.cos(a), cy + R * Math.sin(a)));
+  }
+  ring.push(ring[0]);
+  return { type:"Polygon", coordinates:[ring] };
+}
+function hexesInBounds(b, R, limit){
+  const p1 = prj(b.getSouth(), b.getWest()), p2 = prj(b.getNorth(), b.getEast());
+  const x0 = Math.min(p1[0], p2[0]), x1 = Math.max(p1[0], p2[0]);
+  const y0 = Math.min(p1[1], p2[1]), y1 = Math.max(p1[1], p2[1]);
+  const out = [];
+  const qmin = Math.floor(x0 / (1.5 * R)) - 1, qmax = Math.ceil(x1 / (1.5 * R)) + 1;
+  for(let q = qmin; q <= qmax; q++){
+    const off = (((q % 2) + 2) % 2 === 1) ? 0.5 : 0;
+    const rmin = Math.floor(y0 / (SQ3 * R) - off) - 1, rmax = Math.ceil(y1 / (SQ3 * R) - off) + 1;
+    for(let r = rmin; r <= rmax; r++){
+      out.push({ type:"Feature", properties:{ q, r }, geometry: hexPoly(q, r, R) });
+      if(out.length > (limit || 1600)) return out;
+    }
+  }
+  return out;
+}
 function clearHexGrid(){ if(hexLayer){ map.removeLayer(hexLayer); hexLayer=null; } }
-function drawHexGrid(side){
+function drawHexGrid(){
   clearHexGrid();
   if(map.getZoom() < 13){ toast("Petekler için haritayı yaklaştır"); return; }
-  const b = map.getBounds();
-  const bbox = [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()];
-  const grid = turf.hexGrid(bbox, side || HEX_SIDE_KM, { units:"kilometers" });
-  if(grid.features.length > 1600){ toast("Alan çok geniş, biraz yaklaş"); return; }
+  const feats = hexesInBounds(map.getBounds(), HEX_R);
+  if(feats.length > 1500){ toast("Alan çok geniş, biraz yaklaş"); return; }
+  const grid = { type:"FeatureCollection", features: feats };
   hexLayer = L.geoJSON(grid, {
     style:{ color:"#4a6b57", weight:1, fillOpacity:.05, fillColor:"#9FE1CB" },
     onEachFeature: (f, layer) => {
@@ -230,8 +285,10 @@ function drawHexGrid(side){
 /* ---------- bölge ekle/çıkar ---------- */
 function addZone(gj, ucret, ad, sessiz){
   const col = feeColor(ucret);
-  const layer = L.geoJSON(gj, { style:{ color:col, weight:2, fillColor:col, fillOpacity:.32 } }).addTo(map);
-  const z = { gj, ucret:Number(ucret)||0, ad:ad||"Bölge", layer };
+  const u = Number(ucret)||0;
+  const layer = L.geoJSON(gj, { style:{ color:col, weight:2.5, fillColor:col, fillOpacity:.45, opacity:.95 } }).addTo(map);
+  layer.bindTooltip(u === 0 ? "Ücretsiz" : u + "₺", { permanent:true, direction:"center", className:"ftag" });
+  const z = { gj, ucret:u, ad:ad||"Bölge", layer };
   zones.push(z);
   layer.on("click", ev => { L.DomEvent.stopPropagation(ev); openZonePopup(z, ev.latlng); });
   if(!sessiz) dirty = true;
@@ -242,6 +299,12 @@ function removeZone(i){
   if(!zones[i]) return;
   map.removeLayer(zones[i].layer);
   zones.splice(i,1); dirty = true; renderList();
+}
+function tumunuTemizle(){
+  if(!zones.length) return;
+  if(!confirm(`${zones.length} bölgenin hepsi silinecek. Emin misin?\n(Kaydet'e basmadan çıkarsan eski hâli korunur.)`)) return;
+  zones.forEach(z => map.removeLayer(z.layer));
+  zones = []; dirty = true; renderList(); toast("Tüm bölgeler temizlendi");
 }
 function openZonePopup(z, latlng){
   const i = zones.indexOf(z); if(i<0) return;
@@ -258,13 +321,13 @@ function setZoneFee(i){
   const u = Math.max(0, Math.round(Number(v)||0));
   const col = feeColor(u);
   z.ucret = u; z.layer.setStyle({ color:col, fillColor:col });
+  z.layer.unbindTooltip().bindTooltip(u === 0 ? "Ücretsiz" : u + "₺", { permanent:true, direction:"center", className:"ftag" });
   dirty = true; renderList(); map.closePopup(); toast(`Ücret ${u}₺ yapıldı`);
 }
 function splitZone(i){
   const z = zones[i]; if(!z) return;
-  const b = turf.bbox(z.gj);
-  const small = turf.hexGrid(b, HEX_SIDE_KM/SUB_DIVIDE, { units:"kilometers" });
-  const parts = small.features.filter(f => turf.booleanPointInPolygon(turf.centroid(f), z.gj));
+  const small = hexesInBounds(z.layer.getBounds(), HEX_R / SUB_DIVIDE, 400);
+  const parts = small.filter(f => turf.booleanPointInPolygon(turf.centroid(f), z.gj));
   if(!parts.length){ toast("Bu bölge bölünemedi"); return; }
   const eskiUcret = z.ucret;
   removeZone(i);
@@ -272,6 +335,9 @@ function splitZone(i){
   dirty = true; renderList(); map.closePopup();
   toast(`${parts.length} alt peteğe bölündü — ücretlerini tek tek değiştirebilirsin`);
 }
+
+/* ---------- renk açıklaması ---------- */
+$("lgnd").innerHTML = FEE_TIERS.map(t => `<div><i style="background:${t.c}"></i>${t.t}</div>`).join("");
 
 /* ---------- liste ---------- */
 function renderList(){
