@@ -70,6 +70,25 @@
   .b-next{background:var(--green);color:var(--greenDark)}
   .b-call{background:var(--card2);color:var(--mint)}
   .b-cancel{background:var(--card2);color:#F09595}
+  .b-print{background:var(--card2);color:#EFC98A}
+
+  /* ---- FİŞ (termal yazıcı, 80mm) ---- */
+  #fisAlan{display:none}
+  @media print{
+    body{background:#fff !important;padding:0 !important;max-width:none !important}
+    body > *{display:none !important}
+    body > #fisAlan{display:block !important}
+    @page{size:80mm auto;margin:3mm}
+  }
+  #fisAlan{color:#000;background:#fff;width:74mm;font-family:"Courier New",Courier,monospace;font-size:12px;line-height:1.45}
+  #fisAlan .c{text-align:center}
+  #fisAlan .b{font-weight:700}
+  #fisAlan .xl{font-size:17px;font-weight:700;letter-spacing:1px}
+  #fisAlan .lg{font-size:14px;font-weight:700}
+  #fisAlan .hr{border-top:1px dashed #000;margin:5px 0}
+  #fisAlan .ln{display:flex;justify-content:space-between;gap:6px}
+  #fisAlan .sm{font-size:10.5px}
+  #fisAlan .box{border:1.5px solid #000;padding:3px 5px;margin:5px 0;font-weight:700;text-align:center}
 
   /* MENÜ */
   .mtop{display:flex;align-items:center;justify-content:space-between;padding:14px}
@@ -247,9 +266,18 @@
         <button class="sbtn" style="background:var(--card2);color:var(--mint)" onclick="haritaAc()">🗺️ Teslimat bölgelerini haritada düzenle</button>
         <div class="hint" style="margin:16px 0 0;padding-top:14px;border-top:1px solid var(--line)">🔔 <b style="color:var(--mint)">Sipariş sesi</b> — cihazın sesini açık tut. Aşağıdaki butonla ne kadar duyulduğunu dene; mutfakta duyulmuyorsa tableti/telefonu hoparlöre yakın bir yere koy.</div>
         <button class="sbtn" style="background:var(--card2);color:var(--amber)" onclick="siren(true)">🔔 Sipariş sesini test et</button>
+        <div class="hint" style="margin:16px 0 0;padding-top:14px;border-top:1px solid var(--line)">🖨 <b style="color:var(--mint)">Fiş yazdırma</b> — her siparişin altındaki "Fiş yazdır" ile 80 mm termal fiş çıkarabilirsiniz. Aşağıdaki anahtarı açarsanız yeni siparişler <b>kendiliğinden</b> yazdırılır (bilgisayarın yazıcıya bağlı ve panelin açık olması gerekir).</div>
+        <div class="cls" style="margin-top:10px">
+          <div class="t">Yeni siparişi otomatik yazdır
+            <small>Fiş, sipariş düşer düşmez yazıcıya gider.</small>
+          </div>
+          <button class="sw" id="sOtoFis" onclick="otoFisDegistir(this)"></button>
+        </div>
       </div>
     </div>
   </div>
+
+  <div id="fisAlan"></div>
 
   <!-- YARDIM & YENİLİKLER -->
   <div class="hmodal" id="helpModal">
@@ -281,6 +309,10 @@
         <p><b>🧺 Minimum sepet / 🛵 Getirme ücreti:</b> Harita ekranında üstteki iki düğmeden hangisini boyadığınızı seçersiniz. <b>Minimum sepet</b> modunda her renk bir alt limit gösterir (100₺, 200₺, 300₺…) — o bölgedeki müşteri bu tutarın altında sipariş veremez, sepetinde "X₺ daha ekle" yazar. <b>Getirme ücreti</b> modunda ise renkler teslimat ücretini gösterir. Bir bölge ikisini birlikte de taşıyabilir (örn. min 300₺ + 45₺ getirme).</p>
         <p><b>🎨 Renk paleti:</b> Renk şeritlerinden birini seçip boyarsınız. <b>"Düzenle"</b> ile hem renkleri hem tutarları kendinize göre değiştirebilir, renk ekleyip çıkarabilirsiniz. Bir rengin tutarını değiştirdiğinizde o renkle boyadığınız <b>tüm bölgeler otomatik güncellenir</b> — tek tek uğraşmanız gerekmez. Tek bir bölgeyi farklı yapmak isterseniz üzerine dokunup değerini elle girebilirsiniz.</p>
         <div class="warn">💡 Bölge tanımladığınız anda mesafeye göre ücret devre dışı kalır ve <b>bölge ücretleri</b> geçerli olur. Çizdiğiniz bölgelerin <b>dışındaki</b> müşteriler sizi hiç görmez — teslimat yaptığınız her yeri boyadığınızdan emin olun.</div>
+        <h4>🖨 Fiş Yazdırma</h4>
+        <p>Her siparişin altındaki <b>"🖨 Fiş yazdır"</b> düğmesi 80 mm termal fiş çıkarır: ürünler, müşteri notu, adres, telefon, ödeme durumu ve toplam. Teslim edilmiş siparişlerin fişini de tekrar alabilirsiniz.</p>
+        <p><b>Otomatik yazdırma:</b> Ayarlar sekmesindeki <b>"Yeni siparişi otomatik yazdır"</b> anahtarını açarsanız sipariş düştüğü an fiş yazıcıya gider — ekrana bakmanız gerekmez. Bunun için panelin açık olduğu bilgisayarın yazıcıya bağlı olması gerekir.</p>
+        <div class="warn">💡 <b>Yazdırma penceresi çıkmasın istiyorsanız</b> (tek tuşla direkt çıktı): Chrome kısayolunuza sağ tık → Özellikler → Hedef alanının sonuna bir boşluk bırakıp <b>--kiosk-printing</b> yazın. Chrome'u bu kısayoldan açtığınızda fişler onay penceresi olmadan doğrudan yazıcıya gider. Yazıcıyı önce Windows'ta <b>varsayılan yazıcı</b> yapmayı unutmayın.</div>
         <h4>🗂️ Birden Fazla Markanız Varsa</h4>
         <p>Aynı işletmede birden fazla markanız varsa (örn. pideci + tatlıcı + pizzacı) müşteriler bunları <b>ayrı restoranlar</b> olarak görür — her birinin kendi menüsü, saatleri ve teslimat bölgesi olur. Panelde ise <b>tek girişle hepsini</b> yönetirsiniz: üstteki listeden marka seçersiniz. <b>"🗂️ Tüm markalar"</b> seçilince bütün markaların siparişleri tek listede, üzerinde marka etiketiyle görünür. Menü, Ayarlar ve harita bölümleri tek markaya özeldir; oralarda üstten marka seçmeniz gerekir.</p>
         <h4>🔔 Sipariş Sesi</h4>
@@ -311,7 +343,7 @@ const REFRESH_MS = 12000;
 
 const FLOW = ["Yeni Sipariş","Hazırlanıyor","Yolda","Teslim Edildi"];
 let REST = null, timer = null, lastCount = 0, menuItems = [], editId = null;
-let alarmTimer = null, gecikenIds = [], alarmMode = null, BRANDS = [];
+let alarmTimer = null, gecikenIds = [], alarmMode = null, BRANDS = [], siparisler = [], enSonBasilan = 0;
 function setAlarm(mode){
   if(alarmMode === mode) return;
   alarmMode = mode;
@@ -434,6 +466,7 @@ function statusClass(s){
 }
 function nextStatus(s){ const st=statusClass(s).lbl; const i=FLOW.indexOf(st); return (i>=0&&i<FLOW.length-1)?FLOW[i+1]:null; }
 function renderOrders(orders){
+  siparisler = orders;
   let yeni=0, aktif=0, ciro=0; const today=new Date().toISOString().slice(0,10);
   orders.forEach(o => {
     const sc=statusClass(o.status);
@@ -450,6 +483,7 @@ function renderOrders(orders){
   const geciken = orders.filter(o => statusClass(o.status).pill==="yeni" && o.created_at && (Date.now()-new Date(o.created_at).getTime()) > 180000);
   gecikenIds = geciken.map(o => String(o.id));
   setAlarm(geciken.length ? "geciken" : (yeni > 0 ? "yeni" : null));
+  otoFisKontrol(orders);
   const list = document.getElementById("ordList");
   if(!orders.length){ list.innerHTML='<div class="empty">Henüz sipariş yok.</div>'; return; }
   list.innerHTML = orders.map(o => {
@@ -467,6 +501,7 @@ function renderOrders(orders){
         ${nx?`<button class="b-next" onclick="setStatus(${o.id},'${nx}')">${nx} →</button>`:""}
         <button class="b-call" onclick="window.open('https://wa.me/${o.customer_phone}','_blank')">Müşteriye yaz</button>
         <button class="b-cancel" onclick="setStatus(${o.id},'İptal')">İptal</button></div>`}
+      <div class="acts"><button class="b-print" onclick="fisYazdir(${o.id})">🖨 Fiş yazdır</button></div>
     </div>`;
   }).join("");
 }
@@ -603,6 +638,76 @@ function showSesUyari(){
   document.body.appendChild(d);
 }
 
+/* ---------- FİŞ YAZDIRMA (80 mm termal) ---------- */
+function fisSatirlari(detay){
+  // "Ürün x1, Ürün x2 — 📝 not — 🛵 Getirme: 21 TL"  ->  parçalara ayır
+  const parts = String(detay || "").split("—").map(s => s.trim()).filter(Boolean);
+  const urunler = (parts.shift() || "").split(",").map(s => s.trim()).filter(Boolean);
+  let not = "", ekstra = [];
+  parts.forEach(p => {
+    if(p.indexOf("📝") === 0 || /^not/i.test(p)) not = p.replace("📝", "").trim();
+    else ekstra.push(p);
+  });
+  return { urunler, not, ekstra };
+}
+function fisYazdir(id){
+  const o = siparisler.find(x => String(x.id) === String(id));
+  if(!o){ alert("Sipariş bulunamadı, sayfayı yenile."); return; }
+  const { urunler, not, ekstra } = fisSatirlari(o.order_details);
+  const tarih = o.created_at ? new Date(o.created_at).toLocaleString("tr-TR", { day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit" }) : "";
+  const marka = o._marka || (BRANDS.length > 1 ? aktifMarka() : null) || REST || "YemekChat";
+  const odeme = String(o.payment_method || "-");
+  const online = odeme.toLowerCase().includes("ödendi");
+  const bekliyor = odeme.toLowerCase().includes("bekliyor");
+  const kurumsal = odeme.toLowerCase().includes("kurumsal");
+  document.getElementById("fisAlan").innerHTML = `
+    <div class="c xl">YEMEKCHAT</div>
+    <div class="c sm">yemekchat.com</div>
+    <div class="hr"></div>
+    <div class="c lg">${marka}</div>
+    <div class="c b">SİPARİŞ #${o.id}</div>
+    <div class="c sm">${tarih}</div>
+    <div class="hr"></div>
+    ${urunler.map(u => `<div class="ln"><span>${u}</span></div>`).join("")}
+    <div class="hr"></div>
+    ${not ? `<div class="box">NOT: ${not.toUpperCase()}</div>` : ""}
+    ${ekstra.length ? ekstra.map(e => `<div class="sm">${e}</div>`).join("") + '<div class="hr"></div>' : ""}
+    <div><span class="b">Ödeme:</span> ${odeme}</div>
+    ${online ? '<div class="box">ÖDEME ALINDI ✓</div>' : ""}
+    ${bekliyor ? '<div class="box">ÖDEME BEKLİYOR — HAZIRLAMAYIN</div>' : ""}
+    ${kurumsal ? '<div class="box">KURUMSAL SİPARİŞ</div>' : ""}
+    <div><span class="b">Tel:</span> ${o.customer_phone || "-"}</div>
+    <div><span class="b">Adres:</span> ${o.address || "-"}</div>
+    <div class="hr"></div>
+    <div class="ln lg"><span>TOPLAM</span><span>${Math.round(Number(o.total_amount) || 0)} TL</span></div>
+    <div class="hr"></div>
+    <div class="c sm">Afiyet olsun!</div>
+    <div class="c sm">WhatsApp: @YemekChat</div>
+    <div style="height:8mm"></div>`;
+  window.print();
+}
+function otoFisAcikMi(){ return localStorage.getItem("yc_otofis") === "1"; }
+function otoFisDegistir(btn){
+  btn.classList.toggle("on");
+  const acik = btn.classList.contains("on");
+  localStorage.setItem("yc_otofis", acik ? "1" : "0");
+  const msg = document.getElementById("sMsg");
+  msg.textContent = acik ? "✓ Otomatik fiş açıldı" : "Otomatik fiş kapatıldı";
+  setTimeout(() => { msg.textContent = ""; }, 2500);
+}
+function otoFisKontrol(orders){
+  if(!otoFisAcikMi()) return;
+  const yeniler = orders.filter(o => Number(o.id) > enSonBasilan && statusClass(o.status).pill === "yeni");
+  if(!enSonBasilan){ // ilk yüklemede geçmişi basmayalım
+    enSonBasilan = orders.reduce((m,o) => Math.max(m, Number(o.id) || 0), 0);
+    return;
+  }
+  yeniler.sort((a,b) => Number(a.id) - Number(b.id)).forEach((o,i) => {
+    setTimeout(() => fisYazdir(o.id), i * 2500);
+    enSonBasilan = Math.max(enSonBasilan, Number(o.id));
+  });
+}
+
 /* ---------- AYARLAR (mesai + teslimat) ---------- */
 async function loadSettings(){
   const kutu = document.getElementById("tabSettings");
@@ -617,6 +722,7 @@ async function loadSettings(){
     document.getElementById("sKm").value      = s.km_ucreti ?? "";
     document.getElementById("sMax").value     = s.max_km ?? "";
     document.getElementById("sKapali").classList.toggle("on", s.kapali===true || s.kapali==="true");
+    document.getElementById("sOtoFis").classList.toggle("on", otoFisAcikMi());
   }catch(e){ document.getElementById("sMsg").textContent = "Ayarlar yüklenemedi."; }
 }
 document.getElementById("sSave").onclick = async () => {
@@ -667,6 +773,7 @@ document.getElementById("bkGo").onclick = async () => {
 
 /* ---------- YARDIM & YENİLİKLER ---------- */
 const NEWS = [
+  { d:"31.07.2026", t:"🖨 Fiş yazdırma geldi", x:"Her siparişin altında 'Fiş yazdır' düğmesi var: 80 mm termal fiş olarak ürünler, müşteri notu, adres, ödeme durumu ve toplam çıkıyor. Ayarlar'dan 'Yeni siparişi otomatik yazdır' anahtarını açarsanız sipariş düştüğü an fiş kendiliğinden yazıcıya gider; ekrana bakmanıza gerek kalmaz. Onay penceresi çıkmasın isterseniz kılavuzdaki Chrome ayarına bakın." },
   { d:"30.07.2026", t:"🧺 Bölgeye göre minimum sepet", x:"Harita ekranında artık her bölgeye ayrı minimum sepet tutarı verebiliyorsunuz (100₺, 200₺, 300₺…). Yakın sokaklarda düşük, uzak mahallelerde yüksek limit koyabilirsiniz; müşteri o tutarın altında sipariş veremiyor, sepetinde 'şu kadar daha ekle' uyarısı görüyor. İsterseniz aynı bölgeye getirme ücreti de verebilirsiniz — üstteki iki düğmeyle hangisini boyadığınızı seçiyorsunuz." },
   { d:"30.07.2026", t:"🎨 Kendi renk paletiniz", x:"Harita ekranında artık ücret yazmak yerine renk seçip boyuyorsunuz. Renkleri ve her rengin ücretini 'Renkleri düzenle' ile kendinize göre ayarlayabilirsiniz; bir rengin ücretini değiştirince o renkle boyalı tüm bölgeler otomatik güncellenir. Ayrıca bölünen peteklerde artık boşluk kalmıyor." },
   { d:"30.07.2026", t:"🔔 Sipariş sesi çok daha güçlü", x:"Yeni siparişte artık kısa bir bip değil, güçlü bir siren çalıyor ve telefon titriyor. Onaylanmayan sipariş varsa ses tekrarlanıyor (3 dakikayı geçende daha sık). Ayarlar sekmesinden 'Sipariş sesini test et' ile deneyebilirsiniz." },
