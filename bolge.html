@@ -413,15 +413,18 @@ function drawHexGrid(){
     style:{ color:"#4a6b57", weight:1, fillOpacity:.05, fillColor:"#9FE1CB" },
     onEachFeature: (f, layer) => {
       layer.on("click", () => {
-        const c = turf.centroid(f);
-        const dolu = zones.some(z => turf.booleanPointInPolygon(c, z.gj));
-        // bu peteğin içinde kalan her şeyi (alt bölgeler dahil) temizle
+        // bu peteğin SAHİP OLDUĞU bölgeleri (merkezi peteğin içinde olanlar) temizle
         let temizlenen = 0;
         for(let k = zones.length - 1; k >= 0; k--){
           if(turf.booleanPointInPolygon(turf.centroid(zones[k].gj), f.geometry)){ removeZone(k); temizlenen++; }
         }
-        if(dolu){ toast(temizlenen > 1 ? `Petek temizlendi (${temizlenen} parça)` : "Petek çıkarıldı"); }
-        else { addZone(f.geometry, yeniDegerler(), "Petek"); toast(`Petek eklendi · ${degerYazi(seciliDeger())}`); }
+        if(temizlenen){
+          toast(temizlenen > 1 ? `Petek temizlendi (${temizlenen} parça)` : "Petek çıkarıldı");
+        } else {
+          // üstünden büyük bir çizim geçiyor olsa bile peteği ekleyebilmeli
+          addZone(f.geometry, yeniDegerler(), "Petek");
+          toast(`Petek eklendi · ${degerYazi(seciliDeger())}`);
+        }
       });
     }
   }).addTo(map);
