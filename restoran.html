@@ -71,6 +71,8 @@
   .b-call{background:var(--card2);color:var(--mint)}
   .b-cancel{background:var(--card2);color:#F09595}
   .b-print{background:var(--card2);color:#EFC98A}
+  .b-map{background:var(--card2);color:#8FC4F5}
+  .mthumb{width:46px;height:46px;border-radius:8px;object-fit:cover;flex-shrink:0;background:var(--card2)}
 
   /* ---- FİŞ (termal yazıcı, 80mm) ---- */
   #fisAlan{display:none}
@@ -248,6 +250,7 @@
         <input id="fDs" placeholder="Açıklama (isteğe bağlı)">
         <input id="fPr" type="number" inputmode="decimal" placeholder="Fiyat (TL)">
         <input id="fCt" placeholder="Kategori (örn: burger, içecek)">
+        <input id="fIm" placeholder="Görsel bağlantısı (isteğe bağlı — https://...)">
         <div class="frow">
           <button class="cancel" id="fCancel">İptal</button>
           <button class="save" id="fSave">Kaydet</button>
@@ -303,6 +306,8 @@
         <div class="hint" style="margin:16px 0 0;padding-top:14px;border-top:1px solid var(--line)">🗺️ <b style="color:var(--mint)">Haritadan bölge seçmek</b> istersen (petek, mahalle veya elle çizim) aşağıdaki butondan gir. Bölge tanımlarsan mesafeye göre ücret yerine <b style="color:var(--mint)">bölge ücretleri</b> geçerli olur.</div>
         <button class="sbtn" style="background:var(--card2);color:var(--mint)" onclick="haritaAc()">🗺️ Teslimat bölgelerini haritada düzenle</button>
         <div class="hint" style="margin:16px 0 0;padding-top:14px;border-top:1px solid var(--line)">🔔 <b style="color:var(--mint)">Sipariş sesi</b> — cihazın sesini açık tut. Aşağıdaki butonla ne kadar duyulduğunu dene; mutfakta duyulmuyorsa tableti/telefonu hoparlöre yakın bir yere koy.</div>
+        <label style="margin-top:10px">Sipariş sesi</label>
+        <select id="sSes" onchange="sesSec(this)" style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px;font-size:14px;color:var(--txt);font-family:inherit"></select>
         <button class="sbtn" style="background:var(--card2);color:var(--amber)" onclick="siren(true)">🔔 Sipariş sesini test et</button>
         <div class="hint" style="margin:16px 0 0;padding-top:14px;border-top:1px solid var(--line)">🖨 <b style="color:var(--mint)">Fiş yazdırma</b> — her siparişin altındaki "Fiş yazdır" ile 80 mm termal fiş çıkarabilirsiniz. Aşağıdaki anahtarı açarsanız yeni siparişler <b>kendiliğinden</b> yazdırılır (bilgisayarın yazıcıya bağlı ve panelin açık olması gerekir).</div>
         <div class="cls" style="margin-top:10px">
@@ -509,9 +514,10 @@ async function loadOrders(){
   renderOrders(orders);
 }
 function statusClass(s){
-  s = (s||"").toLowerCase();
+  // Türkçe İ tuzağı: "İptal".toLowerCase() === "i̇ptal" (noktalı i) → normalize et
+  s = (s||"").toLowerCase().replace(/i̇/g, "i").replace(/ı/g, "i");
   if(s.includes("yeni")) return {cls:"s-yeni", pill:"yeni", lbl:"Yeni Sipariş"};
-  if(s.includes("hazır")) return {cls:"s-hazir", pill:"hazir", lbl:"Hazırlanıyor"};
+  if(s.includes("hazir")) return {cls:"s-hazir", pill:"hazir", lbl:"Hazırlanıyor"};
   if(s.includes("yol")) return {cls:"s-yolda", pill:"yolda", lbl:"Yolda"};
   if(s.includes("teslim")) return {cls:"s-teslim", pill:"teslim", lbl:"Teslim Edildi"};
   if(s.includes("iptal")) return {cls:"s-iptal", pill:"iptal", lbl:"İptal"};
@@ -555,7 +561,10 @@ function renderOrders(orders){
         ${nx?`<button class="b-next" onclick="setStatus(${o.id},'${nx}')">${nx} →</button>`:""}
         <button class="b-call" onclick="window.open('https://wa.me/${o.customer_phone}','_blank')">Müşteriye yaz</button>
         <button class="b-cancel" onclick="setStatus(${o.id},'İptal')">İptal</button></div>`}
-      <div class="acts"><button class="b-print" onclick="fisYazdir(${o.id})">🖨 Fiş yazdır</button></div>
+      <div class="acts">
+        <button class="b-print" onclick="fisYazdir(${o.id})">🖨 Fiş yazdır</button>
+        <button class="b-map" onclick="yolTarifi(${o.id})">🧭 Yol tarifi</button>
+      </div>
     </div>`;
   }).join("");
 }
@@ -589,6 +598,7 @@ function renderMenu(){
       const on = (m.is_available===true||m.is_available==="true");
       html += `<div class="mi ${on?"":"off"}">
         <div class="sw ${on?"on":""}" onclick="toggleItem(${m.id})"></div>
+        ${m.image_url?`<img class="mthumb" src="${m.image_url}" alt="" onerror="this.style.display='none'">`:""}
         <div class="info">
           <div class="nm">${m.name}</div>
           ${m.description?`<div class="ds">${m.description}</div>`:""}
@@ -614,6 +624,7 @@ function openForm(item){
   document.getElementById("fDs").value = item ? (item.description||"") : "";
   document.getElementById("fPr").value = item ? item.price : "";
   document.getElementById("fCt").value = item ? (item.category||"") : "";
+  document.getElementById("fIm").value = item ? (item.image_url||"") : "";
   document.getElementById("itemForm").classList.add("show");
 }
 function closeForm(){ document.getElementById("itemForm").classList.remove("show"); editId=null; }
@@ -628,7 +639,8 @@ async function saveItem(){
   if(!name || isNaN(price)){ alert("Ürün adı ve geçerli fiyat gerekli."); return; }
   const cur = editId ? menuItems.find(m=>m.id==editId) : null;
   const is_available = cur ? (cur.is_available===true||cur.is_available==="true") : true;
-  const payload = { restaurant: aktifMarka(), name, description, price, category, is_available, id: editId || "" };
+  const image_url = (document.getElementById("fIm").value || "").trim();
+  const payload = { restaurant: aktifMarka(), name, description, price, category, is_available, image_url, id: editId || "" };
   try{
     await fetch(API.MENU_SAVE, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload) });
     closeForm(); loadMenu();
@@ -667,18 +679,53 @@ function tone(ctx, freq, t0, dur, type, vol){
   o.connect(g); g.connect(ctx.destination);
   o.start(t0); o.stop(t0 + dur + 0.03);
 }
+const SESLER = {
+  siren:  { ad:"🚨 Siren (en dikkat çekici)" },
+  zil:    { ad:"🔔 Telefon zili" },
+  dingdong:{ ad:"🛎️ Kapı zili" },
+  bip:    { ad:"📟 Klasik bip (sakin)" }
+};
+function sesTuru(){ return localStorage.getItem("yc_ses") || "siren"; }
 function siren(strong){
   const ctx = audioCtx();
   if(!ctx){ return; }
   if(ctx.state === "suspended"){ showSesUyari(); return; }
-  const t = ctx.currentTime, n = strong ? 9 : 5;
-  for(let i=0;i<n;i++){
-    const t0 = t + i*0.33, hi = i%2===1;
-    tone(ctx, hi ? 1480 : 990, t0, 0.27, "square", 0.85);      // tiz çağrı
-    tone(ctx, hi ? 740  : 495, t0, 0.27, "sawtooth", 0.42);    // kalın gövde
-    tone(ctx, hi ? 2960 : 1980, t0, 0.10, "square", 0.22);     // keskin uç
+  const t = ctx.currentTime, tur = sesTuru();
+  if(tur === "zil"){
+    const n = strong ? 6 : 3;
+    for(let i=0;i<n;i++){
+      const t0 = t + i*0.5;
+      for(let k=0;k<5;k++){                       // klasik çift tonlu zil
+        tone(ctx, k%2 ? 1050 : 1400, t0 + k*0.055, 0.05, "square", 0.8);
+      }
+    }
+  } else if(tur === "dingdong"){
+    const n = strong ? 3 : 2;
+    for(let i=0;i<n;i++){
+      const t0 = t + i*1.1;
+      tone(ctx, 880, t0, 0.45, "sine", 0.9); tone(ctx, 1320, t0, 0.45, "triangle", 0.35);
+      tone(ctx, 660, t0+0.5, 0.6, "sine", 0.9); tone(ctx, 990, t0+0.5, 0.6, "triangle", 0.35);
+    }
+  } else if(tur === "bip"){
+    const n = strong ? 5 : 3;
+    for(let i=0;i<n;i++) tone(ctx, 1200, t + i*0.28, 0.14, "square", 0.7);
+  } else {
+    const n = strong ? 9 : 5;
+    for(let i=0;i<n;i++){
+      const t0 = t + i*0.33, hi = i%2===1;
+      tone(ctx, hi ? 1480 : 990, t0, 0.27, "square", 0.85);      // tiz çağrı
+      tone(ctx, hi ? 740  : 495, t0, 0.27, "sawtooth", 0.42);    // kalın gövde
+      tone(ctx, hi ? 2960 : 1980, t0, 0.10, "square", 0.22);     // keskin uç
+    }
   }
   try{ navigator.vibrate && navigator.vibrate(strong ? [500,110,500,110,700] : [280,90,280]); }catch(e){}
+}
+function sesSec(sel){
+  localStorage.setItem("yc_ses", sel.value);
+  siren(false);
+  const msg = document.getElementById("sMsg");
+  msg.textContent = "✓ Ses kaydedildi";
+  setTimeout(()=>{ msg.textContent=""; }, 2000);
 }
 function beep(){ siren(true); }
 function alarm(){ siren(true); }
@@ -690,6 +737,17 @@ function showSesUyari(){
   d.textContent = "🔔 Sipariş sesini aç (dokun)";
   d.onclick = () => { siren(true); d.remove(); };
   document.body.appendChild(d);
+}
+
+/* ---------- KURYE YOL TARİFİ ---------- */
+function yolTarifi(id){
+  const o = siparisler.find(x => String(x.id) === String(id));
+  if(!o){ alert("Sipariş bulunamadı, sayfayı yenile."); return; }
+  const lat = Number(o.lat), lng = Number(o.lng);
+  const url = (lat && lng)
+    ? `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`
+    : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(o.address || "")}`;
+  window.open(url, "_blank");
 }
 
 /* ---------- RAPOR ---------- */
@@ -893,6 +951,9 @@ async function loadSettings(){
     document.getElementById("sKapali").classList.toggle("on", s.kapali===true || s.kapali==="true");
     document.getElementById("sOtoFis").classList.toggle("on", otoFisAcikMi());
     document.getElementById("sOtoKabul").classList.toggle("on", otoKabulAcikMi());
+    const ss = document.getElementById("sSes");
+    ss.innerHTML = Object.keys(SESLER).map(k => `<option value="${k}">${SESLER[k].ad}</option>`).join("");
+    ss.value = sesTuru();
   }catch(e){ document.getElementById("sMsg").textContent = "Ayarlar yüklenemedi."; }
 }
 document.getElementById("sSave").onclick = async () => {
