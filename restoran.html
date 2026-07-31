@@ -165,6 +165,23 @@
   .bulk button{background:var(--amber);border:none;border-radius:9px;padding:9px 14px;font-size:13px;font-weight:600;color:#2b1d05;cursor:pointer}
   .bulk .lb{font-size:11.5px;color:var(--txt3);margin-bottom:8px}
   .ord.geciken{box-shadow:0 0 0 2px var(--red)}
+
+  /* rapor */
+  .rbtns{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+  .rb{flex:1;min-width:78px;background:var(--bg);border:1px solid var(--line);color:var(--txt2);border-radius:9px;padding:9px 6px;font-size:12.5px;font-weight:600;cursor:pointer}
+  .rb.on{background:var(--green);border-color:var(--green);color:var(--greenDark)}
+  .rkart{background:var(--card);border-radius:14px;padding:16px;margin:0 14px 12px}
+  .rkart h4{font-size:13px;color:var(--mint);margin-bottom:10px}
+  .rgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+  .rbox{background:var(--bg);border-radius:11px;padding:12px;text-align:center}
+  .rbox .v{font-size:20px;font-weight:700}
+  .rbox .l{font-size:11px;color:var(--txt3);margin-top:2px}
+  .rsat{display:flex;justify-content:space-between;padding:9px 0;border-bottom:.5px solid var(--line);font-size:13.5px}
+  .rsat:last-child{border-bottom:none}
+  .rsat b{color:var(--mint)}
+  .rtop{background:var(--card2);border-radius:11px;padding:12px;margin-top:10px}
+  .rtop .rsat{border-bottom-color:var(--line)}
+  .rnet{font-size:16px;font-weight:700;color:var(--green)}
 </style>
 </head>
 <body>
@@ -195,6 +212,7 @@
     <div class="tabs">
       <button class="tab on" data-tab="orders">Siparişler</button>
       <button class="tab" data-tab="menu">Menü</button>
+      <button class="tab" data-tab="rapor">Rapor</button>
       <button class="tab" data-tab="settings">Ayarlar</button>
     </div>
 
@@ -238,6 +256,26 @@
       <div id="menuList"></div>
     </div>
 
+    <div id="tabRapor" style="display:none">
+      <div class="sbox">
+        <h4>📊 Gün sonu / ciro raporu</h4>
+        <div class="hint">Bir dönem seç, satışını gör. Komisyon ve net hakediş otomatik hesaplanır.</div>
+        <div class="rbtns">
+          <button class="rb on" data-r="bugun" onclick="raporAralik('bugun',this)">Bugün</button>
+          <button class="rb" data-r="dun" onclick="raporAralik('dun',this)">Dün</button>
+          <button class="rb" data-r="hafta" onclick="raporAralik('hafta',this)">Son 7 gün</button>
+          <button class="rb" data-r="ay" onclick="raporAralik('ay',this)">Bu ay</button>
+        </div>
+        <div class="s2" style="margin-top:10px">
+          <div><label>Başlangıç</label><input id="rFrom" type="date"></div>
+          <div><label>Bitiş</label><input id="rTo" type="date"></div>
+        </div>
+        <button class="sbtn" onclick="raporYukle()">Raporu getir</button>
+        <div class="sok" id="rMsg"></div>
+      </div>
+      <div id="raporSonuc"></div>
+    </div>
+
     <div id="tabSettings" style="display:none">
       <div class="sbox">
         <h4>🕒 Çalışma Saatleri</h4>
@@ -272,6 +310,13 @@
             <small>Fiş, sipariş düşer düşmez yazıcıya gider.</small>
           </div>
           <button class="sw" id="sOtoFis" onclick="otoFisDegistir(this)"></button>
+        </div>
+        <div class="hint" style="margin:16px 0 0;padding-top:14px;border-top:1px solid var(--line)">✅ <b style="color:var(--mint)">Otomatik kabul</b> — yoğun saatlerde her siparişe tek tek "Hazırlanıyor" demek zorunda kalmazsınız. Sipariş düşer düşmez otomatik kabul edilir ve müşteriye "hazırlanıyor" bildirimi gider. Ödemesi tamamlanmamış online siparişler <b>otomatik kabul edilmez</b>.</div>
+        <div class="cls" style="margin-top:10px">
+          <div class="t">Siparişleri otomatik kabul et
+            <small>Panel açıkken çalışır. Karşılayamayacağınız siparişi yine de iptal edebilirsiniz.</small>
+          </div>
+          <button class="sw" id="sOtoKabul" onclick="otoKabulDegistir(this)"></button>
         </div>
       </div>
     </div>
@@ -309,6 +354,11 @@
         <p><b>🧺 Minimum sepet / 🛵 Getirme ücreti:</b> Harita ekranında üstteki iki düğmeden hangisini boyadığınızı seçersiniz. <b>Minimum sepet</b> modunda her renk bir alt limit gösterir (100₺, 200₺, 300₺…) — o bölgedeki müşteri bu tutarın altında sipariş veremez, sepetinde "X₺ daha ekle" yazar. <b>Getirme ücreti</b> modunda ise renkler teslimat ücretini gösterir. Bir bölge ikisini birlikte de taşıyabilir (örn. min 300₺ + 45₺ getirme).</p>
         <p><b>🎨 Renk paleti:</b> Renk şeritlerinden birini seçip boyarsınız. <b>"Düzenle"</b> ile hem renkleri hem tutarları kendinize göre değiştirebilir, renk ekleyip çıkarabilirsiniz. Bir rengin tutarını değiştirdiğinizde o renkle boyadığınız <b>tüm bölgeler otomatik güncellenir</b> — tek tek uğraşmanız gerekmez. Tek bir bölgeyi farklı yapmak isterseniz üzerine dokunup değerini elle girebilirsiniz.</p>
         <div class="warn">💡 Bölge tanımladığınız anda mesafeye göre ücret devre dışı kalır ve <b>bölge ücretleri</b> geçerli olur. Çizdiğiniz bölgelerin <b>dışındaki</b> müşteriler sizi hiç görmez — teslimat yaptığınız her yeri boyadığınızdan emin olun.</div>
+        <h4>📊 Rapor / Gün Sonu</h4>
+        <p><b>Rapor</b> sekmesinden Bugün, Dün, Son 7 gün, Bu ay ya da istediğiniz tarih aralığını seçip satışınızı görürsünüz: sipariş adedi, ciro, ortalama sepet, iptaller ve ödeme türüne göre dağılım (nakit / kart / online). <b>%5 komisyon</b> ve <b>net hakediş</b> otomatik hesaplanır. En alttaki satır mutabakat içindir: online tahsilattan komisyon düşülünce <b>YemekChat'ten alacağınız</b> tutarı gösterir.</p>
+        <p><b>🖨 Gün sonu fişi</b> düğmesiyle bu özeti termal fiş olarak yazdırıp kasa defterine ekleyebilirsiniz.</p>
+        <h4>✅ Otomatik Kabul</h4>
+        <p>Ayarlar sekmesindeki <b>"Siparişleri otomatik kabul et"</b> anahtarı açıksa, düşen her sipariş kendiliğinden "Hazırlanıyor" olur ve müşteriye bildirim gider — yoğun saatte tek tek onaylamakla uğraşmazsınız. <b>Ödemesi tamamlanmamış online siparişler otomatik kabul edilmez.</b> Panelin açık olması gerekir; karşılayamayacağınız bir sipariş olursa yine iptal edebilirsiniz.</p>
         <h4>🖨 Fiş Yazdırma</h4>
         <p>Her siparişin altındaki <b>"🖨 Fiş yazdır"</b> düğmesi 80 mm termal fiş çıkarır: ürünler, müşteri notu, adres, telefon, ödeme durumu ve toplam. Teslim edilmiş siparişlerin fişini de tekrar alabilirsiniz.</p>
         <p><b>Otomatik yazdırma:</b> Ayarlar sekmesindeki <b>"Yeni siparişi otomatik yazdır"</b> anahtarını açarsanız sipariş düştüğü an fiş yazıcıya gider — ekrana bakmanız gerekmez. Bunun için panelin açık olduğu bilgisayarın yazıcıya bağlı olması gerekir.</p>
@@ -334,6 +384,7 @@ const API = {
   MENU_SAVE:   "https://webhook.yemekchat.com/webhook/panel-menu-save",
   MENU_DELETE: "https://webhook.yemekchat.com/webhook/panel-menu-delete",
   BRANDS:        "https://webhook.yemekchat.com/webhook/panel-brands",
+  RAPOR:         "https://webhook.yemekchat.com/webhook/panel-report",
   SETTINGS:      "https://webhook.yemekchat.com/webhook/panel-settings",
   SETTINGS_SAVE: "https://webhook.yemekchat.com/webhook/panel-settings-save",
   BULK:          "https://webhook.yemekchat.com/webhook/panel-bulk-price"
@@ -368,9 +419,11 @@ document.querySelectorAll(".tab").forEach(t => {
     document.getElementById("tabOrders").style.display = tab==="orders" ? "block" : "none";
     document.getElementById("tabMenu").style.display = tab==="menu" ? "block" : "none";
     document.getElementById("tabSettings").style.display = tab==="settings" ? "block" : "none";
-    document.getElementById("liveTxt").textContent = tab==="orders" ? "Canlı · otomatik yenileniyor" : (tab==="menu" ? "Menü yönetimi" : "Ayarlar");
+    document.getElementById("tabRapor").style.display = tab==="rapor" ? "block" : "none";
+    document.getElementById("liveTxt").textContent = tab==="orders" ? "Canlı · otomatik yenileniyor" : (tab==="menu" ? "Menü yönetimi" : (tab==="rapor" ? "Ciro raporu" : "Ayarlar"));
     if(tab==="menu") loadMenu();
     if(tab==="settings") loadSettings();
+    if(tab==="rapor") raporAralik("bugun", document.querySelector('.rb[data-r="bugun"]'));
   };
 });
 
@@ -484,6 +537,7 @@ function renderOrders(orders){
   gecikenIds = geciken.map(o => String(o.id));
   setAlarm(geciken.length ? "geciken" : (yeni > 0 ? "yeni" : null));
   otoFisKontrol(orders);
+  otoKabulKontrol(orders);
   const list = document.getElementById("ordList");
   if(!orders.length){ list.innerHTML='<div class="empty">Henüz sipariş yok.</div>'; return; }
   list.innerHTML = orders.map(o => {
@@ -638,6 +692,97 @@ function showSesUyari(){
   document.body.appendChild(d);
 }
 
+/* ---------- RAPOR ---------- */
+const KOMISYON = 5; // %
+let sonRapor = null, raporBaslik = "Bugün";
+function gunStr(d){ return new Date(d.getTime() - d.getTimezoneOffset()*60000).toISOString().slice(0,10); }
+function raporAralik(tip, btn){
+  document.querySelectorAll(".rb").forEach(b => b.classList.toggle("on", b === btn));
+  const b = new Date(); let bas = new Date(), bit = new Date();
+  if(tip === "dun"){ bas.setDate(b.getDate()-1); bit.setDate(b.getDate()-1); raporBaslik = "Dün"; }
+  else if(tip === "hafta"){ bas.setDate(b.getDate()-6); raporBaslik = "Son 7 gün"; }
+  else if(tip === "ay"){ bas = new Date(b.getFullYear(), b.getMonth(), 1); raporBaslik = "Bu ay"; }
+  else raporBaslik = "Bugün";
+  document.getElementById("rFrom").value = gunStr(bas);
+  document.getElementById("rTo").value = gunStr(bit);
+  raporYukle();
+}
+async function raporYukle(){
+  const msg = document.getElementById("rMsg");
+  if(tumMarkaMi()){ msg.textContent = "Rapor tek marka için — üstten marka seç."; document.getElementById("raporSonuc").innerHTML = ""; return; }
+  const from = document.getElementById("rFrom").value, to = document.getElementById("rTo").value;
+  if(!from || !to){ msg.textContent = "Tarih seç."; return; }
+  msg.textContent = "Hesaplanıyor…";
+  try{
+    const r = await fetch(`${API.RAPOR}?restaurant=${encodeURIComponent(aktifMarka())}&from=${from}&to=${to}`);
+    const d = await r.json();
+    sonRapor = Object.assign({ from, to, baslik: raporBaslik }, d);
+    raporCiz(sonRapor);
+    msg.textContent = "";
+  }catch(e){ msg.textContent = "Rapor alınamadı."; }
+}
+function raporCiz(d){
+  const ciro = Number(d.ciro) || 0;
+  const kom = Math.round(ciro * KOMISYON / 100);
+  const online = Number(d.online) || 0, nakit = Number(d.nakit) || 0, kart = Number(d.kart) || 0, kurumsal = Number(d.kurumsal) || 0;
+  const kapida = nakit + kart;
+  document.getElementById("raporSonuc").innerHTML = `
+    <div class="rkart">
+      <h4>${d.baslik} · ${d.from === d.to ? d.from.split("-").reverse().join(".") : d.from.split("-").reverse().join(".") + " – " + d.to.split("-").reverse().join(".")}</h4>
+      <div class="rgrid">
+        <div class="rbox"><div class="v">${Number(d.siparis)||0}</div><div class="l">Sipariş</div></div>
+        <div class="rbox"><div class="v" style="color:var(--mint)">${ciro}₺</div><div class="l">Ciro</div></div>
+        <div class="rbox"><div class="v">${Number(d.ortalama)||0}₺</div><div class="l">Ortalama sepet</div></div>
+        <div class="rbox"><div class="v" style="color:${(Number(d.iptal)||0)?"#F09595":"var(--txt)"}">${Number(d.iptal)||0}</div><div class="l">İptal</div></div>
+      </div>
+      <div class="rsat"><span>💵 Nakit</span><b>${nakit}₺</b></div>
+      <div class="rsat"><span>💳 Kart (kapıda)</span><b>${kart}₺</b></div>
+      <div class="rsat"><span>🌐 Online (YemekChat'te)</span><b>${online}₺</b></div>
+      ${kurumsal ? `<div class="rsat"><span>🏢 Kurumsal</span><b>${kurumsal}₺</b></div>` : ""}
+      <div class="rtop">
+        <div class="rsat"><span>Kapıda tahsil ettiğiniz</span><b>${kapida}₺</b></div>
+        <div class="rsat"><span>YemekChat komisyonu (%${KOMISYON})</span><b>-${kom}₺</b></div>
+        <div class="rsat"><span class="rnet">Net hakedişiniz</span><span class="rnet">${ciro - kom}₺</span></div>
+        <div class="rsat" style="border-top:1px dashed var(--line);margin-top:4px;padding-top:9px">
+          <span>${online - kom >= 0 ? "YemekChat'ten alacağınız" : "YemekChat'e ödeyeceğiniz"}</span>
+          <b>${Math.abs(online - kom)}₺</b>
+        </div>
+      </div>
+      <button class="sbtn" style="background:var(--card2);color:#EFC98A" onclick="gunSonuFisi()">🖨 Gün sonu fişi yazdır</button>
+    </div>`;
+}
+function gunSonuFisi(){
+  if(!sonRapor){ return; }
+  const d = sonRapor, ciro = Number(d.ciro)||0, kom = Math.round(ciro*KOMISYON/100);
+  const marka = (BRANDS.length > 1 ? aktifMarka() : null) || REST || "YemekChat";
+  document.getElementById("fisAlan").innerHTML = `
+    <div class="c xl">GÜN SONU</div>
+    <div class="c sm">YemekChat raporu</div>
+    <div class="hr"></div>
+    <div class="c lg">${marka}</div>
+    <div class="c sm">${d.baslik} · ${d.from.split("-").reverse().join(".")}${d.from===d.to?"":" – "+d.to.split("-").reverse().join(".")}</div>
+    <div class="c sm">Basım: ${new Date().toLocaleString("tr-TR",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"})}</div>
+    <div class="hr"></div>
+    <div class="ln"><span>Sipariş adedi</span><span class="b">${Number(d.siparis)||0}</span></div>
+    <div class="ln"><span>İptal</span><span>${Number(d.iptal)||0}</span></div>
+    <div class="ln"><span>Ortalama sepet</span><span>${Number(d.ortalama)||0} TL</span></div>
+    <div class="hr"></div>
+    <div class="ln"><span>Nakit</span><span>${Number(d.nakit)||0} TL</span></div>
+    <div class="ln"><span>Kart (kapida)</span><span>${Number(d.kart)||0} TL</span></div>
+    <div class="ln"><span>Online</span><span>${Number(d.online)||0} TL</span></div>
+    ${Number(d.kurumsal) ? `<div class="ln"><span>Kurumsal</span><span>${Number(d.kurumsal)} TL</span></div>` : ""}
+    <div class="hr"></div>
+    <div class="ln lg"><span>TOPLAM CİRO</span><span>${ciro} TL</span></div>
+    <div class="ln"><span>Komisyon (%${KOMISYON})</span><span>-${kom} TL</span></div>
+    <div class="ln lg"><span>NET HAKEDİŞ</span><span>${ciro - kom} TL</span></div>
+    <div class="hr"></div>
+    <div class="ln b"><span>${(Number(d.online)||0) - kom >= 0 ? "YemekChat'ten alacak" : "YemekChat'e borc"}</span><span>${Math.abs((Number(d.online)||0) - kom)} TL</span></div>
+    <div class="hr"></div>
+    <div class="c sm">yemekchat.com · @YemekChat</div>
+    <div style="height:8mm"></div>`;
+  window.print();
+}
+
 /* ---------- FİŞ YAZDIRMA (80 mm termal) ---------- */
 function fisSatirlari(detay){
   // "Ürün x1, Ürün x2 — 📝 not — 🛵 Getirme: 21 TL"  ->  parçalara ayır
@@ -686,6 +831,30 @@ function fisYazdir(id){
     <div style="height:8mm"></div>`;
   window.print();
 }
+/* ---------- OTOMATİK KABUL ---------- */
+const otoKabulEdilen = new Set();
+function otoKabulAcikMi(){ return localStorage.getItem("yc_otokabul") === "1"; }
+function otoKabulDegistir(btn){
+  btn.classList.toggle("on");
+  const acik = btn.classList.contains("on");
+  localStorage.setItem("yc_otokabul", acik ? "1" : "0");
+  const msg = document.getElementById("sMsg");
+  msg.textContent = acik ? "✓ Otomatik kabul açıldı" : "Otomatik kabul kapatıldı";
+  setTimeout(() => { msg.textContent = ""; }, 2500);
+}
+function otoKabulKontrol(orders){
+  if(!otoKabulAcikMi()) return;
+  orders.forEach(o => {
+    const yeniMi = statusClass(o.status).pill === "yeni";
+    const odemeBekliyor = String(o.payment_method || "").toLowerCase().includes("bekliyor");
+    const id = String(o.id);
+    if(yeniMi && !odemeBekliyor && !otoKabulEdilen.has(id)){
+      otoKabulEdilen.add(id);
+      setStatus(o.id, "Hazırlanıyor");
+    }
+  });
+}
+
 function otoFisAcikMi(){ return localStorage.getItem("yc_otofis") === "1"; }
 function otoFisDegistir(btn){
   btn.classList.toggle("on");
@@ -723,6 +892,7 @@ async function loadSettings(){
     document.getElementById("sMax").value     = s.max_km ?? "";
     document.getElementById("sKapali").classList.toggle("on", s.kapali===true || s.kapali==="true");
     document.getElementById("sOtoFis").classList.toggle("on", otoFisAcikMi());
+    document.getElementById("sOtoKabul").classList.toggle("on", otoKabulAcikMi());
   }catch(e){ document.getElementById("sMsg").textContent = "Ayarlar yüklenemedi."; }
 }
 document.getElementById("sSave").onclick = async () => {
@@ -773,6 +943,8 @@ document.getElementById("bkGo").onclick = async () => {
 
 /* ---------- YARDIM & YENİLİKLER ---------- */
 const NEWS = [
+  { d:"31.07.2026", t:"📊 Rapor sekmesi + gün sonu", x:"Yeni 'Rapor' sekmesi: bugün, dün, son 7 gün veya seçtiğiniz tarih aralığı için sipariş adedi, ciro, ortalama sepet, iptal ve ödeme türü dağılımı. Komisyon ve net hakediş otomatik hesaplanıyor, gün sonu özetini termal fiş olarak yazdırabiliyorsunuz." },
+  { d:"31.07.2026", t:"✅ Siparişleri otomatik kabul et", x:"Ayarlar'daki yeni anahtarla siparişler düşer düşmez otomatik 'Hazırlanıyor' olur ve müşteriye bildirim gider; yoğun saatte tek tek onaylamazsınız. Ödemesi tamamlanmamış online siparişler otomatik kabul edilmez." },
   { d:"31.07.2026", t:"🖨 Fiş yazdırma geldi", x:"Her siparişin altında 'Fiş yazdır' düğmesi var: 80 mm termal fiş olarak ürünler, müşteri notu, adres, ödeme durumu ve toplam çıkıyor. Ayarlar'dan 'Yeni siparişi otomatik yazdır' anahtarını açarsanız sipariş düştüğü an fiş kendiliğinden yazıcıya gider; ekrana bakmanıza gerek kalmaz. Onay penceresi çıkmasın isterseniz kılavuzdaki Chrome ayarına bakın." },
   { d:"30.07.2026", t:"🧺 Bölgeye göre minimum sepet", x:"Harita ekranında artık her bölgeye ayrı minimum sepet tutarı verebiliyorsunuz (100₺, 200₺, 300₺…). Yakın sokaklarda düşük, uzak mahallelerde yüksek limit koyabilirsiniz; müşteri o tutarın altında sipariş veremiyor, sepetinde 'şu kadar daha ekle' uyarısı görüyor. İsterseniz aynı bölgeye getirme ücreti de verebilirsiniz — üstteki iki düğmeyle hangisini boyadığınızı seçiyorsunuz." },
   { d:"30.07.2026", t:"🎨 Kendi renk paletiniz", x:"Harita ekranında artık ücret yazmak yerine renk seçip boyuyorsunuz. Renkleri ve her rengin ücretini 'Renkleri düzenle' ile kendinize göre ayarlayabilirsiniz; bir rengin ücretini değiştirince o renkle boyalı tüm bölgeler otomatik güncellenir. Ayrıca bölünen peteklerde artık boşluk kalmıyor." },
