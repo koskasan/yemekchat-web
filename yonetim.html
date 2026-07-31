@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YemekChat - Yönetim</title>
+<style>
+  :root{
+    --bg:#111B14; --card:#1C2A20; --card2:#243530; --line:#2C3E32;
+    --txt:#F1EFE8; --txt2:#B4B2A9; --txt3:#888780; --muted:#5F5E5A;
+    --green:#1D9E75; --greenDark:#04342C; --mint:#9FE1CB; --red:#E24B4A;
+    --amber:#EF9F27; --blue:#378ADD; --purple:#A855F7;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{background:var(--bg);color:var(--txt);font-family:-apple-system,"Segoe UI",Roboto,sans-serif}
+  body{max-width:1100px;margin:0 auto;padding-bottom:50px}
+
+  .giris{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;gap:14px}
+  .giris .logo{width:64px;height:64px;border-radius:50%;background:var(--purple);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:22px}
+  .giris h1{font-size:20px;font-weight:600}
+  .giris p{color:var(--txt2);font-size:13px;margin-top:-8px}
+  .giris input{width:100%;max-width:320px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px;font-size:15px;color:var(--txt);font-family:inherit}
+  .giris button{width:100%;max-width:320px;background:var(--purple);border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:600;color:#fff;cursor:pointer}
+  .giris .err{color:var(--red);font-size:13px;min-height:16px}
+
+  .app{display:none}
+  .top{background:var(--card);padding:14px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10;border-bottom:.5px solid var(--line)}
+  .top .logo{width:36px;height:36px;border-radius:50%;background:var(--purple);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px}
+  .top .nm{font-size:16px;font-weight:600}
+  .top .sb{font-size:11px;color:var(--mint)}
+  .top .out{margin-left:auto;background:var(--card2);border:none;color:var(--txt2);border-radius:8px;padding:7px 12px;font-size:12px;cursor:pointer}
+
+  .araclar{display:flex;gap:6px;flex-wrap:wrap;padding:12px 14px 0}
+  .rb{background:var(--card);border:1px solid var(--line);color:var(--txt2);border-radius:9px;padding:9px 13px;font-size:12.5px;font-weight:600;cursor:pointer}
+  .rb.on{background:var(--purple);border-color:var(--purple);color:#fff}
+  .rb.yenile{margin-left:auto;color:var(--mint)}
+
+  .kartlar{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:9px;padding:12px 14px}
+  .k{background:var(--card);border-radius:13px;padding:14px;text-align:center}
+  .k .v{font-size:22px;font-weight:700}
+  .k .l{font-size:11px;color:var(--txt3);margin-top:3px}
+  .k.vurgu .v{color:var(--mint)}
+  .k.uyari .v{color:var(--amber)}
+
+  .blok{background:var(--card);border-radius:14px;margin:0 14px 12px;overflow:hidden}
+  .blok h3{font-size:13px;color:var(--mint);padding:14px 16px 8px}
+  .blok .bos{padding:0 16px 16px;color:var(--txt3);font-size:13px}
+
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  thead th{text-align:left;font-size:11px;color:var(--txt3);font-weight:600;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+  tbody td{padding:11px 10px;border-bottom:.5px solid var(--line);vertical-align:middle}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr.pasif{opacity:.55}
+  .rn{font-weight:600}
+  .rk{font-size:11px;color:var(--txt3)}
+  .sag{text-align:right;white-space:nowrap}
+  .ci{color:var(--mint);font-weight:600}
+  .rozet{display:inline-block;font-size:10.5px;font-weight:600;padding:2px 7px;border-radius:10px;margin-left:5px;white-space:nowrap}
+  .r-kapali{background:#3a1715;color:#F09595}
+  .r-bekleyen{background:#3a2a15;color:#EFC98A}
+  .r-yeni{background:#1b2b3a;color:#8FC4F5}
+
+  .eksik{padding:0 16px 14px}
+  .esat{background:var(--bg);border:1px solid var(--line);border-radius:11px;padding:11px 12px;margin-bottom:8px}
+  .esat .ead{font-weight:600;font-size:13.5px;margin-bottom:5px}
+  .etag{display:inline-block;font-size:11px;background:#3a1715;color:#F09595;padding:2px 8px;border-radius:9px;margin:0 5px 5px 0}
+  .etag.bilgi{background:#2e2415;color:#EFC98A}
+  .esat button{background:var(--card2);border:none;color:var(--mint);border-radius:8px;padding:7px 11px;font-size:12px;font-weight:600;cursor:pointer;margin-top:4px}
+  .toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--greenDark);color:var(--mint);border:1px solid var(--green);padding:11px 18px;border-radius:22px;font-size:13px;font-weight:600;display:none;z-index:99}
+  .toast.on{display:block}
+  .dip{text-align:center;font-size:11px;color:var(--muted);padding:10px}
+</style>
+</head>
+<body>
+
+<div class="giris" id="girisScr">
+  <div class="logo">YC</div>
+  <h1>YemekChat Yönetim</h1>
+  <p>Platform özeti — sadece yönetici</p>
+  <input id="anahtar" type="password" placeholder="Yönetim şifresi">
+  <div class="err" id="girisErr"></div>
+  <button onclick="girisYap()">Giriş yap</button>
+</div>
+
+<div class="app" id="appScr">
+  <div class="top">
+    <div class="logo">YC</div>
+    <div>
+      <div class="nm">Yönetim Paneli</div>
+      <div class="sb" id="ustBilgi">yükleniyor…</div>
+    </div>
+    <button class="out" onclick="cikis()">Çıkış</button>
+  </div>
+
+  <div class="araclar">
+    <button class="rb on" data-r="bugun" onclick="aralik('bugun',this)">Bugün</button>
+    <button class="rb" data-r="dun" onclick="aralik('dun',this)">Dün</button>
+    <button class="rb" data-r="hafta" onclick="aralik('hafta',this)">Son 7 gün</button>
+    <button class="rb" data-r="ay" onclick="aralik('ay',this)">Bu ay</button>
+    <button class="rb" data-r="hepsi" onclick="aralik('hepsi',this)">Tüm zamanlar</button>
+    <button class="rb yenile" onclick="veriYukle()">↻ Yenile</button>
+  </div>
+
+  <div class="kartlar" id="kartlar"></div>
+
+  <div class="blok">
+    <h3>🏪 Restoranlar</h3>
+    <div style="overflow-x:auto"><table id="tablo"></table></div>
+  </div>
+
+  <div class="blok">
+    <h3>⚠️ Eksik veriler</h3>
+    <div class="eksik" id="eksikler"></div>
+  </div>
+
+  <div class="dip">YemekChat · yönetim paneli</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===================== AYAR =====================
+const API = "https://webhook.yemekchat.com/webhook/admin-data";
+const KOMISYON = 5; // %
+// ================================================
+
+let ANAHTAR = localStorage.getItem("yc_admin") || "";
+let veri = [], aralikTip = "bugun";
+const $ = id => document.getElementById(id);
+const gunStr = d => new Date(d.getTime() - d.getTimezoneOffset()*60000).toISOString().slice(0,10);
+function toast(t){ const e=$("toast"); e.textContent=t; e.classList.add("on"); setTimeout(()=>e.classList.remove("on"),2200); }
+
+function tarihler(){
+  const b = new Date(); let bas = new Date(), bit = new Date();
+  if(aralikTip === "dun"){ bas.setDate(b.getDate()-1); bit.setDate(b.getDate()-1); }
+  else if(aralikTip === "hafta") bas.setDate(b.getDate()-6);
+  else if(aralikTip === "ay") bas = new Date(b.getFullYear(), b.getMonth(), 1);
+  else if(aralikTip === "hepsi") bas = new Date(2020, 0, 1);
+  return { from: gunStr(bas), to: gunStr(bit) };
+}
+function aralik(tip, btn){
+  aralikTip = tip;
+  document.querySelectorAll(".rb[data-r]").forEach(b => b.classList.toggle("on", b === btn));
+  veriYukle();
+}
+
+function girisYap(){
+  const k = $("anahtar").value.trim();
+  if(!k){ $("girisErr").textContent = "Şifre gerekli."; return; }
+  ANAHTAR = k;
+  veriYukle(true);
+}
+function cikis(){ localStorage.removeItem("yc_admin"); location.reload(); }
+
+async function veriYukle(ilk){
+  const t = tarihler();
+  try{
+    const r = await fetch(`${API}?key=${encodeURIComponent(ANAHTAR)}&from=${t.from}&to=${t.to}`);
+    const d = await r.json();
+    if(!d.ok){
+      if(ilk){ $("girisErr").textContent = "Şifre hatalı."; }
+      else toast("Yetki hatası");
+      return;
+    }
+    localStorage.setItem("yc_admin", ANAHTAR);
+    $("girisScr").style.display = "none";
+    $("appScr").style.display = "block";
+    veri = d.data || [];
+    ciz();
+  }catch(e){
+    if(ilk) $("girisErr").textContent = "Bağlantı hatası.";
+    else toast("Bağlantı hatası");
+  }
+}
+
+function ciz(){
+  const t = tarihler();
+  const top = veri.reduce((a,r) => ({
+    siparis: a.siparis + (+r.siparis||0),
+    ciro:    a.ciro    + (+r.ciro||0),
+    online:  a.online  + (+r.online||0),
+    iptal:   a.iptal   + (+r.iptal||0),
+    bekleyen:a.bekleyen+ (+r.bekleyen||0)
+  }), { siparis:0, ciro:0, online:0, iptal:0, bekleyen:0 });
+  const kom = Math.round(top.ciro * KOMISYON / 100);
+  const aktif = veri.filter(r => (+r.siparis||0) > 0).length;
+
+  $("ustBilgi").textContent = `${veri.length} restoran · ${t.from.split("-").reverse().join(".")}${t.from===t.to?"":" – "+t.to.split("-").reverse().join(".")}`;
+
+  $("kartlar").innerHTML = `
+    <div class="k"><div class="v">${top.siparis}</div><div class="l">Sipariş</div></div>
+    <div class="k vurgu"><div class="v">${top.ciro.toLocaleString("tr-TR")}₺</div><div class="l">Toplam ciro</div></div>
+    <div class="k vurgu"><div class="v">${kom.toLocaleString("tr-TR")}₺</div><div class="l">Komisyon (%${KOMISYON})</div></div>
+    <div class="k"><div class="v">${top.online.toLocaleString("tr-TR")}₺</div><div class="l">Online tahsilat</div></div>
+    <div class="k"><div class="v">${aktif}/${veri.length}</div><div class="l">Sipariş alan restoran</div></div>
+    <div class="k ${top.bekleyen?"uyari":""}"><div class="v">${top.bekleyen}</div><div class="l">Bekleyen sipariş</div></div>`;
+
+  $("tablo").innerHTML = `
+    <thead><tr>
+      <th>Restoran</th><th class="sag">Sipariş</th><th class="sag">Ciro</th>
+      <th class="sag">Komisyon</th><th class="sag">Online</th><th class="sag">Son sipariş</th>
+    </tr></thead>
+    <tbody>${veri.map(r => {
+      const s = +r.siparis||0, c = +r.ciro||0;
+      const k = Math.round(c * KOMISYON / 100);
+      const kapali = (r.manuel_kapali === true || r.manuel_kapali === "true");
+      const bek = +r.bekleyen||0;
+      return `<tr class="${s?"":"pasif"}">
+        <td><span class="rn">${r.name}</span>${kapali?'<span class="rozet r-kapali">kapalı</span>':""}${bek?`<span class="rozet r-bekleyen">${bek} bekleyen</span>`:""}${(!s)?'<span class="rozet r-yeni">sipariş yok</span>':""}
+          <div class="rk">${r.kategori||"-"} · ${r.urun} ürün · ${r.bolge} bölge${r.grup?" · "+r.grup:""}</div></td>
+        <td class="sag">${s}${(+r.iptal)?`<span class="rk"> (${r.iptal} iptal)</span>`:""}</td>
+        <td class="sag ci">${c.toLocaleString("tr-TR")}₺</td>
+        <td class="sag">${k.toLocaleString("tr-TR")}₺</td>
+        <td class="sag">${(+r.online||0).toLocaleString("tr-TR")}₺</td>
+        <td class="sag rk">${r.son ? zamanFarki(r.son) : "-"}</td>
+      </tr>`;
+    }).join("")}</tbody>`;
+
+  eksikleriCiz();
+}
+
+function zamanFarki(iso){
+  const dk = Math.floor((Date.now() - new Date(iso).getTime())/60000);
+  if(dk < 60) return dk + " dk önce";
+  if(dk < 1440) return Math.floor(dk/60) + " saat önce";
+  return Math.floor(dk/1440) + " gün önce";
+}
+
+function eksikleriCiz(){
+  const liste = [];
+  veri.forEach(r => {
+    const e = [];
+    if(!String(r.telefon||"").trim()) e.push({ t:"telefon yok", k:false });
+    if(!(r.konum_var === true || r.konum_var === "true")) e.push({ t:"konum yok", k:false });
+    if(!(r.sifre_var === true || r.sifre_var === "true")) e.push({ t:"şifre yok", k:false });
+    if((+r.urun||0) === 0) e.push({ t:"menü boş", k:false });
+    if(!r.acilis || !r.kapanis) e.push({ t:"çalışma saati yok", k:true });
+    if((+r.min_sepet||0) === 0) e.push({ t:"min. sepet 0", k:true });
+    if((+r.bolge||0) === 0) e.push({ t:"bölge çizilmemiş", k:true });
+    if(e.length) liste.push({ r, e });
+  });
+  if(!liste.length){ $("eksikler").innerHTML = '<div style="color:var(--mint);font-size:13px">Tebrikler, eksik veri yok 🎉</div>'; return; }
+  $("eksikler").innerHTML = liste.map((x,i) => `
+    <div class="esat">
+      <div class="ead">${x.r.name}</div>
+      ${x.e.map(t => `<span class="etag ${t.k?"bilgi":""}">${t.t}</span>`).join("")}
+      <div><button onclick="sqlKopyala(${i})">📋 Düzeltme SQL'ini kopyala</button></div>
+    </div>`).join("");
+  window._eksik = liste;
+}
+
+function sqlKopyala(i){
+  const x = window._eksik[i]; if(!x) return;
+  const r = x.r, ad = String(r.name).replace(/'/g,"''");
+  const sat = [];
+  if(!String(r.telefon||"").trim()) sat.push("  telefon = '905XXXXXXXXX'");
+  if(!(r.konum_var === true || r.konum_var === "true")) sat.push("  latitude = 39.XXXXXXX,\n  longitude = 32.XXXXXXX");
+  if(!(r.sifre_var === true || r.sifre_var === "true")) sat.push("  sifre = 'SIFRE'");
+  if(!r.acilis || !r.kapanis) sat.push("  acilis = '11:00',\n  kapanis = '23:00'");
+  if((+r.min_sepet||0) === 0) sat.push("  min_order_amount = 200");
+  const sql = `UPDATE restaurants SET\n${sat.join(",\n")}\nWHERE name = '${ad}';`;
+  navigator.clipboard.writeText(sql).then(()=>toast("SQL panoya kopyalandı"), ()=>{
+    prompt("Kopyala:", sql);
+  });
+}
+
+/* otomatik giriş + 60 sn yenileme */
+if(ANAHTAR) veriYukle(true);
+setInterval(() => { if(ANAHTAR && $("appScr").style.display === "block") veriYukle(); }, 60000);
+$("anahtar").addEventListener("keydown", e => { if(e.key === "Enter") girisYap(); });
+</script>
+</body>
+</html>
