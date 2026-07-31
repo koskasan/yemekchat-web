@@ -191,6 +191,7 @@ const DRAFT = p.get("draft");             // yazarak sipariş taslağı (Path B)
 
 let screen = 1, nearby = [], menu = [], rest = null, pay = null, catFilter = "Tümü";
 let isCat = false, catInfo = null, isDraft = false, draftNote = "", deliveryFee = 0, minSepet = 0;
+let musteriLat = LAT || "", musteriLng = LNG || "";   // kurye yol tarifi için
 const cart = {};  // id -> {item, qty}
 
 const $ = id => document.getElementById(id);
@@ -386,7 +387,7 @@ async function submitOrder(){
   let details = Object.values(cart).map(c=>`${c.item.name} x${c.qty}`).join(", ");
   if(draftNote) details += ` — 📝 ${draftNote}`;
   if(deliveryFee > 0) details += ` — 🛵 Getirme: ${deliveryFee} TL`;
-  const payload = { restaurant_name:rest, customer_phone:TEL, order_details:details, total_amount:grand(), payment_method:(pay==="Online"?"Online (bekliyor)":pay), address };
+  const payload = { restaurant_name:rest, customer_phone:TEL, order_details:details, total_amount:grand(), payment_method:(pay==="Online"?"Online (bekliyor)":pay), address, lat:musteriLat||"", lng:musteriLng||"" };
   const go=$("go"); go.disabled=true; go.textContent="Gönderiliyor…";
   try{
     const r = await fetch(CONFIG.ORDER,{ method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload) });
@@ -438,6 +439,7 @@ async function draftInit(){
     if(["null","undefined","="].includes(draftNote.toLowerCase())) draftNote = "";
     minSepet   = Math.max(0, Math.round(Number(d.min_sepet) || 0));
     deliveryFee = Math.max(0, Math.round(Number(d.teslimat_ucreti) || 0));
+    if(d.lat && d.lng){ musteriLat = d.lat; musteriLng = d.lng; }
     $("hdName").textContent = d.restaurant_name;
     $("hdSub").textContent = "sepetin hazır · ödeme & adres";
     screen = 3; renderCart(); show();
