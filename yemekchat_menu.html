@@ -134,6 +134,9 @@
         <div class="opt" data-pay="Online"><div class="ic">💳</div><div class="lb">Online Öde</div></div>
       </div>
     </div>
+    <div class="sec"><h3>Siparişine not</h3>
+      <input class="fld" id="sipnot" placeholder="Örn: soğansız olsun, acısız, zile basmayın">
+    </div>
     <div class="sec"><h3>Teslimat adresi</h3>
       <input class="fld" id="bina" placeholder="Bina adı / sokak no">
       <div class="row2"><input class="fld" id="kat" placeholder="Kat"><input class="fld" id="daire" placeholder="Daire"></div>
@@ -385,7 +388,9 @@ async function submitOrder(){
   const kat=$("kat").value.trim(), daire=$("daire").value.trim(), nt=$("adnot").value.trim();
   const address = `${bina}${kat?", Kat "+kat:""}${daire?", Daire "+daire:""}${nt?" ("+nt+")":""}`;
   let details = Object.values(cart).map(c=>`${c.item.name} x${c.qty}`).join(", ");
-  if(draftNote) details += ` — 📝 ${draftNote}`;
+  const musteriNot = ($("sipnot") ? $("sipnot").value : "").trim();
+  const tumNot = [draftNote, musteriNot].filter(Boolean).join(" · ");
+  if(tumNot) details += ` — 📝 ${tumNot}`;
   if(deliveryFee > 0) details += ` — 🛵 Getirme: ${deliveryFee} TL`;
   const payload = { restaurant_name:rest, customer_phone:TEL, order_details:details, total_amount:grand(), payment_method:(pay==="Online"?"Online (bekliyor)":pay), address, lat:musteriLat||"", lng:musteriLng||"" };
   const go=$("go"); go.disabled=true; go.textContent="Gönderiliyor…";
@@ -443,6 +448,7 @@ async function draftInit(){
     $("hdName").textContent = d.restaurant_name;
     $("hdSub").textContent = "sepetin hazır · ödeme & adres";
     screen = 3; renderCart(); show();
+    if(draftNote && $("sipnot") && !$("sipnot").value) $("sipnot").value = draftNote;
   }catch(e){ document.body.innerHTML = '<div class="empty" style="padding-top:90px">Bağlantı hatası.</div>'; }
 }
 
