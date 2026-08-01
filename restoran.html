@@ -216,6 +216,7 @@
     <div class="tabs">
       <button class="tab on" data-tab="orders">Siparişler</button>
       <button class="tab" data-tab="menu">Menü</button>
+      <button class="tab" data-tab="catering" id="tabBtnCatering" style="display:none">Kurumsal</button>
       <button class="tab" data-tab="rapor">Rapor</button>
       <button class="tab" data-tab="settings">Ayarlar</button>
     </div>
@@ -261,6 +262,27 @@
         </div>
       </div>
       <div id="menuList"></div>
+    </div>
+
+    <div id="tabCatering" style="display:none">
+      <div class="sbox">
+        <h4>🍲 Günün kurumsal menüsü</h4>
+        <div class="hint" id="catBilgi">…</div>
+        <div class="s2">
+          <div><label>Tarih</label><input id="catTarih" type="date" onchange="catYukle()"></div>
+          <div style="display:flex;align-items:flex-end"><button class="sbtn" style="margin:0;background:var(--card2);color:var(--mint)" onclick="catOncekiKopyala()">↺ Önceki menüyü getir</button></div>
+        </div>
+        <div id="catEditor"></div>
+        <button class="sbtn" onclick="catKaydet()">Menüyü kaydet</button>
+        <div class="sok" id="catMsg"></div>
+      </div>
+
+      <div class="sbox">
+        <h4>👥 Bugünkü kurumsal siparişler</h4>
+        <div class="hint">Mutfak için toplam sayım, paketleme için kişi listesi.</div>
+        <div id="catListe"></div>
+        <button class="sbtn" style="background:var(--card2);color:#EFC98A" onclick="catListeYazdir()">🖨 Mutfak listesini yazdır</button>
+      </div>
     </div>
 
     <div id="tabRapor" style="display:none">
@@ -422,8 +444,12 @@ const API = {
   SETTINGS:      "https://webhook.yemekchat.com/webhook/panel-settings",
   SETTINGS_SAVE: "https://webhook.yemekchat.com/webhook/panel-settings-save",
   BULK:          "https://webhook.yemekchat.com/webhook/panel-bulk-price",
-  ZONES:         "https://webhook.yemekchat.com/webhook/panel-zones"
+  ZONES:         "https://webhook.yemekchat.com/webhook/panel-zones",
+  CAT_MENU:      "https://webhook.yemekchat.com/webhook/catering-panel-menu",
+  CAT_MENU_SAVE: "https://webhook.yemekchat.com/webhook/catering-panel-menu-save",
+  CAT_LISTE:     "https://webhook.yemekchat.com/webhook/catering-panel-liste"
 };
+const CAT_GRUPLAR = ["Çorba", "Ana Yemek", "Ara Sıcak", "İçecek", "Tatlı"];
 const REFRESH_MS = 12000;
 // ================================================
 
@@ -455,6 +481,8 @@ document.querySelectorAll(".tab").forEach(t => {
     document.getElementById("tabMenu").style.display = tab==="menu" ? "block" : "none";
     document.getElementById("tabSettings").style.display = tab==="settings" ? "block" : "none";
     document.getElementById("tabRapor").style.display = tab==="rapor" ? "block" : "none";
+    document.getElementById("tabCatering").style.display = tab==="catering" ? "block" : "none";
+    if(tab==="catering") catAc();
     document.getElementById("liveTxt").textContent = tab==="orders" ? "Canlı · otomatik yenileniyor" : (tab==="menu" ? "Menü yönetimi" : (tab==="rapor" ? "Ciro raporu" : "Ayarlar"));
     if(tab==="menu") loadMenu();
     if(tab==="settings") loadSettings();
@@ -481,6 +509,7 @@ function startPanel(){
   document.getElementById("panelScr").style.display = "block";
   document.getElementById("pName").textContent = REST;
   loadBrands();
+  catVarMi();
   loadOrders();
   timer = setInterval(loadOrders, REFRESH_MS);
   audioCtx(); if(!AC || AC.state === "suspended") showSesUyari();
@@ -818,6 +847,146 @@ function showSesUyari(){
   d.textContent = "🔔 Sipariş sesini aç (dokun)";
   d.onclick = () => { siren(true); d.remove(); };
   document.body.appendChild(d);
+}
+
+/* ---------- KURUMSAL (CATERING) ---------- */
+let catSirket = "", catSatirlar = [], catOnceki = [], catSiparisler = [];
+function catBugun(){ const d = new Date(); return new Date(d.getTime() - d.getTimezoneOffset()*60000).toISOString().slice(0,10); }
+async function catVarMi(){
+  try{
+    const r = await fetch(`${API.CAT_MENU}?restaurant=${encodeURIComponent(aktifMarka())}`);
+    const d = await r.json();
+    catSirket = d.sirket || "";
+    document.getElementById("tabBtnCatering").style.display = catSirket ? "block" : "none";
+  }catch(e){}
+}
+function catAc(){ if(!document.getElementById("catTarih").value) document.getElementById("catTarih").value = catBugun(); catYukle(); }
+async function catYukle(){
+  const tarih = document.getElementById("catTarih").value || catBugun();
+  try{
+    const r = await fetch(`${API.CAT_MENU}?restaurant=${encodeURIComponent(aktifMarka())}&tarih=${tarih}`);
+    const d = await r.json();
+    catSirket = d.sirket || "";
+    let m = d.menu; if(typeof m === "string") m = JSON.parse(m || "[]");
+    let o = d.onceki_menu; if(typeof o === "string") o = JSON.parse(o || "[]");
+    catSatirlar = Array.isArray(m) ? m : [];
+    catOnceki = Array.isArray(o) ? o : [];
+    document.getElementById("catBilgi").innerHTML = catSirket
+      ? `Kurumsal müşteri: <b style="color:var(--mint)">${catSirket}</b> · kişi başı <b style="color:var(--mint)">${d.ucret||0}₺</b>. Çalışanlar her gruptan bir seçim yapar.`
+      : "Kurumsal müşteriniz tanımlı değil.";
+    catEditorCiz();
+  }catch(e){ document.getElementById("catMsg").textContent = "Menü yüklenemedi."; }
+  catListeYukle();
+}
+function catEditorCiz(){
+  const el = document.getElementById("catEditor");
+  el.innerHTML = CAT_GRUPLAR.map(g => {
+    const satir = catSatirlar.filter(x => x.grup === g);
+    const kutular = (satir.length ? satir : [{ ad: "" }]).map((x,i) =>
+      `<div style="display:flex;gap:6px;margin-bottom:6px">
+         <input class="catInp" data-grup="${g}" value="${String(x.ad||"").replace(/"/g,"&quot;")}" placeholder="${g} seçeneği">
+         <button onclick="catSatirSil(this)" style="background:var(--card2);border:none;color:#F09595;border-radius:9px;padding:0 12px;cursor:pointer">🗑</button>
+       </div>`).join("");
+    return `<div style="margin-top:14px">
+      <label style="color:var(--mint);font-weight:600">${g}</label>
+      <div id="catG_${g.replace(/\s/g,'_')}">${kutular}</div>
+      <button onclick="catSatirEkle('${g}')" style="background:var(--card2);border:none;color:var(--mint);border-radius:9px;padding:8px 12px;font-size:12.5px;font-weight:600;cursor:pointer">+ ${g} ekle</button>
+    </div>`;
+  }).join("");
+}
+function catSatirEkle(g){
+  const kap = document.getElementById("catG_" + g.replace(/\s/g,'_'));
+  const d = document.createElement("div");
+  d.style.cssText = "display:flex;gap:6px;margin-bottom:6px";
+  d.innerHTML = `<input class="catInp" data-grup="${g}" placeholder="${g} seçeneği">
+    <button onclick="catSatirSil(this)" style="background:var(--card2);border:none;color:#F09595;border-radius:9px;padding:0 12px;cursor:pointer">🗑</button>`;
+  kap.appendChild(d);
+  d.querySelector("input").focus();
+}
+function catSatirSil(btn){ btn.parentElement.remove(); }
+function catOncekiKopyala(){
+  if(!catOnceki.length){ document.getElementById("catMsg").textContent = "Önceki menü bulunamadı."; return; }
+  catSatirlar = catOnceki.slice();
+  catEditorCiz();
+  document.getElementById("catMsg").textContent = "Önceki menü getirildi — düzenleyip kaydet.";
+  setTimeout(()=>{ document.getElementById("catMsg").textContent=""; }, 3000);
+}
+async function catKaydet(){
+  const msg = document.getElementById("catMsg");
+  const satirlar = [];
+  document.querySelectorAll(".catInp").forEach((inp,i) => {
+    const ad = inp.value.trim();
+    if(ad) satirlar.push({ grup: inp.dataset.grup, ad, sira: i });
+  });
+  if(!satirlar.length){ msg.textContent = "En az bir seçenek yaz."; return; }
+  msg.textContent = "Kaydediliyor…";
+  try{
+    const r = await fetch(API.CAT_MENU_SAVE, { method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ restaurant: aktifMarka(), tarih: document.getElementById("catTarih").value || catBugun(), satirlar }) });
+    const d = await r.json();
+    msg.textContent = d.ok ? `✓ ${d.adet} seçenek kaydedildi — çalışanlar artık seçebilir` : "Kaydedilemedi.";
+    catSatirlar = satirlar;
+  }catch(e){ msg.textContent = "Bağlantı hatası."; }
+  setTimeout(()=>{ msg.textContent=""; }, 4000);
+}
+async function catListeYukle(){
+  const tarih = document.getElementById("catTarih").value || catBugun();
+  try{
+    const r = await fetch(`${API.CAT_LISTE}?restaurant=${encodeURIComponent(aktifMarka())}&tarih=${tarih}`);
+    const d = await r.json();
+    let s = d.siparisler; if(typeof s === "string") s = JSON.parse(s || "[]");
+    catSiparisler = Array.isArray(s) ? s : [];
+    catListeCiz(d);
+  }catch(e){ document.getElementById("catListe").innerHTML = '<div class="empty">Liste alınamadı.</div>'; }
+}
+function catAyristir(detay){
+  const p = String(detay || "").split("—");
+  const ad = (p.shift() || "").trim();
+  const secimler = p.join("—").split("|").map(x => x.trim()).filter(Boolean);
+  return { ad, secimler };
+}
+function catListeCiz(d){
+  const el = document.getElementById("catListe");
+  if(!catSiparisler.length){ el.innerHTML = '<div class="empty" style="padding:20px">Bu tarihte kurumsal sipariş yok.</div>'; return; }
+  const sayim = {};
+  const kisiler = catSiparisler.map(o => {
+    const a = catAyristir(o.detay);
+    a.secimler.forEach(s => { sayim[s] = (sayim[s] || 0) + 1; });
+    return a;
+  });
+  el.innerHTML = `
+    <div class="rgrid" style="margin-top:10px">
+      <div class="rbox"><div class="v">${d.kisi || catSiparisler.length}</div><div class="l">Kişi</div></div>
+      <div class="rbox"><div class="v" style="color:var(--mint)">${(+d.tutar||0).toLocaleString("tr-TR")}₺</div><div class="l">Tutar</div></div>
+    </div>
+    <div style="margin-top:6px">${Object.keys(sayim).sort().map(k =>
+      `<div class="rsat"><span>${k}</span><b>${sayim[k]}</b></div>`).join("")}</div>
+    <div style="margin-top:14px;font-size:12px;color:var(--txt3)">Kişi listesi</div>
+    <div>${kisiler.map(k => `<div class="rsat"><span>${k.ad}</span><span style="color:var(--txt2);font-size:12px;text-align:right">${k.secimler.join(" · ")}</span></div>`).join("")}</div>`;
+}
+function catListeYazdir(){
+  if(!catSiparisler.length){ alert("Yazdırılacak sipariş yok."); return; }
+  const tarih = document.getElementById("catTarih").value || catBugun();
+  const sayim = {};
+  const kisiler = catSiparisler.map(o => {
+    const a = catAyristir(o.detay);
+    a.secimler.forEach(s => { sayim[s] = (sayim[s] || 0) + 1; });
+    return a;
+  });
+  document.getElementById("fisAlan").innerHTML = `
+    <div class="c xl">KURUMSAL LİSTE</div>
+    <div class="c lg">${catSirket || ""}</div>
+    <div class="c sm">${tarih.split("-").reverse().join(".")} · ${kisiler.length} kişi</div>
+    <div class="hr"></div>
+    <div class="c b">MUTFAK TOPLAMI</div>
+    ${Object.keys(sayim).sort().map(k => `<div class="ln"><span>${k}</span><span class="b">${sayim[k]}</span></div>`).join("")}
+    <div class="hr"></div>
+    <div class="c b">KİŞİ LİSTESİ</div>
+    ${kisiler.map(k => `<div style="margin-bottom:4px"><span class="b">${k.ad}</span><div class="sm">${k.secimler.join(" · ")}</div></div>`).join("")}
+    <div class="hr"></div>
+    <div class="c sm">YemekChat · yemekchat.com</div>
+    <div style="height:8mm"></div>`;
+  window.print();
 }
 
 /* ---------- KURYE YOL TARİFİ ---------- */
