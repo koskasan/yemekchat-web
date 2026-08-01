@@ -59,6 +59,9 @@
   .r-kapali{background:#3a1715;color:#F09595}
   .r-bekleyen{background:#3a2a15;color:#EFC98A}
   .r-yeni{background:#1b2b3a;color:#8FC4F5}
+  .r-acik{background:#12331f;color:#7ee2a8}
+  .r-uyku{background:#2e2415;color:#EFC98A}
+  .r-hic{background:#2b2b2b;color:#9a9a9a}
 
   .eksik{padding:0 16px 14px}
   .esat{background:var(--bg);border:1px solid var(--line);border-radius:11px;padding:11px 12px;margin-bottom:8px}
@@ -256,6 +259,7 @@ function ciz(){
   }), { siparis:0, ciro:0, online:0, iptal:0, bekleyen:0 });
   const kom = Math.round(top.ciro * KOMISYON / 100);
   const aktif = veri.filter(r => (+r.siparis||0) > 0).length;
+  const panelAcik = veri.filter(panelAcikMi).length;
 
   $("ustBilgi").textContent = `${veri.length} restoran · ${t.from.split("-").reverse().join(".")}${t.from===t.to?"":" – "+t.to.split("-").reverse().join(".")}`;
 
@@ -265,6 +269,7 @@ function ciz(){
     <div class="k vurgu"><div class="v">${kom.toLocaleString("tr-TR")}₺</div><div class="l">Komisyon (%${KOMISYON})</div></div>
     <div class="k"><div class="v">${top.online.toLocaleString("tr-TR")}₺</div><div class="l">Online tahsilat</div></div>
     <div class="k"><div class="v">${aktif}/${veri.length}</div><div class="l">Sipariş alan restoran</div></div>
+    <div class="k"><div class="v" style="color:${panelAcik?"#7ee2a8":"var(--txt)"}">${panelAcik}/${veri.length}</div><div class="l">🟢 Paneli açık</div></div>
     <div class="k ${top.bekleyen?"uyari":""}"><div class="v">${top.bekleyen}</div><div class="l">Bekleyen sipariş</div></div>`;
 
   $("tablo").innerHTML = `
@@ -278,7 +283,7 @@ function ciz(){
       const kapali = (r.manuel_kapali === true || r.manuel_kapali === "true");
       const bek = +r.bekleyen||0;
       return `<tr class="${s?"":"pasif"}">
-        <td><span class="rn">${r.name}</span>${kapali?'<span class="rozet r-kapali">kapalı</span>':""}${bek?`<span class="rozet r-bekleyen">${bek} bekleyen</span>`:""}${(!s)?'<span class="rozet r-yeni">sipariş yok</span>':""}
+        <td><span class="rn">${r.name}</span>${panelRozet(r)}${kapali?'<span class="rozet r-kapali">kapalı</span>':""}${bek?`<span class="rozet r-bekleyen">${bek} bekleyen</span>`:""}${(!s)?'<span class="rozet r-yeni">sipariş yok</span>':""}
           <div class="rk">${r.kategori||"-"} · ${r.urun} ürün · ${r.bolge} bölge${r.grup?" · "+r.grup:""}</div></td>
         <td class="sag">${s}${(+r.iptal)?`<span class="rk"> (${r.iptal} iptal)</span>`:""}</td>
         <td class="sag ci">${c.toLocaleString("tr-TR")}₺</td>
@@ -292,6 +297,16 @@ function ciz(){
   eksikleriCiz();
 }
 
+function panelAcikMi(r){ const d = r.panel_dk; return (d !== null && d !== undefined && Number(d) <= 3); }
+function panelRozet(r){
+  const d = r.panel_dk;
+  if(d === null || d === undefined) return '<span class="rozet r-hic">panele hiç girmemiş</span>';
+  const dk = Number(d);
+  if(dk <= 3) return '<span class="rozet r-acik">🟢 panel açık</span>';
+  if(dk < 60) return `<span class="rozet r-uyku">panel kapalı · ${dk} dk</span>`;
+  if(dk < 1440) return `<span class="rozet r-uyku">panel kapalı · ${Math.floor(dk/60)} saat</span>`;
+  return `<span class="rozet r-hic">panel kapalı · ${Math.floor(dk/1440)} gün</span>`;
+}
 function zamanFarki(iso){
   const dk = Math.floor((Date.now() - new Date(iso).getTime())/60000);
   if(dk < 60) return dk + " dk önce";
