@@ -48,6 +48,10 @@
   .item{background:var(--card);border-radius:12px;padding:11px 12px;margin-bottom:7px;display:flex;align-items:center;gap:11px}
   .item.off{opacity:.45}
   .item .thumb{width:54px;height:54px;border-radius:9px;object-fit:cover;flex-shrink:0;background:var(--card2)}
+  .item.secim{cursor:pointer}
+  .item.secim.on{border:1.5px solid var(--green);background:var(--card2)}
+  .item.secim .tik{width:26px;height:26px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;color:var(--txt3);font-size:15px;flex-shrink:0}
+  .item.secim.on .tik{color:var(--mint)}
   .item .info{flex:1;min-width:0}
   .item .nm{font-size:14px}
   .item .ds{font-size:11px;color:var(--txt3);margin-top:1px}
@@ -165,6 +169,8 @@ const CONFIG = {
   ORDER:  "https://webhook.yemekchat.com/webhook/order",
   CATERING_INFO:  "https://webhook.yemekchat.com/webhook/catering-info",
   CATERING_ORDER: "https://webhook.yemekchat.com/webhook/catering-order",
+  CATERING_GUNLUK:  "https://webhook.yemekchat.com/webhook/catering-gunluk",
+  CATERING_SIPARIS: "https://webhook.yemekchat.com/webhook/catering-siparis",
   DRAFT: "https://webhook.yemekchat.com/webhook/draft",
   PAYTR: "https://webhook.yemekchat.com/webhook/paytr-create"
 };
@@ -452,8 +458,92 @@ async function draftInit(){
   }catch(e){ document.body.innerHTML = '<div class="empty" style="padding-top:90px">Bağlantı hatası.</div>'; }
 }
 
-/* ---------- KURUMSAL (CATERING) ---------- */
+/* ---------- KURUMSAL v2: GÜNÜN MENÜSÜ ---------- */
+let gunlukSecim = {}, gunlukMenu = [];
 async function cateringInit(){
+  isCat = true;
+  // önce günlük menü sistemini dene
+  try{
+    const r = await fetch(`${CONFIG.CATERING_GUNLUK}?code=${encodeURIComponent(CATERING)}`);
+    const d = await r.json();
+    if(d && d.ok){
+      let m = d.menu; if(typeof m === "string") m = JSON.parse(m || "[]");
+      gunlukMenu = Array.isArray(m) ? m : [];
+      if(gunlukMenu.length){ gunlukEkran(d); return; }
+      // günün menüsü girilmemişse
+      document.body.innerHTML = `<div class="empty" style="padding-top:90px">Merhaba ${d.ad || ""} 👋<br><br>${d.restoran || "Restoran"} bugünün menüsünü henüz girmemiş.<br>Birazdan tekrar dener misin?</div>`;
+      return;
+    }
+    if(d && d.ok === false && d.ad === ""){
+      document.body.innerHTML = '<div class="empty" style="padding-top:90px">Bu kod tanımlı değil ustam.<br>Şirket yetkilinle görüş.</div>';
+      return;
+    }
+  }catch(e){ /* eski sisteme düş */ }
+  return cateringEskiInit();
+}
+
+function gunlukEkran(d){
+  const gruplar = [];
+  gunlukMenu.forEach(x => { if(!gruplar.includes(x.grup)) gruplar.push(x.grup); });
+  rest = d.restoran || "Kurumsal";
+  $("hdName").textContent = d.restoran || "Kurumsal Yemek";
+  $("hdSub").textContent = `${d.sirket || "Kurumsal"} · ${d.ad || ""}`;
+  screen = 2; show();
+  const bugun = new Date().toLocaleDateString("tr-TR", { day:"2-digit", month:"long", weekday:"long" });
+  let html = `<div class="sec"><h3>${bugun} · günün menüsü</h3>`;
+  if(Number(d.bugun_verilen) > 0){
+    html += `<div class="cartline" style="border:none"><span class="cn" style="color:var(--amber)">ℹ️ Bugün zaten sipariş verdin. Yeni seçim gönderirsen ikinci sipariş oluşur.</span></div>`;
+  }
+  html += "</div>";
+  gruplar.forEach(g => {
+    html += `<div class="sec"><div class="cat">${g}</div>`;
+    gunlukMenu.filter(x => x.grup === g).forEach((x,i) => {
+      const id = `${g}__${i}`;
+      html += `<div class="item secim" data-grup="${g}" data-ad="${String(x.ad).replace(/"/g,"&quot;")}" onclick="gunlukSec(this)">
+        <div class="tik">○</div>
+        <div class="info"><div class="nm">${x.ad}</div></div>
+      </div>`;
+    });
+    html += "</div>";
+  });
+  $("menuWrap").innerHTML = html;
+  gunlukSecim = {};
+  gunlukBar();
+}
+function gunlukSec(el){
+  const g = el.dataset.grup, ad = el.dataset.ad;
+  document.querySelectorAll(`.item.secim[data-grup="${g}"]`).forEach(x => {
+    x.classList.remove("on"); x.querySelector(".tik").textContent = "○";
+  });
+  if(gunlukSecim[g] === ad){ delete gunlukSecim[g]; }
+  else { gunlukSecim[g] = ad; el.classList.add("on"); el.querySelector(".tik").textContent = "●"; }
+  gunlukBar();
+}
+function gunlukBar(){
+  const go = $("go"); const n = Object.keys(gunlukSecim).length;
+  $("bar").classList.add("on");
+  go.onclick = gunlukGonder;
+  if(!n){ go.disabled = true; go.textContent = "Menüden seçim yap"; }
+  else { go.disabled = false; go.innerHTML = `✓ Siparişi Onayla (${n} seçim)`; }
+}
+async function gunlukGonder(){
+  const secim = Object.keys(gunlukSecim).map(g => `${g}: ${gunlukSecim[g]}`).join(" | ");
+  const go = $("go"); go.disabled = true; go.textContent = "Gönderiliyor…";
+  try{
+    const r = await fetch(CONFIG.CATERING_SIPARIS, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: CATERING, tel: TEL, secim })
+    });
+    const res = await r.json();
+    if(!res.ok){ alert("Sipariş kaydedilemedi, tekrar dene."); go.disabled = false; gunlukBar(); return; }
+    $("okNo").textContent = res.order_id ? "Sipariş No: #" + res.order_id : "";
+    $("okScreen").style.display = "flex";
+    setTimeout(() => { try{ window.close(); }catch(e){} }, 3500);
+  }catch(e){ alert("Bağlantı hatası, tekrar dene."); go.disabled = false; gunlukBar(); }
+}
+
+/* ---------- KURUMSAL (eski à la carte akışı) ---------- */
+async function cateringEskiInit(){
   isCat = true;
   try{
     const r = await fetch(`${CONFIG.CATERING_INFO}?code=${encodeURIComponent(CATERING)}`);
