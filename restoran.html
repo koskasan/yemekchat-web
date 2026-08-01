@@ -82,15 +82,16 @@
     body > #fisAlan{display:block !important}
     @page{size:80mm auto;margin:3mm}
   }
-  #fisAlan{color:#000;background:#fff;width:74mm;font-family:"Courier New",Courier,monospace;font-size:12px;line-height:1.45}
+  #fisAlan{color:#000;background:#fff;width:74mm;font-family:"Arial Black","Segoe UI",Arial,sans-serif;font-size:13px;line-height:1.5;font-weight:700;-webkit-print-color-adjust:exact;print-color-adjust:exact;text-rendering:geometricPrecision}
+  #fisAlan *{color:#000 !important;font-weight:700}
   #fisAlan .c{text-align:center}
-  #fisAlan .b{font-weight:700}
-  #fisAlan .xl{font-size:17px;font-weight:700;letter-spacing:1px}
-  #fisAlan .lg{font-size:14px;font-weight:700}
-  #fisAlan .hr{border-top:1px dashed #000;margin:5px 0}
+  #fisAlan .b{font-weight:900}
+  #fisAlan .xl{font-size:20px;font-weight:900;letter-spacing:1px}
+  #fisAlan .lg{font-size:16px;font-weight:900}
+  #fisAlan .hr{border-top:2px solid #000;margin:6px 0}
   #fisAlan .ln{display:flex;justify-content:space-between;gap:6px}
-  #fisAlan .sm{font-size:10.5px}
-  #fisAlan .box{border:1.5px solid #000;padding:3px 5px;margin:5px 0;font-weight:700;text-align:center}
+  #fisAlan .sm{font-size:12px}
+  #fisAlan .box{border:2.5px solid #000;padding:4px 6px;margin:6px 0;font-weight:900;text-align:center;font-size:14px}
 
   /* MENÜ */
   .mtop{display:flex;align-items:center;justify-content:space-between;padding:14px}
@@ -344,6 +345,7 @@
         <h4>Yapılacaklar</h4>
         <p><b>1.</b> Termal yazıcınızı bu bilgisayara bağlayın ve Windows'ta <b>varsayılan yazıcı</b> yapın (Ayarlar → Bluetooth ve cihazlar → Yazıcılar).</p>
         <p><b>2.</b> Yazıcı sürücüsünde kâğıt boyutunu <b>80 mm</b> seçin.</p>
+        <p><b>2b. Fiş silik çıkıyorsa:</b> Windows → Yazıcılar → yazıcınıza sağ tık → <b>Yazdırma tercihleri</b> → <b>Yoğunluk / Darkness / Koyuluk</b> ayarını en yükseğe (Dark / 15) çekin. Ayrıca yazdırma penceresinde <b>Kalite: Yüksek</b> ve <b>"Arka plan grafikleri"</b> açık olsun. Kâğıdın termal yüzü doğru tarafa bakmalı ve rulo eski/nemliyse yenisiyle deneyin.</p>
         <p><b>3.</b> Onay penceresi çıkmasın istiyorsanız: Chrome kısayoluna sağ tık → <b>Özellikler</b> → <b>Hedef</b> alanının sonuna bir boşluk bırakıp <b>--kiosk-printing</b> yazın → Tamam. Chrome'u bundan sonra <b>bu kısayoldan</b> açın.</p>
         <p><b>4.</b> Paneli bu Chrome'da açık tutun. Sipariş düştüğü an fiş kendiliğinden çıkar.</p>
         <div class="warn">⚠️ Panel kapalıyken otomatik fiş çalışmaz. Kasadaki bilgisayarda sekmeyi açık bırakın.</div>
