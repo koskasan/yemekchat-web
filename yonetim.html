@@ -66,6 +66,28 @@
   .etag{display:inline-block;font-size:11px;background:#3a1715;color:#F09595;padding:2px 8px;border-radius:9px;margin:0 5px 5px 0}
   .etag.bilgi{background:#2e2415;color:#EFC98A}
   .esat button{background:var(--card2);border:none;color:var(--mint);border-radius:8px;padding:7px 11px;font-size:12px;font-weight:600;cursor:pointer;margin-top:4px}
+  .duzenle{background:var(--card2);border:none;color:var(--mint);border-radius:8px;padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap}
+  .yeni-rest{background:var(--green);border:none;color:var(--greenDark);border-radius:9px;padding:9px 13px;font-size:12.5px;font-weight:700;cursor:pointer}
+
+  /* düzenleme penceresi */
+  .dmodal{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:400;display:none;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto}
+  .dmodal.on{display:flex}
+  .dbox{background:var(--card);border:1px solid var(--purple);border-radius:16px;padding:18px;width:100%;max-width:520px;margin-top:20px}
+  .dbox h3{font-size:16px;margin-bottom:4px}
+  .dbox .alt{font-size:11.5px;color:var(--txt3);margin-bottom:14px}
+  .dbox label{display:block;font-size:11.5px;color:var(--txt3);margin:10px 0 4px}
+  .dbox input{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:11px;font-size:14px;color:var(--txt);font-family:inherit}
+  .d2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .d3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .dsw{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--bg);border:1px solid var(--line);border-radius:11px;padding:12px;margin-top:12px;font-size:13px}
+  .sw{width:48px;height:26px;border-radius:14px;background:var(--card2);border:none;position:relative;cursor:pointer;flex-shrink:0}
+  .sw::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:var(--muted);transition:.2s}
+  .sw.on{background:var(--red)}
+  .sw.on::after{left:25px;background:#fff}
+  .dfoot{display:flex;gap:8px;margin-top:16px}
+  .dfoot button{flex:1;border:none;border-radius:11px;padding:13px;font-size:14px;font-weight:600;cursor:pointer}
+  .dfoot .vaz{background:var(--card2);color:var(--txt2)}
+  .dfoot .kay{background:var(--green);color:var(--greenDark)}
   .toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--greenDark);color:var(--mint);border:1px solid var(--green);padding:11px 18px;border-radius:22px;font-size:13px;font-weight:600;display:none;z-index:99}
   .toast.on{display:block}
   .dip{text-align:center;font-size:11px;color:var(--muted);padding:10px}
@@ -99,6 +121,7 @@
     <button class="rb" data-r="ay" onclick="aralik('ay',this)">Bu ay</button>
     <button class="rb" data-r="hepsi" onclick="aralik('hepsi',this)">Tüm zamanlar</button>
     <button class="rb yenile" onclick="veriYukle()">↻ Yenile</button>
+    <button class="yeni-rest" onclick="duzenleAc(null)">➕ Yeni restoran</button>
   </div>
 
   <div class="kartlar" id="kartlar"></div>
@@ -116,11 +139,60 @@
   <div class="dip">YemekChat · yönetim paneli</div>
 </div>
 
+<div class="dmodal" id="dmodal">
+  <div class="dbox">
+    <h3 id="dBaslik">Restoranı Düzenle</h3>
+    <div class="alt" id="dAlt">Boş bıraktığın alanlar değişmez.</div>
+
+    <label>Restoran adı</label>
+    <input id="dAd" placeholder="Örn: Aynen Burger">
+
+    <div class="d2">
+      <div><label>Kategori</label><input id="dKat" placeholder="burger / pizza / kebab / döner"></div>
+      <div><label>Telefon</label><input id="dTel" placeholder="905XXXXXXXXX"></div>
+    </div>
+
+    <label>Konum (Google Maps'ten kopyala: enlem, boylam)</label>
+    <input id="dKonum" placeholder="39.9241693, 32.817152">
+
+    <div class="d3">
+      <div><label>Şifre</label><input id="dSifre" placeholder="panel şifresi"></div>
+      <div><label>Min. sepet ₺</label><input id="dMin" type="number" inputmode="numeric" placeholder="200"></div>
+      <div><label>Puan</label><input id="dPuan" type="number" step="0.1" placeholder="4.5"></div>
+    </div>
+
+    <div class="d2">
+      <div><label>Açılış</label><input id="dAcilis" type="time"></div>
+      <div><label>Kapanış</label><input id="dKapanis" type="time"></div>
+    </div>
+
+    <div class="d3">
+      <div><label>Teslimat taban ₺</label><input id="dTaban" type="number" inputmode="numeric" placeholder="0"></div>
+      <div><label>Km ücreti ₺</label><input id="dKm" type="number" inputmode="numeric" placeholder="0"></div>
+      <div><label>Maks. km</label><input id="dMax" type="number" inputmode="numeric" placeholder="5"></div>
+    </div>
+
+    <label>Grup kodu (aynı işletmenin markaları için — boş bırakılabilir)</label>
+    <input id="dGrup" placeholder="örn: janti-grup">
+
+    <div class="dsw">
+      <div>Şu an siparişe kapalı</div>
+      <button class="sw" id="dKapali" onclick="this.classList.toggle('on')"></button>
+    </div>
+
+    <div class="dfoot">
+      <button class="vaz" onclick="duzenleKapat()">Vazgeç</button>
+      <button class="kay" id="dKaydet" onclick="duzenleKaydet()">Kaydet</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
 // ===================== AYAR =====================
 const API = "https://webhook.yemekchat.com/webhook/admin-data";
+const API_KAYDET = "https://webhook.yemekchat.com/webhook/admin-save";
 const KOMISYON = 5; // %
 // ================================================
 
@@ -198,7 +270,7 @@ function ciz(){
   $("tablo").innerHTML = `
     <thead><tr>
       <th>Restoran</th><th class="sag">Sipariş</th><th class="sag">Ciro</th>
-      <th class="sag">Komisyon</th><th class="sag">Online</th><th class="sag">Son sipariş</th>
+      <th class="sag">Komisyon</th><th class="sag">Online</th><th class="sag">Son sipariş</th><th></th>
     </tr></thead>
     <tbody>${veri.map(r => {
       const s = +r.siparis||0, c = +r.ciro||0;
@@ -213,6 +285,7 @@ function ciz(){
         <td class="sag">${k.toLocaleString("tr-TR")}₺</td>
         <td class="sag">${(+r.online||0).toLocaleString("tr-TR")}₺</td>
         <td class="sag rk">${r.son ? zamanFarki(r.son) : "-"}</td>
+        <td class="sag"><button class="duzenle" onclick="duzenleAc(${r.id})">Düzenle</button></td>
       </tr>`;
     }).join("")}</tbody>`;
 
@@ -244,7 +317,8 @@ function eksikleriCiz(){
     <div class="esat">
       <div class="ead">${x.r.name}</div>
       ${x.e.map(t => `<span class="etag ${t.k?"bilgi":""}">${t.t}</span>`).join("")}
-      <div><button onclick="sqlKopyala(${i})">📋 Düzeltme SQL'ini kopyala</button></div>
+      <div><button onclick="duzenleAc(${x.r.id})">✏️ Panelden düzelt</button>
+      <button onclick="sqlKopyala(${i})">📋 SQL kopyala</button></div>
     </div>`).join("");
   window._eksik = liste;
 }
@@ -263,6 +337,72 @@ function sqlKopyala(i){
     prompt("Kopyala:", sql);
   });
 }
+
+/* ---------- RESTORAN DÜZENLE / EKLE ---------- */
+let duzenlenenId = null;
+function duzenleAc(id){
+  duzenlenenId = id;
+  const r = id ? veri.find(x => String(x.id) === String(id)) : null;
+  $("dBaslik").textContent = r ? r.name : "Yeni Restoran";
+  $("dAlt").textContent = r ? "Boş bıraktığın alanlar değişmeden kalır." : "En az restoran adı gerekli. Diğerlerini sonra da doldurabilirsin.";
+  $("dAd").value      = r ? (r.name || "") : "";
+  $("dKat").value     = r ? (r.kategori || "") : "";
+  $("dTel").value     = r ? (r.telefon || "") : "";
+  $("dKonum").value   = (r && r.latitude && r.longitude) ? `${r.latitude}, ${r.longitude}` : "";
+  $("dSifre").value   = r ? (r.sifre || "") : "";
+  $("dMin").value     = r ? (r.min_sepet || "") : "";
+  $("dPuan").value    = (r && Number(r.rating)) ? r.rating : "";
+  $("dAcilis").value  = r ? (r.acilis || "") : "";
+  $("dKapanis").value = r ? (r.kapanis || "") : "";
+  $("dTaban").value   = r ? (r.taban ?? "") : "";
+  $("dKm").value      = r ? (r.km_ucreti ?? "") : "";
+  $("dMax").value     = r ? (r.max_km ?? "") : "";
+  $("dGrup").value    = r ? (r.grup || "") : "";
+  $("dKapali").classList.toggle("on", !!(r && (r.manuel_kapali === true || r.manuel_kapali === "true")));
+  $("dmodal").classList.add("on");
+}
+function duzenleKapat(){ $("dmodal").classList.remove("on"); duzenlenenId = null; }
+function telefonDuzelt(t){
+  let s = String(t || "").replace(/[^0-9]/g, "");
+  if(!s) return "";
+  if(s.indexOf("00") === 0) s = s.slice(2);          // 0090... → 90...
+  if(s.length === 10 && s.indexOf("5") === 0) s = "90" + s;   // 5XXXXXXXXX → 905...
+  if(s.length === 11 && s.indexOf("0") === 0) s = "9" + s;    // 05XXXXXXXXX → 905...
+  return s;
+}
+async function duzenleKaydet(){
+  const ad = $("dAd").value.trim();
+  if(!ad){ toast("Restoran adı gerekli"); return; }
+  const konum = $("dKonum").value.replace(/\s/g, "").split(",");
+  const lat = (konum[0] || "").replace(",", "."), lng = (konum[1] || "").replace(",", ".");
+  const btn = $("dKaydet"); btn.disabled = true; btn.textContent = "Kaydediliyor…";
+  const govde = {
+    key: ANAHTAR,
+    id: duzenlenenId || "",
+    name: ad,
+    category: $("dKat").value.trim(),
+    telefon: telefonDuzelt($("dTel").value),
+    latitude: lat, longitude: lng,
+    sifre: $("dSifre").value.trim(),
+    min_order_amount: $("dMin").value,
+    rating: $("dPuan").value,
+    acilis: $("dAcilis").value,
+    kapanis: $("dKapanis").value,
+    teslimat_taban: $("dTaban").value,
+    teslimat_km_ucreti: $("dKm").value,
+    teslimat_max_km: $("dMax").value,
+    grup_kodu: $("dGrup").value.trim(),
+    manuel_kapali: $("dKapali").classList.contains("on") ? "true" : "false"
+  };
+  try{
+    const r = await fetch(API_KAYDET, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(govde) });
+    const d = await r.json();
+    if(d.ok){ toast(duzenlenenId ? "✓ Güncellendi" : "✓ Restoran eklendi"); duzenleKapat(); veriYukle(); }
+    else toast("Kaydedilemedi");
+  }catch(e){ toast("Bağlantı hatası"); }
+  btn.disabled = false; btn.textContent = "Kaydet";
+}
+document.getElementById("dmodal").addEventListener("click", e => { if(e.target.id === "dmodal") duzenleKapat(); });
 
 /* otomatik giriş + 60 sn yenileme */
 if(ANAHTAR) veriYukle(true);
