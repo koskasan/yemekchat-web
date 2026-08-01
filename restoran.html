@@ -563,8 +563,10 @@ async function loadOrders(){
   const listeler = await Promise.all(hedefler.map(async b => {
     try{
       const r = await fetch(API.ORDERS + "?restaurant=" + encodeURIComponent(b));
-      let o = await r.json();
+      const t = await r.text();
+      let o = t ? JSON.parse(t) : [];
       if(!Array.isArray(o)) o = o.data || [];
+      o = o.filter(x => x && x.id);   // n8n 0 satırda {success:true} dönebiliyor
       return o.map(x => Object.assign({}, x, { _marka: b }));
     }catch(e){ return []; }
   }));
@@ -640,11 +642,12 @@ async function loadMenu(){
   list.innerHTML = '<div class="empty">Menü yükleniyor…</div>';
   try{
     const r = await fetch(API.MENU + "?restaurant=" + encodeURIComponent(aktifMarka()));
-    let m = await r.json();
+    const t = await r.text();                       // boş yanıt = hiç ürün yok
+    let m = t ? JSON.parse(t) : [];
     if(!Array.isArray(m)) m = m.data || [];
-    menuItems = m;
+    menuItems = m.filter(x => x && x.id);
     renderMenu(); fillBulkCats();
-  }catch(e){ list.innerHTML = '<div class="empty">Menü yüklenemedi.</div>'; }
+  }catch(e){ menuItems = []; renderMenu(); fillBulkCats(); }
 }
 function renderMenu(){
   const list = document.getElementById("menuList");
@@ -855,7 +858,8 @@ function catBugun(){ const d = new Date(); return new Date(d.getTime() - d.getTi
 async function catVarMi(){
   try{
     const r = await fetch(`${API.CAT_MENU}?restaurant=${encodeURIComponent(aktifMarka())}`);
-    const d = await r.json();
+    const t = await r.text();
+    const d = t ? JSON.parse(t) : {};
     catSirket = d.sirket || "";
     document.getElementById("tabBtnCatering").style.display = catSirket ? "block" : "none";
   }catch(e){}
@@ -865,7 +869,8 @@ async function catYukle(){
   const tarih = document.getElementById("catTarih").value || catBugun();
   try{
     const r = await fetch(`${API.CAT_MENU}?restaurant=${encodeURIComponent(aktifMarka())}&tarih=${tarih}`);
-    const d = await r.json();
+    const t2 = await r.text();
+    const d = t2 ? JSON.parse(t2) : {};
     catSirket = d.sirket || "";
     let m = d.menu; if(typeof m === "string") m = JSON.parse(m || "[]");
     let o = d.onceki_menu; if(typeof o === "string") o = JSON.parse(o || "[]");
