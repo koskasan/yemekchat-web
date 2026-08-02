@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>YemekChat - Sipariş</title>
+<title>YemekChat - SipariÅŸ</title>
 <style>
   :root{
     --bg:#111B14; --card:#1C2A20; --card2:#243530; --line:#2C3E32;
@@ -41,7 +41,7 @@
   .rc.kapali{opacity:.5}
   .rc .kpl{font-size:11px;color:var(--red);background:#2e1817;padding:2px 9px;border-radius:12px;display:inline-block;margin-top:5px;margin-left:5px}
 
-  /* menü */
+  /* menÃ¼ */
   .sec{padding:12px 14px 2px}
   .sec h3{font-size:11px;letter-spacing:.4px;color:var(--txt3);font-weight:600;margin-bottom:6px;text-transform:uppercase}
   .cat{font-size:13px;color:var(--mint);font-weight:600;margin:14px 0 8px}
@@ -61,7 +61,7 @@
   .stp .qt{font-size:14px;font-weight:600;min-width:14px;text-align:center}
   .add{background:var(--card2);border:none;color:var(--mint);border-radius:9px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer}
 
-  /* ödeme + adres */
+  /* Ã¶deme + adres */
   .pay{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
   .pay .opt{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:11px 4px;text-align:center;cursor:pointer}
   .pay .opt .ic{font-size:20px;color:var(--txt2)}
@@ -108,11 +108,11 @@
 <body>
 
   <div class="top">
-    <button class="back" id="back">‹</button>
+    <button class="back" id="back">â€¹</button>
     <div class="logo">YC</div>
     <div>
       <div class="name" id="hdName">YemekChat</div>
-      <div class="sub" id="hdSub">güvenli sipariş</div>
+      <div class="sub" id="hdSub">gÃ¼venli sipariÅŸ</div>
     </div>
   </div>
 
@@ -120,44 +120,44 @@
   <div class="screen on" id="scr1">
     <div class="mascot" id="mascotTop"></div>
     <div class="chips" id="chips"></div>
-    <div class="rlist" id="rlist"><div class="spin">Yakındaki restoranlar yükleniyor…</div></div>
+    <div class="rlist" id="rlist"><div class="spin">YakÄ±ndaki restoranlar yÃ¼kleniyorâ€¦</div></div>
   </div>
 
-  <!-- EKRAN 2: MENÜ -->
+  <!-- EKRAN 2: MENÃœ -->
   <div class="screen" id="scr2">
-    <div id="menuWrap"><div class="spin">Menü yükleniyor…</div></div>
+    <div id="menuWrap"><div class="spin">MenÃ¼ yÃ¼kleniyorâ€¦</div></div>
   </div>
 
-  <!-- EKRAN 3: ÖDEME + ADRES -->
+  <!-- EKRAN 3: Ã–DEME + ADRES -->
   <div class="screen" id="scr3">
     <div class="sec"><h3>Sepetin</h3><div id="cartLines"></div></div>
-    <div class="sec"><h3>Ödeme yöntemi</h3>
+    <div class="sec"><h3>Ã–deme yÃ¶ntemi</h3>
       <div class="pay">
-        <div class="opt" data-pay="Nakit"><div class="ic">₺</div><div class="lb">Nakit</div></div>
-        <div class="opt" data-pay="Kredi Kartı"><div class="ic">▭</div><div class="lb">Kart</div></div>
-        <div class="opt" data-pay="Online"><div class="ic">💳</div><div class="lb">Online Öde</div></div>
+        <div class="opt" data-pay="Nakit"><div class="ic">â‚º</div><div class="lb">Nakit</div></div>
+        <div class="opt" data-pay="Kredi KartÄ±"><div class="ic">â–­</div><div class="lb">Kart</div></div>
+        <div class="opt" data-pay="Online"><div class="ic">ğŸ’³</div><div class="lb">Online Ã–de</div></div>
       </div>
     </div>
-    <div class="sec"><h3>Siparişine not</h3>
-      <input class="fld" id="sipnot" placeholder="Örn: soğansız olsun, acısız, zile basmayın">
+    <div class="sec"><h3>SipariÅŸine not</h3>
+      <input class="fld" id="sipnot" placeholder="Ã–rn: soÄŸansÄ±z olsun, acÄ±sÄ±z, zile basmayÄ±n">
     </div>
     <div class="sec"><h3>Teslimat adresi</h3>
-      <input class="fld" id="bina" placeholder="Bina adı / sokak no">
+      <input class="fld" id="bina" placeholder="Bina adÄ± / sokak no">
       <div class="row2"><input class="fld" id="kat" placeholder="Kat"><input class="fld" id="daire" placeholder="Daire"></div>
-      <input class="fld" id="adnot" placeholder="Kuryeye not (isteğe bağlı)">
+      <input class="fld" id="adnot" placeholder="Kuryeye not (isteÄŸe baÄŸlÄ±)">
     </div>
-    <div class="legal">Siparişi tamamlayarak <a href="https://yemekchat.com/yasal.html#kullanici" target="_blank">Kullanıcı Sözleşmesi</a>'ni kabul etmiş olursun · <a href="https://yemekchat.com/yasal.html#kvkk" target="_blank">KVKK Aydınlatma Metni</a></div>
+    <div class="legal">SipariÅŸi tamamlayarak <a href="https://yemekchat.com/yasal.html#kullanici" target="_blank">KullanÄ±cÄ± SÃ¶zleÅŸmesi</a>'ni kabul etmiÅŸ olursun Â· <a href="https://yemekchat.com/yasal.html#kvkk" target="_blank">KVKK AydÄ±nlatma Metni</a></div>
   </div>
 
   <div class="bar" id="bar">
-    <button class="go" id="go" disabled>Sepetin boş</button>
-    <div class="note">Siparişin WhatsApp üzerinden onaylanacak</div>
+    <button class="go" id="go" disabled>Sepetin boÅŸ</button>
+    <div class="note">SipariÅŸin WhatsApp Ã¼zerinden onaylanacak</div>
   </div>
 
   <div class="ok" id="okScreen">
-    <div id="okVisual"><div class="ring">✓</div></div>
-    <h2>Siparişin alındı!</h2>
-    <p>Mutfağa ilettik, hazırlanmaya başlıyor.<br>Onayı WhatsApp'tan göndereceğiz.</p>
+    <div id="okVisual"><div class="ring">âœ“</div></div>
+    <h2>SipariÅŸin alÄ±ndÄ±!</h2>
+    <p>MutfaÄŸa ilettik, hazÄ±rlanmaya baÅŸlÄ±yor.<br>OnayÄ± WhatsApp'tan gÃ¶ndereceÄŸiz.</p>
     <div class="no" id="okNo"></div>
   </div>
 
@@ -175,19 +175,19 @@ const CONFIG = {
   PAYTR: "https://webhook.yemekchat.com/webhook/paytr-create"
 };
 
-// Maskot görselleri — arkadaşın hazırlayınca URL'leri buraya yapıştır (boşsa görünmez)
-const MASCOT_URL = "";       // üstte karşılama maskotu (restoran listesi ekranı)
-const MASCOT_RUN_URL = "";   // sipariş sonrası koşan maskot (başarı ekranı)
+// Maskot gÃ¶rselleri â€” arkadaÅŸÄ±n hazÄ±rlayÄ±nca URL'leri buraya yapÄ±ÅŸtÄ±r (boÅŸsa gÃ¶rÃ¼nmez)
+const MASCOT_URL = "";       // Ã¼stte karÅŸÄ±lama maskotu (restoran listesi ekranÄ±)
+const MASCOT_RUN_URL = "";   // sipariÅŸ sonrasÄ± koÅŸan maskot (baÅŸarÄ± ekranÄ±)
 
-// Kategoriye göre kart arka plan görseli (restoran resmi olmayınca kategori resmi)
+// Kategoriye gÃ¶re kart arka plan gÃ¶rseli (restoran resmi olmayÄ±nca kategori resmi)
 const CATEGORY_IMG = {
   burger: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600",
   pizza:  "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600",
   kebab:  "https://images.unsplash.com/photo-1561651823-34feb02250e4?w=600",
-  "döner": "https://images.unsplash.com/photo-1561651823-34feb02250e4?w=600",
+  "dÃ¶ner": "https://images.unsplash.com/photo-1561651823-34feb02250e4?w=600",
   "doner": "https://images.unsplash.com/photo-1561651823-34feb02250e4?w=600",
-  "içecek": "https://images.unsplash.com/photo-1437418747212-8d9709afab22?w=600",
-  "i̇çecek": "https://images.unsplash.com/photo-1437418747212-8d9709afab22?w=600"
+  "iÃ§ecek": "https://images.unsplash.com/photo-1437418747212-8d9709afab22?w=600",
+  "iÌ‡Ã§ecek": "https://images.unsplash.com/photo-1437418747212-8d9709afab22?w=600"
 };
 // ================================================
 
@@ -195,29 +195,29 @@ const p = new URLSearchParams(location.search);
 const TEL = p.get("tel") || "";
 const LAT = p.get("lat"); const LNG = p.get("lng");
 const DIRECT_REST = p.get("restaurant");  // tek restoran modu (yazarak/eski)
-const CATERING = p.get("catering");       // kurumsal mod (çalışan kodu)
-const DRAFT = p.get("draft");             // yazarak sipariş taslağı (Path B)
+const CATERING = p.get("catering");       // kurumsal mod (Ã§alÄ±ÅŸan kodu)
+const DRAFT = p.get("draft");             // yazarak sipariÅŸ taslaÄŸÄ± (Path B)
 
-let screen = 1, nearby = [], menu = [], rest = null, pay = null, catFilter = "Tümü";
+let screen = 1, nearby = [], menu = [], rest = null, pay = null, catFilter = "TÃ¼mÃ¼";
 let isCat = false, catInfo = null, isDraft = false, draftNote = "", deliveryFee = 0, minSepet = 0;
-let musteriLat = LAT || "", musteriLng = LNG || "";   // kurye yol tarifi için
+let musteriLat = LAT || "", musteriLng = LNG || "";   // kurye yol tarifi iÃ§in
 const cart = {};  // id -> {item, qty}
 
 const $ = id => document.getElementById(id);
 $("back").onclick = goBack;
 
-// maskotları yerleştir (URL boşsa görünmez)
+// maskotlarÄ± yerleÅŸtir (URL boÅŸsa gÃ¶rÃ¼nmez)
 if(MASCOT_URL) $("mascotTop").innerHTML = `<img src="${MASCOT_URL}" alt="">`;
 if(MASCOT_RUN_URL) $("okVisual").innerHTML = `<div class="runwrap"><img src="${MASCOT_RUN_URL}" alt=""></div>`;
 
-/* ---------- başlangıç ---------- */
+/* ---------- baÅŸlangÄ±Ã§ ---------- */
 if(DRAFT){ draftInit(); }
 else if(CATERING){ cateringInit(); }
 else if(DIRECT_REST){ openRestaurant(DIRECT_REST); }
 else if(LAT && LNG){ loadNearby(); }
-else { $("rlist").innerHTML = '<div class="empty">Konum bulunamadı. WhatsApp\'tan tekrar başla.</div>'; }
+else { $("rlist").innerHTML = '<div class="empty">Konum bulunamadÄ±. WhatsApp\'tan tekrar baÅŸla.</div>'; }
 
-/* ---------- EKRAN 1: yakın restoranlar ---------- */
+/* ---------- EKRAN 1: yakÄ±n restoranlar ---------- */
 async function loadNearby(){
   try{
     const r = await fetch(`${CONFIG.NEARBY}?lat=${LAT}&lng=${LNG}`);
@@ -227,36 +227,36 @@ async function loadNearby(){
   renderChips(); renderNearby();
 }
 function renderChips(){
-  const cats = ["Tümü", ...new Set(nearby.map(r => r.category).filter(Boolean))];
+  const cats = ["TÃ¼mÃ¼", ...new Set(nearby.map(r => r.category).filter(Boolean))];
   $("chips").innerHTML = cats.map(c => `<div class="chip ${c===catFilter?"on":""}" data-c="${c}">${c}</div>`).join("");
   document.querySelectorAll(".chip").forEach(ch => ch.onclick = () => { catFilter = ch.dataset.c; renderChips(); renderNearby(); });
 }
 function renderNearby(){
   const list = $("rlist");
-  const arr = catFilter==="Tümü" ? nearby : nearby.filter(r => r.category===catFilter);
-  if(!arr.length){ list.innerHTML = '<div class="empty">Bu konuma yakın restoran yok.</div>'; return; }
+  const arr = catFilter==="TÃ¼mÃ¼" ? nearby : nearby.filter(r => r.category===catFilter);
+  if(!arr.length){ list.innerHTML = '<div class="empty">Bu konuma yakÄ±n restoran yok.</div>'; return; }
   list.innerHTML = arr.map(r => {
     const img = CATEGORY_IMG[(r.category||"").trim().toLowerCase()] || "";
     const bg = img ? `background-image:linear-gradient(90deg, rgba(28,42,32,0.97) 45%, rgba(28,42,32,0.55)), url('${img}');background-size:cover;background-position:right center;` : "";
     const kapali = (r.acik === false || r.acik === "false");
     return `<div class="rc ${kapali?"kapali":""}" style="${bg}" onclick="${kapali?`kapaliUyari('${(r.acilis||"")}','${(r.kapanis||"")}')`:`openRestaurant('${r.name.replace(/'/g,"\\'")}')`}">
     <div class="rinfo">
-      <div class="rn">${r.name}${kapali?'<span class="kpl">🌙 Şu an kapalı</span>':""}</div>
-      <div class="rm"><span class="star">★</span> ${r.rating||"-"} &nbsp;·&nbsp; ${r.dist_km} km &nbsp;·&nbsp; ${r.min_order_amount?("Min "+r.min_order_amount+"₺"):"Min yok"} &nbsp;·&nbsp; 🛵 ${Number(r.teslimat_ucreti)>0 ? r.teslimat_ucreti+"₺" : "Ücretsiz"}</div>
+      <div class="rn">${r.name}${kapali?'<span class="kpl">ğŸŒ™ Åu an kapalÄ±</span>':""}</div>
+      <div class="rm"><span class="star">â˜…</span> ${r.rating||"-"} &nbsp;Â·&nbsp; ${r.dist_km} km &nbsp;Â·&nbsp; ${r.min_order_amount?("Min "+r.min_order_amount+"â‚º"):"Min yok"} &nbsp;Â·&nbsp; ğŸ›µ ${Number(r.teslimat_ucreti)>0 ? r.teslimat_ucreti+"â‚º" : "Ãœcretsiz"}</div>
       ${r.category?`<div class="rcat">${r.category}</div>`:""}
     </div>
-    <div class="arrow">›</div>
+    <div class="arrow">â€º</div>
   </div>`; }).join("");
 }
 
 function kapaliUyari(a, k){
-  alert(a && k ? `Bu restoran şu an kapalı ustam 🌙\nÇalışma saatleri: ${a} – ${k}` : "Bu restoran şu an siparişe kapalı ustam 🌙");
+  alert(a && k ? `Bu restoran ÅŸu an kapalÄ± ustam ğŸŒ™\nÃ‡alÄ±ÅŸma saatleri: ${a} â€“ ${k}` : "Bu restoran ÅŸu an sipariÅŸe kapalÄ± ustam ğŸŒ™");
 }
 
-/* ---------- EKRAN 2: menü ---------- */
+/* ---------- EKRAN 2: menÃ¼ ---------- */
 async function openRestaurant(name){
   if(rest && rest!==name && Object.keys(cart).length){
-    if(!confirm("Başka restorana geçiyorsun, sepetin sıfırlanacak. Devam?")) return;
+    if(!confirm("BaÅŸka restorana geÃ§iyorsun, sepetin sÄ±fÄ±rlanacak. Devam?")) return;
     for(const k in cart) delete cart[k];
   }
   rest = name;
@@ -265,7 +265,7 @@ async function openRestaurant(name){
     deliveryFee = Math.max(0, Math.round(Number(nb.teslimat_ucreti) || 0));
     minSepet = Math.max(0, Math.round(Number(nb.min_order_amount) || 0));
   }
-  $("menuWrap").innerHTML = '<div class="spin">Menü yükleniyor…</div>';
+  $("menuWrap").innerHTML = '<div class="spin">MenÃ¼ yÃ¼kleniyorâ€¦</div>';
   go2();
   try{
     const r = await fetch(`${CONFIG.MENU}?restaurant=${encodeURIComponent(name)}`);
@@ -276,10 +276,10 @@ async function openRestaurant(name){
 }
 function renderMenu(){
   const wrap = $("menuWrap");
-  if(!menu.length){ wrap.innerHTML = '<div class="empty">Bu restoranın menüsü boş.</div>'; return; }
+  if(!menu.length){ wrap.innerHTML = '<div class="empty">Bu restoranÄ±n menÃ¼sÃ¼ boÅŸ.</div>'; return; }
   const cats = {};
-  menu.forEach(m => { (cats[m.category||"Diğer"]=cats[m.category||"Diğer"]||[]).push(m); });
-  let html = '<div class="sec"><h3>Menü</h3>';
+  menu.forEach(m => { (cats[m.category||"DiÄŸer"]=cats[m.category||"DiÄŸer"]||[]).push(m); });
+  let html = '<div class="sec"><h3>MenÃ¼</h3>';
   for(const c in cats){
     html += `<div class="cat">${c}</div>`;
     cats[c].forEach(m => {
@@ -287,7 +287,7 @@ function renderMenu(){
       html += `<div class="item ${on?"":"off"}">
         ${m.image_url?`<img class="thumb" src="${m.image_url}" alt="" onerror="this.style.display='none'">`:""}
         <div class="info"><div class="nm">${m.name}</div>${m.description?`<div class="ds">${m.description}</div>`:""}<div class="pr">${m.price} TL</div></div>
-        <div class="ctrl" data-id="${m.id}">${on?"":'<span style="font-size:11px;color:var(--txt3)">Tükendi</span>'}</div>
+        <div class="ctrl" data-id="${m.id}">${on?"":'<span style="font-size:11px;color:var(--txt3)">TÃ¼kendi</span>'}</div>
       </div>`;
     });
   }
@@ -299,7 +299,7 @@ function renderCtrl(id){
   const q = cart[id]?.qty || 0;
   if(q===0){ box.innerHTML = `<button class="add">Ekle</button>`; box.querySelector("button").onclick = () => chg(id,1); }
   else{
-    box.innerHTML = `<div class="stp"><button>−</button><span class="qt">${q}</span><button>+</button></div>`;
+    box.innerHTML = `<div class="stp"><button>âˆ’</button><span class="qt">${q}</span><button>+</button></div>`;
     const [m,p2] = box.querySelectorAll("button"); m.onclick=()=>chg(id,-1); p2.onclick=()=>chg(id,1);
   }
 }
@@ -309,24 +309,24 @@ function chg(id,d){
   renderCtrl(id); updateBar();
 }
 
-/* ---------- EKRAN 3: sepet/ödeme ---------- */
+/* ---------- EKRAN 3: sepet/Ã¶deme ---------- */
 function renderCart(){
   const keys = Object.keys(cart);
   let html = keys.map(k => {
     const c = cart[k];
     return `<div class="cartline"><span class="cn">${c.item.name}</span>
-      <div class="stp" data-k="${k}"><button>−</button><span class="qt">${c.qty}</span><button>+</button></div>
+      <div class="stp" data-k="${k}"><button>âˆ’</button><span class="qt">${c.qty}</span><button>+</button></div>
       <span class="cl-t">${c.item.price*c.qty} TL</span></div>`;
   }).join("");
   if(keys.length){
-    if(minSepet > 0 && total() < minSepet) html += `<div class="cartline" style="border:none"><span class="cn" style="color:var(--amber)">🧺 Bu bölgede minimum sepet ${minSepet} TL — ${minSepet-total()} TL daha ekle</span></div>`;
-    if(deliveryFee > 0) html += `<div class="cartline"><span class="cn">🛵 Getirme ücreti</span><span class="cl-t">${deliveryFee} TL</span></div>`;
+    if(minSepet > 0 && total() < minSepet) html += `<div class="cartline" style="border:none"><span class="cn" style="color:var(--amber)">ğŸ§º Bu bÃ¶lgede minimum sepet ${minSepet} TL â€” ${minSepet-total()} TL daha ekle</span></div>`;
+    if(deliveryFee > 0) html += `<div class="cartline"><span class="cn">ğŸ›µ Getirme Ã¼creti</span><span class="cl-t">${deliveryFee} TL</span></div>`;
     html += `<div class="cartline" style="border:none;font-weight:600"><span class="cn">Toplam</span><span style="color:var(--mint)">${grand()} TL</span></div>`;
   } else {
-    html = '<div class="empty" style="padding:22px">Sepet boş.</div>';
+    html = '<div class="empty" style="padding:22px">Sepet boÅŸ.</div>';
   }
-  if(draftNote) html += `<div class="cartline" style="border:none"><span class="cn" style="color:var(--amber)">📝 Not: ${draftNote}</span></div>`;
-  if(isDraft) html += `<button class="addmore" id="addMore">➕ Menüden başka bir şey ekle</button>`;
+  if(draftNote) html += `<div class="cartline" style="border:none"><span class="cn" style="color:var(--amber)">ğŸ“ Not: ${draftNote}</span></div>`;
+  if(isDraft) html += `<button class="addmore" id="addMore">â• MenÃ¼den baÅŸka bir ÅŸey ekle</button>`;
   $("cartLines").innerHTML = html;
   document.querySelectorAll("#cartLines .stp").forEach(s => {
     const k = s.dataset.k; const [mB,pB] = s.querySelectorAll("button");
@@ -357,11 +357,11 @@ function show(){
   $("scr3").classList.toggle("on", screen===3);
   $("back").style.display = (isCat || screen===1 || (screen===2&&DIRECT_REST) || (isDraft&&screen===3)) ? "none" : "block";
   if(!isCat && !isDraft){
-    $("hdName").textContent = screen===1 ? "Yakındaki Restoranlar" : (rest||"YemekChat");
-    $("hdSub").textContent = screen===1 ? "konumuna göre" : (screen===3?"sepet & ödeme":"menü");
+    $("hdName").textContent = screen===1 ? "YakÄ±ndaki Restoranlar" : (rest||"YemekChat");
+    $("hdSub").textContent = screen===1 ? "konumuna gÃ¶re" : (screen===3?"sepet & Ã¶deme":"menÃ¼");
   } else if(isDraft){
     $("hdName").textContent = rest || "YemekChat";
-    $("hdSub").textContent = screen===2 ? "menü · sepetine ekle" : "sepetin hazır · ödeme & adres";
+    $("hdSub").textContent = screen===2 ? "menÃ¼ Â· sepetine ekle" : "sepetin hazÄ±r Â· Ã¶deme & adres";
   }
   $("bar").classList.toggle("on", screen===2 || screen===3);
   window.scrollTo(0,0); updateBar();
@@ -370,62 +370,66 @@ function updateBar(){
   const go = $("go"); const n = Object.keys(cart).length; const t = total();
   if(screen===2 && isCat){
     go.onclick = cateringSubmit;
-    if(n===0){ go.disabled=true; go.textContent="Menüden ürün seç"; }
-    else { go.disabled=false; go.innerHTML=`✓ Siparişi Onayla (${n} ürün · ${t} TL)`; }
+    if(n===0){ go.disabled=true; go.textContent="MenÃ¼den Ã¼rÃ¼n seÃ§"; }
+    else { go.disabled=false; go.innerHTML=`âœ“ SipariÅŸi Onayla (${n} Ã¼rÃ¼n Â· ${t} TL)`; }
   } else if(screen===2){
     go.onclick = go3;
     const eksik = minSepet - t;
-    if(n===0){ go.disabled=true; go.textContent="Sepetin boş"; }
-    else if(eksik > 0){ go.disabled=true; go.innerHTML=`Min. sepet ${minSepet} TL · ${eksik} TL daha ekle`; }
-    else { go.disabled=false; go.innerHTML=`Sepet (${n} ürün · ${t} TL) →`; }
+    if(n===0){ go.disabled=true; go.textContent="Sepetin boÅŸ"; }
+    else if(eksik > 0){ go.disabled=true; go.innerHTML=`Min. sepet ${minSepet} TL Â· ${eksik} TL daha ekle`; }
+    else { go.disabled=false; go.innerHTML=`Sepet (${n} Ã¼rÃ¼n Â· ${t} TL) â†’`; }
   } else if(screen===3){
     go.onclick = submitOrder;
     const eksik = minSepet - t;
-    if(n===0){ go.disabled=true; go.textContent="Sepet boş — menüden ürün ekle"; }
-    else if(eksik > 0){ go.disabled=true; go.innerHTML=`Min. sepet ${minSepet} TL · ${eksik} TL daha ekle`; }
-    else if(!pay){ go.disabled=true; go.textContent=`Ödeme yöntemi seç · ${grand()} TL`; }
-    else { go.disabled=false; go.innerHTML=`✓ Siparişi tamamla · ${grand()} TL`; }
+    if(n===0){ go.disabled=true; go.textContent="Sepet boÅŸ â€” menÃ¼den Ã¼rÃ¼n ekle"; }
+    else if(eksik > 0){ go.disabled=true; go.innerHTML=`Min. sepet ${minSepet} TL Â· ${eksik} TL daha ekle`; }
+    else if(!pay){ go.disabled=true; go.textContent=`Ã–deme yÃ¶ntemi seÃ§ Â· ${grand()} TL`; }
+    else { go.disabled=false; go.innerHTML=`âœ“ SipariÅŸi tamamla Â· ${grand()} TL`; }
   }
 }
 
 async function submitOrder(){
   const bina = $("bina").value.trim();
-  if(!bina){ alert("Lütfen bina adı / adres gir."); return; }
+  if(!bina){ alert("LÃ¼tfen bina adÄ± / adres gir."); return; }
   const kat=$("kat").value.trim(), daire=$("daire").value.trim(), nt=$("adnot").value.trim();
   const address = `${bina}${kat?", Kat "+kat:""}${daire?", Daire "+daire:""}${nt?" ("+nt+")":""}`;
   let details = Object.values(cart).map(c=>`${c.item.name} x${c.qty}`).join(", ");
   const musteriNot = ($("sipnot") ? $("sipnot").value : "").trim();
-  const tumNot = [draftNote, musteriNot].filter(Boolean).join(" · ");
-  if(tumNot) details += ` — 📝 ${tumNot}`;
-  if(deliveryFee > 0) details += ` — 🛵 Getirme: ${deliveryFee} TL`;
+  const tumNot = [draftNote, musteriNot].filter(Boolean).join(" Â· ");
+  if(tumNot) details += ` â€” ğŸ“ ${tumNot}`;
+  if(deliveryFee > 0) details += ` â€” ğŸ›µ Getirme: ${deliveryFee} TL`;
   const payload = { restaurant_name:rest, customer_phone:TEL, order_details:details, total_amount:grand(), payment_method:(pay==="Online"?"Online (bekliyor)":pay), address, lat:musteriLat||"", lng:musteriLng||"" };
-  const go=$("go"); go.disabled=true; go.textContent="Gönderiliyor…";
+  const go=$("go"); go.disabled=true; go.textContent="GÃ¶nderiliyorâ€¦";
   try{
     const r = await fetch(CONFIG.ORDER,{ method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload) });
     const res = await r.json().catch(()=>({}));
+    if(res.durum && res.durum !== "ok"){          // sunucu reddetti: bÃ¶lge dÄ±ÅŸÄ± / konum yok
+      alert(res.mesaj || "ÃœzgÃ¼nÃ¼m, bu restoran senin bÃ¶lgene teslimat yapmÄ±yor ustam.");
+      go.disabled=false; updateBar(); return;
+    }
     const oid = res.order_id || res.id;
     if(pay==="Online" && oid){
-      go.textContent = "Ödeme sayfası açılıyor…";
+      go.textContent = "Ã–deme sayfasÄ± aÃ§Ä±lÄ±yorâ€¦";
       try{
         const pr = await fetch(`${CONFIG.PAYTR}?order_id=${oid}&amount=${grand()}&tel=${encodeURIComponent(TEL)}`);
         const pd = await pr.json();
         if(pd.link){ showPayFrame(pd.link); return; }
       }catch(e){}
-      alert("Ödeme sayfası açılamadı — siparişin alındı, kapıda ödeyebilirsin ustam.");
+      alert("Ã–deme sayfasÄ± aÃ§Ä±lamadÄ± â€” sipariÅŸin alÄ±ndÄ±, kapÄ±da Ã¶deyebilirsin ustam.");
     }
-    $("okNo").textContent = oid ? "Sipariş No: #"+oid : "";
+    $("okNo").textContent = oid ? "SipariÅŸ No: #"+oid : "";
     $("okScreen").style.display="flex";
     setTimeout(()=>{ try{window.close();}catch(e){} }, 3500);
-  }catch(e){ alert("Bağlantı hatası, tekrar dene."); go.disabled=false; updateBar(); }
+  }catch(e){ alert("BaÄŸlantÄ± hatasÄ±, tekrar dene."); go.disabled=false; updateBar(); }
 }
 
-/* ---------- GÖMÜLÜ ÖDEME (PayTR iFrame) ---------- */
+/* ---------- GÃ–MÃœLÃœ Ã–DEME (PayTR iFrame) ---------- */
 function showPayFrame(link){
   ["scr1","scr2","scr3"].forEach(s => $(s).classList.remove("on"));
   $("bar").classList.remove("on");
   $("back").style.display = "none";
   $("hdName").textContent = rest || "YemekChat";
-  $("hdSub").textContent = "güvenli ödeme · PayTR 🔒";
+  $("hdSub").textContent = "gÃ¼venli Ã¶deme Â· PayTR ğŸ”’";
   const w = document.createElement("div");
   w.id = "payWrap";
   w.innerHTML = `<iframe id="payFrame" src="${link}"></iframe>`;
@@ -433,14 +437,14 @@ function showPayFrame(link){
   window.scrollTo(0,0);
 }
 
-/* ---------- YAZARAK SİPARİŞ (DRAFT / Path B) ---------- */
+/* ---------- YAZARAK SÄ°PARÄ°Å (DRAFT / Path B) ---------- */
 async function draftInit(){
   isDraft = true;
   try{
     const r = await fetch(`${CONFIG.DRAFT}?id=${encodeURIComponent(DRAFT)}`);
     const d = await r.json();
     if(!d || !d.restaurant_name){
-      document.body.innerHTML = '<div class="empty" style="padding-top:90px">Taslak bulunamadı ustam.</div>'; return;
+      document.body.innerHTML = '<div class="empty" style="padding-top:90px">Taslak bulunamadÄ± ustam.</div>'; return;
     }
     rest = d.restaurant_name;
     let items = d.items;
@@ -452,17 +456,17 @@ async function draftInit(){
     deliveryFee = Math.max(0, Math.round(Number(d.teslimat_ucreti) || 0));
     if(d.lat && d.lng){ musteriLat = d.lat; musteriLng = d.lng; }
     $("hdName").textContent = d.restaurant_name;
-    $("hdSub").textContent = "sepetin hazır · ödeme & adres";
+    $("hdSub").textContent = "sepetin hazÄ±r Â· Ã¶deme & adres";
     screen = 3; renderCart(); show();
     if(draftNote && $("sipnot") && !$("sipnot").value) $("sipnot").value = draftNote;
-  }catch(e){ document.body.innerHTML = '<div class="empty" style="padding-top:90px">Bağlantı hatası.</div>'; }
+  }catch(e){ document.body.innerHTML = '<div class="empty" style="padding-top:90px">BaÄŸlantÄ± hatasÄ±.</div>'; }
 }
 
-/* ---------- KURUMSAL v2: GÜNÜN MENÜSÜ ---------- */
+/* ---------- KURUMSAL v2: GÃœNÃœN MENÃœSÃœ ---------- */
 let gunlukSecim = {}, gunlukMenu = [];
 async function cateringInit(){
   isCat = true;
-  // önce günlük menü sistemini dene
+  // Ã¶nce gÃ¼nlÃ¼k menÃ¼ sistemini dene
   try{
     const r = await fetch(`${CONFIG.CATERING_GUNLUK}?code=${encodeURIComponent(CATERING)}`);
     const d = await r.json();
@@ -470,15 +474,15 @@ async function cateringInit(){
       let m = d.menu; if(typeof m === "string") m = JSON.parse(m || "[]");
       gunlukMenu = Array.isArray(m) ? m : [];
       if(gunlukMenu.length){ gunlukEkran(d); return; }
-      // günün menüsü girilmemişse
-      document.body.innerHTML = `<div class="empty" style="padding-top:90px">Merhaba ${d.ad || ""} 👋<br><br>${d.restoran || "Restoran"} bugünün menüsünü henüz girmemiş.<br>Birazdan tekrar dener misin?</div>`;
+      // gÃ¼nÃ¼n menÃ¼sÃ¼ girilmemiÅŸse
+      document.body.innerHTML = `<div class="empty" style="padding-top:90px">Merhaba ${d.ad || ""} ğŸ‘‹<br><br>${d.restoran || "Restoran"} bugÃ¼nÃ¼n menÃ¼sÃ¼nÃ¼ henÃ¼z girmemiÅŸ.<br>Birazdan tekrar dener misin?</div>`;
       return;
     }
     if(d && d.ok === false && d.ad === ""){
-      document.body.innerHTML = '<div class="empty" style="padding-top:90px">Bu kod tanımlı değil ustam.<br>Şirket yetkilinle görüş.</div>';
+      document.body.innerHTML = '<div class="empty" style="padding-top:90px">Bu kod tanÄ±mlÄ± deÄŸil ustam.<br>Åirket yetkilinle gÃ¶rÃ¼ÅŸ.</div>';
       return;
     }
-  }catch(e){ /* eski sisteme düş */ }
+  }catch(e){ /* eski sisteme dÃ¼ÅŸ */ }
   return cateringEskiInit();
 }
 
@@ -487,12 +491,12 @@ function gunlukEkran(d){
   gunlukMenu.forEach(x => { if(!gruplar.includes(x.grup)) gruplar.push(x.grup); });
   rest = d.restoran || "Kurumsal";
   $("hdName").textContent = d.restoran || "Kurumsal Yemek";
-  $("hdSub").textContent = `${d.sirket || "Kurumsal"} · ${d.ad || ""}`;
+  $("hdSub").textContent = `${d.sirket || "Kurumsal"} Â· ${d.ad || ""}`;
   screen = 2; show();
   const bugun = new Date().toLocaleDateString("tr-TR", { day:"2-digit", month:"long", weekday:"long" });
-  let html = `<div class="sec"><h3>${bugun} · günün menüsü</h3>`;
+  let html = `<div class="sec"><h3>${bugun} Â· gÃ¼nÃ¼n menÃ¼sÃ¼</h3>`;
   if(Number(d.bugun_verilen) > 0){
-    html += `<div class="cartline" style="border:none"><span class="cn" style="color:var(--amber)">ℹ️ Bugün zaten sipariş verdin. Yeni seçim gönderirsen ikinci sipariş oluşur.</span></div>`;
+    html += `<div class="cartline" style="border:none"><span class="cn" style="color:var(--amber)">â„¹ï¸ BugÃ¼n zaten sipariÅŸ verdin. Yeni seÃ§im gÃ¶nderirsen ikinci sipariÅŸ oluÅŸur.</span></div>`;
   }
   html += "</div>";
   gruplar.forEach(g => {
@@ -500,7 +504,7 @@ function gunlukEkran(d){
     gunlukMenu.filter(x => x.grup === g).forEach((x,i) => {
       const id = `${g}__${i}`;
       html += `<div class="item secim" data-grup="${g}" data-ad="${String(x.ad).replace(/"/g,"&quot;")}" onclick="gunlukSec(this)">
-        <div class="tik">○</div>
+        <div class="tik">â—‹</div>
         <div class="info"><div class="nm">${x.ad}</div></div>
       </div>`;
     });
@@ -513,65 +517,65 @@ function gunlukEkran(d){
 function gunlukSec(el){
   const g = el.dataset.grup, ad = el.dataset.ad;
   document.querySelectorAll(`.item.secim[data-grup="${g}"]`).forEach(x => {
-    x.classList.remove("on"); x.querySelector(".tik").textContent = "○";
+    x.classList.remove("on"); x.querySelector(".tik").textContent = "â—‹";
   });
   if(gunlukSecim[g] === ad){ delete gunlukSecim[g]; }
-  else { gunlukSecim[g] = ad; el.classList.add("on"); el.querySelector(".tik").textContent = "●"; }
+  else { gunlukSecim[g] = ad; el.classList.add("on"); el.querySelector(".tik").textContent = "â—"; }
   gunlukBar();
 }
 function gunlukBar(){
   const go = $("go"); const n = Object.keys(gunlukSecim).length;
   $("bar").classList.add("on");
   go.onclick = gunlukGonder;
-  if(!n){ go.disabled = true; go.textContent = "Menüden seçim yap"; }
-  else { go.disabled = false; go.innerHTML = `✓ Siparişi Onayla (${n} seçim)`; }
+  if(!n){ go.disabled = true; go.textContent = "MenÃ¼den seÃ§im yap"; }
+  else { go.disabled = false; go.innerHTML = `âœ“ SipariÅŸi Onayla (${n} seÃ§im)`; }
 }
 async function gunlukGonder(){
   const secim = Object.keys(gunlukSecim).map(g => `${g}: ${gunlukSecim[g]}`).join(" | ");
-  const go = $("go"); go.disabled = true; go.textContent = "Gönderiliyor…";
+  const go = $("go"); go.disabled = true; go.textContent = "GÃ¶nderiliyorâ€¦";
   try{
     const r = await fetch(CONFIG.CATERING_SIPARIS, {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ code: CATERING, tel: TEL, secim })
     });
     const res = await r.json();
-    if(!res.ok){ alert("Sipariş kaydedilemedi, tekrar dene."); go.disabled = false; gunlukBar(); return; }
-    $("okNo").textContent = res.order_id ? "Sipariş No: #" + res.order_id : "";
+    if(!res.ok){ alert("SipariÅŸ kaydedilemedi, tekrar dene."); go.disabled = false; gunlukBar(); return; }
+    $("okNo").textContent = res.order_id ? "SipariÅŸ No: #" + res.order_id : "";
     $("okScreen").style.display = "flex";
     setTimeout(() => { try{ window.close(); }catch(e){} }, 3500);
-  }catch(e){ alert("Bağlantı hatası, tekrar dene."); go.disabled = false; gunlukBar(); }
+  }catch(e){ alert("BaÄŸlantÄ± hatasÄ±, tekrar dene."); go.disabled = false; gunlukBar(); }
 }
 
-/* ---------- KURUMSAL (eski à la carte akışı) ---------- */
+/* ---------- KURUMSAL (eski Ã  la carte akÄ±ÅŸÄ±) ---------- */
 async function cateringEskiInit(){
   isCat = true;
   try{
     const r = await fetch(`${CONFIG.CATERING_INFO}?code=${encodeURIComponent(CATERING)}`);
     const d = await r.json();
     if(!d.ok || !d.restaurant){
-      document.body.innerHTML = '<div class="empty" style="padding-top:90px">Geçersiz kod ustam.<br>Yöneticinle iletişime geç.</div>'; return;
+      document.body.innerHTML = '<div class="empty" style="padding-top:90px">GeÃ§ersiz kod ustam.<br>YÃ¶neticinle iletiÅŸime geÃ§.</div>'; return;
     }
     catInfo = d; rest = d.restaurant;
     $("hdName").textContent = d.restaurant;
-    $("hdSub").textContent = `${d.company||"Kurumsal"} · ${d.name}`;
+    $("hdSub").textContent = `${d.company||"Kurumsal"} Â· ${d.name}`;
     screen = 2; show();
-    $("menuWrap").innerHTML = '<div class="spin">Menü yükleniyor…</div>';
+    $("menuWrap").innerHTML = '<div class="spin">MenÃ¼ yÃ¼kleniyorâ€¦</div>';
     const m = await fetch(`${CONFIG.MENU}?restaurant=${encodeURIComponent(d.restaurant)}`);
     let mm = await m.json(); if(!Array.isArray(mm)) mm = mm.data||[];
     menu = mm; renderMenu();
-  }catch(e){ document.body.innerHTML = '<div class="empty" style="padding-top:90px">Bağlantı hatası.</div>'; }
+  }catch(e){ document.body.innerHTML = '<div class="empty" style="padding-top:90px">BaÄŸlantÄ± hatasÄ±.</div>'; }
 }
 async function cateringSubmit(){
   const details = Object.values(cart).map(c=>`${c.item.name} x${c.qty}`).join(", ");
   const payload = { code: CATERING, tel: TEL, order_details: details, total_amount: total() };
-  const go=$("go"); go.disabled=true; go.textContent="Gönderiliyor…";
+  const go=$("go"); go.disabled=true; go.textContent="GÃ¶nderiliyorâ€¦";
   try{
     const r = await fetch(CONFIG.CATERING_ORDER,{ method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload) });
     const res = await r.json().catch(()=>({}));
-    $("okNo").textContent = (res.order_id||res.id) ? "Sipariş No: #"+(res.order_id||res.id) : "";
+    $("okNo").textContent = (res.order_id||res.id) ? "SipariÅŸ No: #"+(res.order_id||res.id) : "";
     $("okScreen").style.display="flex";
     setTimeout(()=>{ try{window.close();}catch(e){} }, 3500);
-  }catch(e){ alert("Bağlantı hatası, tekrar dene."); go.disabled=false; updateBar(); }
+  }catch(e){ alert("BaÄŸlantÄ± hatasÄ±, tekrar dene."); go.disabled=false; updateBar(); }
 }
 </script>
 </body>
