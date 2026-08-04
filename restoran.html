@@ -266,6 +266,16 @@
 
     <div id="tabCatering" style="display:none">
       <div class="sbox">
+        <h4>🏢 Kurumsal müşteri</h4>
+        <div class="hint">Birden fazla şirkete hizmet veriyorsan buradan seç. Her şirketin menüsü ve çalışan kodları ayrıdır.</div>
+        <div style="display:flex;gap:8px;align-items:flex-end">
+          <div style="flex:1"><label>Şirket</label><select id="catFirma" onchange="catFirmaSec()"></select></div>
+          <button onclick="catFirmaAc('yeni')" style="background:var(--card2);border:none;color:var(--mint);border-radius:11px;padding:13px 14px;font-weight:600;cursor:pointer">➕</button>
+          <button onclick="catFirmaAc('duzenle')" style="background:var(--card2);border:none;color:var(--mint);border-radius:11px;padding:13px 14px;font-weight:600;cursor:pointer">✏️</button>
+        </div>
+      </div>
+
+      <div class="sbox">
         <h4>🍲 Günün kurumsal menüsü</h4>
         <div class="hint" id="catBilgi">…</div>
         <div class="s2">
@@ -282,6 +292,38 @@
         <div class="hint">Mutfak için toplam sayım, paketleme için kişi listesi.</div>
         <div id="catListe"></div>
         <button class="sbtn" style="background:var(--card2);color:#EFC98A" onclick="catListeYazdir()">🖨 Mutfak listesini yazdır</button>
+      </div>
+
+      <div class="sbox">
+        <h4>👥 Çalışan kodları</h4>
+        <div class="hint">Her çalışana bir kod. Çalışan bota kodunu yazınca o günün menüsünü görür ve seçim yapar.</div>
+        <div class="s2">
+          <div><label>Kod öneki</label><input id="kodOnek" placeholder="PTK" maxlength="8"></div>
+          <div><label>Kaç adet</label><input id="kodAdet" type="number" inputmode="numeric" value="10" min="1" max="500"></div>
+        </div>
+        <div class="s2">
+          <div><label>Başlangıç no</label><input id="kodBas" type="number" inputmode="numeric" value="1001"></div>
+          <div style="display:flex;align-items:flex-end"><button class="sbtn" style="margin:0" onclick="catKodUret()">＋ Kod üret</button></div>
+        </div>
+        <div class="sok" id="kodMsg"></div>
+        <div id="kodListe" style="margin-top:12px"></div>
+      </div>
+    </div>
+
+    <div class="hmodal" id="firmaModal">
+      <div class="hbox">
+        <div class="hhead"><b id="firmaBaslik" style="font-size:14px">Şirket</b>
+          <button class="hclose" onclick="document.getElementById('firmaModal').classList.remove('show')">✕</button></div>
+        <div style="padding:14px">
+          <label>Şirket adı</label><input id="fmAd" placeholder="Örn. Acme Yazılım A.Ş.">
+          <label>Kişi başı öğün bedeli (₺)</label><input id="fmUcret" type="number" inputmode="numeric" placeholder="250">
+          <label>Fatura bilgisi (vergi dairesi / no / yetkili)</label><input id="fmFatura" placeholder="isteğe bağlı">
+          <label style="display:flex;align-items:center;gap:8px;margin-top:10px">
+            <input id="fmAktif" type="checkbox" style="width:auto;margin:0" checked> Aktif (pasifse çalışanlar sipariş veremez)
+          </label>
+          <button class="sbtn" onclick="catFirmaKaydet()">Kaydet</button>
+          <div class="sok" id="fmMsg"></div>
+        </div>
       </div>
     </div>
 
@@ -447,9 +489,14 @@ const API = {
   ZONES:         "https://webhook.yemekchat.com/webhook/panel-zones",
   CAT_MENU:      "https://webhook.yemekchat.com/webhook/catering-panel-menu",
   CAT_MENU_SAVE: "https://webhook.yemekchat.com/webhook/catering-panel-menu-save",
-  CAT_LISTE:     "https://webhook.yemekchat.com/webhook/catering-panel-liste"
+  CAT_LISTE:     "https://webhook.yemekchat.com/webhook/catering-panel-liste",
+  CAT_FIRMALAR:   "https://webhook.yemekchat.com/webhook/catering-firmalar",
+  CAT_FIRMA_SAVE: "https://webhook.yemekchat.com/webhook/catering-firma-kaydet",
+  CAT_KODLAR:     "https://webhook.yemekchat.com/webhook/catering-kodlar",
+  CAT_KOD_URET:   "https://webhook.yemekchat.com/webhook/catering-kod-uret",
+  CAT_KOD_SAVE:   "https://webhook.yemekchat.com/webhook/catering-kod-kaydet"
 };
-const CAT_GRUPLAR = ["Çorba", "Ana Yemek", "Ara Sıcak", "İçecek", "Tatlı"];
+const CAT_GRUPLAR = ["Çorba", "Ana Yemek", "Ara Sıcak", "Salata", "İçecek", "Tatlı"];
 const REFRESH_MS = 12000;
 // ================================================
 
@@ -854,21 +901,153 @@ function showSesUyari(){
 
 /* ---------- KURUMSAL (CATERING) ---------- */
 let catSirket = "", catSatirlar = [], catOnceki = [], catSiparisler = [];
+let catFirmalar = [], catFirmaId = 0, catKodlar = [];
 function catBugun(){ const d = new Date(); return new Date(d.getTime() - d.getTimezoneOffset()*60000).toISOString().slice(0,10); }
-async function catVarMi(){
+function catFirmaAktif(){ return catFirmalar.find(f => String(f.id) === String(catFirmaId)) || null; }
+function catQS(){ return catFirmaId ? "&company_id=" + encodeURIComponent(catFirmaId) : ""; }
+
+async function catFirmalariCek(){
   try{
-    const r = await fetch(`${API.CAT_MENU}?restaurant=${encodeURIComponent(aktifMarka())}`);
+    const r = await fetch(`${API.CAT_FIRMALAR}?restaurant=${encodeURIComponent(aktifMarka())}`);
     const t = await r.text();
     const d = t ? JSON.parse(t) : {};
-    catSirket = d.sirket || "";
-    document.getElementById("tabBtnCatering").style.display = catSirket ? "block" : "none";
-  }catch(e){}
+    let f = d.firmalar; if(typeof f === "string") f = JSON.parse(f || "[]");
+    catFirmalar = Array.isArray(f) ? f : [];
+  }catch(e){ catFirmalar = []; }
+  if(!catFirmaAktif()) catFirmaId = catFirmalar.length ? catFirmalar[0].id : 0;
+  return catFirmalar;
 }
-function catAc(){ if(!document.getElementById("catTarih").value) document.getElementById("catTarih").value = catBugun(); catYukle(); }
+async function catVarMi(){
+  await catFirmalariCek();
+  document.getElementById("tabBtnCatering").style.display = catFirmalar.length ? "block" : "none";
+}
+function catFirmaCiz(){
+  const sel = document.getElementById("catFirma");
+  sel.innerHTML = catFirmalar.length
+    ? catFirmalar.map(f => `<option value="${f.id}" ${String(f.id)===String(catFirmaId)?"selected":""}>${f.ad}${f.aktif?"":" (pasif)"} · ${f.ucret}₺ · ${f.calisan} kod</option>`).join("")
+    : `<option value="0">Şirket yok — ➕ ile ekle</option>`;
+}
+function catFirmaSec(){
+  catFirmaId = Number(document.getElementById("catFirma").value) || 0;
+  catYukle(); catKodYukle();
+}
+function catFirmaAc(mod){
+  const f = mod === "duzenle" ? catFirmaAktif() : null;
+  if(mod === "duzenle" && !f){ alert("Önce bir şirket ekle."); return; }
+  document.getElementById("firmaBaslik").textContent = f ? "Şirketi düzenle" : "Yeni kurumsal müşteri";
+  document.getElementById("fmAd").value     = f ? f.ad : "";
+  document.getElementById("fmUcret").value  = f ? f.ucret : "";
+  document.getElementById("fmFatura").value = f ? (f.fatura || "") : "";
+  document.getElementById("fmAktif").checked = f ? !!f.aktif : true;
+  document.getElementById("fmMsg").textContent = "";
+  document.getElementById("firmaModal").dataset.id = f ? f.id : "";
+  document.getElementById("firmaModal").classList.add("show");
+}
+async function catFirmaKaydet(){
+  const msg = document.getElementById("fmMsg");
+  const ad = document.getElementById("fmAd").value.trim();
+  if(!ad){ msg.textContent = "Şirket adı gerekli."; return; }
+  const govde = {
+    restaurant: aktifMarka(),
+    id: document.getElementById("firmaModal").dataset.id || "",
+    ad,
+    ucret: Number(document.getElementById("fmUcret").value) || 0,
+    fatura: document.getElementById("fmFatura").value.trim(),
+    aktif: document.getElementById("fmAktif").checked
+  };
+  msg.textContent = "Kaydediliyor…";
+  try{
+    const r = await fetch(API.CAT_FIRMA_SAVE, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(govde) });
+    const d = await r.json();
+    if(!d.ok){ msg.textContent = "Kaydedilemedi."; return; }
+    catFirmaId = d.id;
+    await catFirmalariCek(); catFirmaCiz();
+    document.getElementById("firmaModal").classList.remove("show");
+    catYukle(); catKodYukle();
+  }catch(e){ msg.textContent = "Bağlantı hatası."; }
+}
+
+/* --- çalışan kodları --- */
+async function catKodYukle(){
+  const el = document.getElementById("kodListe");
+  if(!catFirmaId){ el.innerHTML = ""; catKodlar = []; return; }
+  try{
+    const r = await fetch(`${API.CAT_KODLAR}?company_id=${encodeURIComponent(catFirmaId)}`);
+    const t = await r.text();
+    const d = t ? JSON.parse(t) : {};
+    let k = d.kodlar; if(typeof k === "string") k = JSON.parse(k || "[]");
+    catKodlar = Array.isArray(k) ? k : [];
+  }catch(e){ catKodlar = []; }
+  catKodCiz();
+}
+function catKodCiz(){
+  const el = document.getElementById("kodListe");
+  if(!catKodlar.length){ el.innerHTML = '<div class="empty">Henüz kod yok. Yukarıdan üret.</div>'; return; }
+  const pasif = catKodlar.filter(k => !k.aktif).length;
+  el.innerHTML = `<div class="hint">${catKodlar.length} kod${pasif ? " · " + pasif + " pasif" : ""}. İsmi düzenleyip ✓ ile kaydet.</div>` +
+    catKodlar.map(k => `<div style="display:flex;gap:6px;align-items:center;margin-bottom:6px">
+      <span style="min-width:78px;font-weight:700;color:${k.aktif?"var(--mint)":"var(--txt3)"};font-size:12.5px">${k.kod}</span>
+      <input id="kd_${k.id}" value="${String(k.ad||"").replace(/"/g,"&quot;")}" placeholder="Çalışan adı" style="flex:1;margin:0">
+      <span style="font-size:11px;color:var(--txt3);min-width:44px;text-align:right">${k.siparis} sip.</span>
+      <button onclick="catKodKaydet(${k.id})" style="background:var(--card2);border:none;color:var(--mint);border-radius:9px;padding:0 11px;height:38px;cursor:pointer">✓</button>
+      <button onclick="catKodDurum(${k.id})" style="background:var(--card2);border:none;color:${k.aktif?"#EFC98A":"var(--txt3)"};border-radius:9px;padding:0 11px;height:38px;cursor:pointer">${k.aktif?"⏸":"▶"}</button>
+      <button onclick="catKodSil(${k.id})" style="background:var(--card2);border:none;color:#F09595;border-radius:9px;padding:0 11px;height:38px;cursor:pointer">🗑</button>
+    </div>`).join("");
+}
+async function catKodGonder(govde){
+  const r = await fetch(API.CAT_KOD_SAVE, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(govde) });
+  return await r.json();
+}
+async function catKodKaydet(id){
+  const k = catKodlar.find(x => x.id === id); if(!k) return;
+  const ad = (document.getElementById("kd_" + id) || {}).value || "";
+  await catKodGonder({ id, ad: ad.trim(), aktif: k.aktif });
+  document.getElementById("kodMsg").textContent = "✓ " + k.kod + " kaydedildi";
+  setTimeout(()=>{ document.getElementById("kodMsg").textContent=""; }, 2500);
+  catKodYukle();
+}
+async function catKodDurum(id){
+  const k = catKodlar.find(x => x.id === id); if(!k) return;
+  await catKodGonder({ id, ad: k.ad, aktif: !k.aktif });
+  catKodYukle();
+}
+async function catKodSil(id){
+  const k = catKodlar.find(x => x.id === id); if(!k) return;
+  if(k.siparis > 0){ alert(k.kod + " kodunun " + k.siparis + " siparişi var. Silmek yerine ⏸ ile pasife al."); return; }
+  if(!confirm(k.kod + " kodu silinsin mi?")) return;
+  await catKodGonder({ id, sil: true });
+  catKodYukle();
+}
+async function catKodUret(){
+  const msg = document.getElementById("kodMsg");
+  if(!catFirmaId){ msg.textContent = "Önce şirket ekle."; return; }
+  const onek = document.getElementById("kodOnek").value.trim();
+  const adet = Number(document.getElementById("kodAdet").value) || 0;
+  const bas  = Number(document.getElementById("kodBas").value) || 1001;
+  if(!onek){ msg.textContent = "Kod öneki yaz (örn. PTK)."; return; }
+  if(adet < 1){ msg.textContent = "Kaç adet üretileceğini yaz."; return; }
+  if(!confirm(`${onek}${bas} … ${onek}${bas+adet-1} aralığında ${adet} kod üretilecek. Devam?`)) return;
+  msg.textContent = "Üretiliyor…";
+  try{
+    const r = await fetch(API.CAT_KOD_URET, { method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ company_id: catFirmaId, onek, adet, baslangic: bas }) });
+    const d = await r.json();
+    msg.textContent = d.uretilen ? `✓ ${d.uretilen} kod üretildi (${d.ilk} … ${d.son})` : "Yeni kod üretilmedi — bu aralık zaten dolu olabilir.";
+    document.getElementById("kodBas").value = bas + adet;
+    await catFirmalariCek(); catFirmaCiz(); catKodYukle();
+  }catch(e){ msg.textContent = "Bağlantı hatası."; }
+  setTimeout(()=>{ msg.textContent=""; }, 6000);
+}
+
+async function catAc(){
+  if(!document.getElementById("catTarih").value) document.getElementById("catTarih").value = catBugun();
+  await catFirmalariCek(); catFirmaCiz();
+  catYukle(); catKodYukle();
+}
 async function catYukle(){
   const tarih = document.getElementById("catTarih").value || catBugun();
   try{
-    const r = await fetch(`${API.CAT_MENU}?restaurant=${encodeURIComponent(aktifMarka())}&tarih=${tarih}`);
+    const r = await fetch(`${API.CAT_MENU}?restaurant=${encodeURIComponent(aktifMarka())}&tarih=${tarih}${catQS()}`);
     const t2 = await r.text();
     const d = t2 ? JSON.parse(t2) : {};
     catSirket = d.sirket || "";
@@ -927,7 +1106,7 @@ async function catKaydet(){
   msg.textContent = "Kaydediliyor…";
   try{
     const r = await fetch(API.CAT_MENU_SAVE, { method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({ restaurant: aktifMarka(), tarih: document.getElementById("catTarih").value || catBugun(), satirlar }) });
+      body: JSON.stringify({ restaurant: aktifMarka(), company_id: catFirmaId || "", tarih: document.getElementById("catTarih").value || catBugun(), satirlar }) });
     const d = await r.json();
     msg.textContent = d.ok ? `✓ ${d.adet} seçenek kaydedildi — çalışanlar artık seçebilir` : "Kaydedilemedi.";
     catSatirlar = satirlar;
@@ -937,7 +1116,7 @@ async function catKaydet(){
 async function catListeYukle(){
   const tarih = document.getElementById("catTarih").value || catBugun();
   try{
-    const r = await fetch(`${API.CAT_LISTE}?restaurant=${encodeURIComponent(aktifMarka())}&tarih=${tarih}`);
+    const r = await fetch(`${API.CAT_LISTE}?restaurant=${encodeURIComponent(aktifMarka())}&tarih=${tarih}${catQS()}`);
     const d = await r.json();
     let s = d.siparisler; if(typeof s === "string") s = JSON.parse(s || "[]");
     catSiparisler = Array.isArray(s) ? s : [];
