@@ -165,6 +165,7 @@
 // ===================== AYAR =====================
 const CONFIG = {
   NEARBY: "https://webhook.yemekchat.com/webhook/nearby",
+  KAPSAMA: "https://webhook.yemekchat.com/webhook/kapsama",
   MENU:   "https://webhook.yemekchat.com/webhook/menu",
   ORDER:  "https://webhook.yemekchat.com/webhook/order",
   CATERING_INFO:  "https://webhook.yemekchat.com/webhook/catering-info",
@@ -221,10 +222,37 @@ else { $("rlist").innerHTML = '<div class="empty">Konum bulunamadı. WhatsApp\'t
 async function loadNearby(){
   try{
     const r = await fetch(`${CONFIG.NEARBY}?lat=${LAT}&lng=${LNG}`);
-    let d = await r.json(); if(!Array.isArray(d)) d = d.data || [];
-    nearby = d;
+    const t = await r.text();                       // boş yanıt = kapsama dışı
+    let d = t ? JSON.parse(t) : [];
+    if(!Array.isArray(d)) d = d.data || [];
+    nearby = d.filter(x => x && x.name);
   }catch(e){ nearby = []; }
+  if(!nearby.length){ kapsamaEkrani(); return; }
   renderChips(); renderNearby();
+}
+async function kapsamaEkrani(){
+  $("chips").innerHTML = "";
+  const list = $("rlist");
+  list.innerHTML = '<div class="empty">Bölgen kontrol ediliyor…</div>';
+  let d = {};
+  try{
+    const r = await fetch(`${CONFIG.KAPSAMA}?lat=${LAT}&lng=${LNG}&tel=${encodeURIComponent(TEL || "")}`);
+    const t = await r.text();
+    d = t ? JSON.parse(t) : {};
+  }catch(e){}
+  const sehirDisi = (d.durum !== "bolge_disi");
+  list.innerHTML = `<div style="text-align:center;padding:34px 20px">
+    <div style="font-size:54px;line-height:1">🚧</div>
+    <div style="font-size:19px;font-weight:800;margin:14px 0 0;color:#1f2a24">
+      ${sehirDisi ? "Henüz senin şehrinde değiliz" : "Bu bölgeye henüz gelmiyoruz"}
+    </div>
+    <div style="font-size:14px;color:#6b6b6b;line-height:1.75;margin-top:10px">
+      ${sehirDisi
+        ? "Şu an sadece <b>Ankara</b>'da hizmet veriyoruz. Talebini kaydettik — şehrine açıldığımızda WhatsApp'tan ilk sana haber vereceğiz 🙌"
+        : `Ankara'da hizmet veriyoruz ama bu noktaya teslimat yapan restoran henüz yok. En yakınımız <b>${d.en_yakin_km || "?"} km</b> uzakta. Talebini kaydettik, bu bölgeye açılınca haber vereceğiz 🙌`}
+    </div>
+    ${d.aktif_restoran ? `<div style="font-size:12.5px;color:#9a9a9a;margin-top:18px">Şu an ${d.aktif_restoran} restoran Ankara'da sipariş alıyor</div>` : ""}
+  </div>`;
 }
 function renderChips(){
   const cats = ["Tümü", ...new Set(nearby.map(r => r.category).filter(Boolean))];
