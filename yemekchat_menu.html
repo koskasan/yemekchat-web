@@ -155,7 +155,7 @@
   </div>
 
   <div class="ok" id="okScreen">
-    <div id="okVisual"><div class="ring">✓</div></div>
+    <div id="okVisual"><img src="maskot.png" alt="" style="width:132px;height:132px;object-fit:contain;display:block;margin:0 auto"></div>
     <h2>Siparişin alındı!</h2>
     <p>Mutfağa ilettik, hazırlanmaya başlıyor.<br>Onayı WhatsApp'tan göndereceğiz.</p>
     <div class="no" id="okNo"></div>
@@ -241,10 +241,10 @@ async function kapsamaEkrani(){
     d = t ? JSON.parse(t) : {};
   }catch(e){}
   const sehirDisi = (d.durum !== "bolge_disi");
-  list.innerHTML = `<div style="text-align:center;padding:34px 20px">
-    <div style="font-size:54px;line-height:1">🚧</div>
-    <div style="font-size:19px;font-weight:800;margin:14px 0 0;color:#1f2a24">
-      ${sehirDisi ? "Henüz senin şehrinde değiliz" : "Bu bölgeye henüz gelmiyoruz"}
+  list.innerHTML = `<div style="text-align:center;padding:28px 20px 34px">
+    <img src="maskot.png" alt="" style="width:150px;height:150px;object-fit:contain;display:block;margin:0 auto">
+    <div style="font-size:19px;font-weight:800;margin:6px 0 0;color:#1f2a24">
+      ${sehirDisi ? "Şu an Ankara dışındasın ustam" : "Bu bölgeye henüz gelmiyoruz"}
     </div>
     <div style="font-size:14px;color:#6b6b6b;line-height:1.75;margin-top:10px">
       ${sehirDisi
