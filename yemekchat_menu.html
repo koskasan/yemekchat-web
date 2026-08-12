@@ -146,6 +146,10 @@
       <input class="fld" id="bina" placeholder="Bina adı / sokak no">
       <div class="row2"><input class="fld" id="kat" placeholder="Kat"><input class="fld" id="daire" placeholder="Daire"></div>
       <input class="fld" id="adnot" placeholder="Kuryeye not (isteğe bağlı)">
+      <label style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12.5px;color:var(--txt2);cursor:pointer">
+        <input type="checkbox" id="adrKaydet" style="width:16px;height:16px;accent-color:var(--green);margin:0">
+        Bu adresi kaydet, bir daha yazmayayım
+      </label>
     </div>
     <div class="legal">Siparişi tamamlayarak <a href="https://yemekchat.com/yasal.html#kullanici" target="_blank">Kullanıcı Sözleşmesi</a>'ni kabul etmiş olursun · <a href="https://yemekchat.com/yasal.html#kvkk" target="_blank">KVKK Aydınlatma Metni</a></div>
   </div>
@@ -211,6 +215,32 @@ $("back").onclick = goBack;
 // maskotları yerleştir (URL boşsa görünmez)
 if(MASCOT_URL) $("mascotTop").innerHTML = `<img src="${MASCOT_URL}" alt="">`;
 if(MASCOT_RUN_URL) $("okVisual").innerHTML = `<div class="runwrap"><img src="${MASCOT_RUN_URL}" alt=""></div>`;
+
+/* ---------- kayıtlı adres ---------- */
+const ADR_KEY = "yc_adres";
+function adresYukle(){
+  let a = null;
+  try{ a = JSON.parse(localStorage.getItem(ADR_KEY) || "null"); }catch(e){}
+  if(!a) return;
+  if($("bina"))  $("bina").value  = a.bina  || "";
+  if($("kat"))   $("kat").value   = a.kat   || "";
+  if($("daire")) $("daire").value = a.daire || "";
+  if($("adnot")) $("adnot").value = a.not   || "";
+  if($("adrKaydet")) $("adrKaydet").checked = true;
+}
+function adresKaydet(){
+  const k = $("adrKaydet");
+  if(!k) return;
+  if(k.checked){
+    localStorage.setItem(ADR_KEY, JSON.stringify({
+      bina: $("bina").value.trim(), kat: $("kat").value.trim(),
+      daire: $("daire").value.trim(), not: $("adnot").value.trim()
+    }));
+  } else {
+    localStorage.removeItem(ADR_KEY);   // isaret kaldirilinca kayit silinsin
+  }
+}
+adresYukle();
 
 /* ---------- başlangıç ---------- */
 if(DRAFT){ draftInit(); }
@@ -421,6 +451,7 @@ async function submitOrder(){
   const bina = $("bina").value.trim();
   if(!bina){ alert("Lütfen bina adı / adres gir."); return; }
   const kat=$("kat").value.trim(), daire=$("daire").value.trim(), nt=$("adnot").value.trim();
+  adresKaydet();
   const address = `${bina}${kat?", Kat "+kat:""}${daire?", Daire "+daire:""}${nt?" ("+nt+")":""}`;
   let details = Object.values(cart).map(c=>`${c.item.name} x${c.qty}`).join(", ");
   const musteriNot = ($("sipnot") ? $("sipnot").value : "").trim();
