@@ -79,7 +79,8 @@
   .addmore{width:100%;background:var(--card2);border:1px dashed var(--line);color:var(--mint);border-radius:11px;padding:11px;font-size:13px;font-weight:600;cursor:pointer;margin-top:10px}
   .legal{padding:4px 14px 10px;font-size:10px;color:var(--muted);text-align:center;line-height:1.7}
   .legal a{color:var(--txt3)}
-  #payWrap{padding:10px 10px 24px}
+  #payWrap{position:fixed;inset:0;z-index:500;background:var(--bg);padding:10px 10px 24px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+  #payAc{display:block;text-align:center;background:var(--green);color:var(--greenDark);font-weight:700;font-size:14px;padding:13px;border-radius:11px;text-decoration:none;margin-bottom:10px}
   #payFrame{width:100%;min-height:calc(100vh - 130px);border:none;border-radius:12px;background:#fff}
 
   .bar{position:fixed;bottom:0;left:0;right:0;max-width:520px;margin:0 auto;background:var(--bg);padding:10px 14px 16px;border-top:.5px solid var(--line);display:none}
@@ -460,9 +461,11 @@ function showPayFrame(link){
   $("hdSub").textContent = "güvenli ödeme · PayTR 🔒";
   const w = document.createElement("div");
   w.id = "payWrap";
-  w.innerHTML = `<iframe id="payFrame" src="${link}"></iframe>`;
+  // iframe + gorunur yedek: WhatsApp ici tarayici iframe'i acmazsa musteri takilmasin
+  w.innerHTML = `<a id="payAc" href="${link}" target="_blank" rel="noopener">🔒 Ödeme ekranı açılmadıysa buraya dokun ↗</a>
+    <iframe id="payFrame" src="${link}"></iframe>`;
   document.body.appendChild(w);
-  window.scrollTo(0,0);
+  w.scrollTop = 0;
 }
 
 /* ---------- YAZARAK SİPARİŞ (DRAFT / Path B) ---------- */
