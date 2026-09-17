@@ -22,7 +22,11 @@
   .top .sub{font-size:11px;color:var(--mint)}
 
   .screen{display:none}
-  .screen.on{display:block}
+  .screen.on{display:block;animation:scrGir .24s cubic-bezier(.22,.61,.36,1) both}
+  .screen.on.geri{animation-name:scrGirGeri}
+  @keyframes scrGir{from{opacity:0;transform:translate3d(16px,0,0)}to{opacity:1;transform:none}}
+  @keyframes scrGirGeri{from{opacity:0;transform:translate3d(-16px,0,0)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){.screen.on,.screen.on.geri{animation:none}}
 
   /* chips */
   .chips{display:flex;gap:7px;overflow-x:auto;padding:12px 14px 4px;scrollbar-width:none}
@@ -41,6 +45,11 @@
   .rc .arrow{color:var(--txt3);font-size:20px}
   .rc.kapali{opacity:.5}
   .rc .kpl{font-size:11px;color:var(--red);background:#2e1817;padding:2px 9px;border-radius:12px;display:inline-block;margin-top:5px;margin-left:5px}
+
+  /* kapali restoran: menu incelenebilir ama tiklanamaz */
+  .kapaliUst{margin:12px 14px 0;background:#2e1817;border:1px solid #5a2b28;color:#ffb3ad;border-radius:12px;padding:11px 13px;font-size:13px;line-height:1.45}
+  .kapaliUst b{color:#fff}
+  .kapaliMenu{opacity:.5;pointer-events:none;user-select:none;filter:grayscale(.15)}
 
   /* menü */
   .sec{padding:12px 14px 2px}
@@ -206,6 +215,7 @@ const CATERING = p.get("catering");       // kurumsal mod (çalışan kodu)
 const DRAFT = p.get("draft");             // yazarak sipariş taslağı (Path B)
 
 let screen = 1, nearby = [], menu = [], rest = null, pay = null, catFilter = "Tümü";
+let restKapali = false, restAcilis = "", restKapanis = "", yon = "ileri";
 let isCat = false, catInfo = null, isDraft = false, draftNote = "", deliveryFee = 0, minSepet = 0;
 let musteriLat = LAT || "", musteriLng = LNG || "";   // kurye yol tarifi için
 const cart = {};  // id -> {item, qty}
@@ -299,9 +309,9 @@ function renderNearby(){
     const img = CATEGORY_IMG[(r.category||"").trim().toLowerCase()] || "";
     const bg = img ? `background-image:linear-gradient(90deg, rgba(28,42,32,0.97) 45%, rgba(28,42,32,0.55)), url('${img}');background-size:cover;background-position:right center;` : "";
     const kapali = (r.acik === false || r.acik === "false");
-    return `<div class="rc ${kapali?"kapali":""}" style="${bg}" onclick="${kapali?`kapaliUyari('${(r.acilis||"")}','${(r.kapanis||"")}')`:`openRestaurant('${r.name.replace(/'/g,"\\'")}')`}">
+    return `<div class="rc ${kapali?"kapali":""}" style="${bg}" onclick="openRestaurant('${r.name.replace(/'/g,"\\'")}')">
     <div class="rinfo">
-      <div class="rn">${r.name}${kapali?'<span class="kpl">🌙 Şu an kapalı</span>':""}</div>
+      <div class="rn">${r.name}${kapali?`<span class="kpl">${kapaliIkon(r.acilis,r.kapanis)} ${kapaliMetni(r.acilis,r.kapanis)}</span>`:""}</div>
       <div class="rm"><span class="star">★</span> ${r.rating||"-"} &nbsp;·&nbsp; ${r.dist_km} km &nbsp;·&nbsp; ${r.min_order_amount?("Min "+r.min_order_amount+"₺"):"Min yok"} &nbsp;·&nbsp; 🛵 ${Number(r.teslimat_ucreti)>0 ? r.teslimat_ucreti+"₺" : "Ücretsiz"}</div>
       ${r.category?`<div class="rcat">${r.category}</div>`:""}
     </div>
@@ -309,8 +319,46 @@ function renderNearby(){
   </div>`; }).join("");
 }
 
-function kapaliUyari(a, k){
-  alert(a && k ? `Bu restoran şu an kapalı ustam 🌙\nÇalışma saatleri: ${a} – ${k}` : "Bu restoran şu an siparişe kapalı ustam 🌙");
+/* "09:00:00" -> "09.00" */
+function saatBicim(s){
+  const m = String(s||"").match(/(\d{1,2})[:.](\d{2})/);
+  if(!m) return "";
+  return ("0"+m[1]).slice(-2) + "." + m[2];
+}
+/* Turkce bulunma eki: 9'da, 11'de, 3'te ... */
+function saatEki(s){
+  const m = String(s||"").match(/(\d{1,2})[:.](\d{2})/);
+  if(!m) return "da";
+  const sa = Number(m[1]), dk = Number(m[2]);
+  const BIR = ["da","de","de","te","te","te","da","de","de","da"];
+  const ON  = {10:"da",20:"de",30:"da",40:"ta",50:"de"};
+  const oku = n => (n>=10 && n%10!==0) ? BIR[n%10] : (n>=10 ? ON[n-(n%10)] : BIR[n]);
+  return dk!==0 ? oku(dk) : oku(sa);
+}
+function acilisMetni(a){
+  const s = saatBicim(a);
+  return s ? `Saat ${s}'${saatEki(a)} açılacak` : "Şu an kapalı";
+}
+/* "09:00" -> gece yarisindan beri gecen dakika */
+function saatDk(s){
+  const m = String(s||"").match(/(\d{1,2})[:.](\d{2})/);
+  return m ? Number(m[1])*60 + Number(m[2]) : null;
+}
+/* Su an calisma saatleri icinde miyiz? bilinmiyorsa null */
+function saatIcinde(a, k){
+  const pa = saatDk(a), pk = saatDk(k);
+  if(pa === null || pk === null) return null;
+  const d = new Date(), s = d.getHours()*60 + d.getMinutes();
+  return pa <= pk ? (s >= pa && s < pk) : (s >= pa || s < pk);   // gece asan saatler
+}
+/* Kapali restoranin sebebi: calisma saatindeyse geçici kapatma demektir */
+function kapaliMetni(a, k){
+  const ic = saatIcinde(a, k);
+  return (ic === null || ic === true) ? "Yoğunluktan dolayı kapalı" : acilisMetni(a);
+}
+function kapaliIkon(a, k){
+  const ic = saatIcinde(a, k);
+  return (ic === null || ic === true) ? "🔥" : "🌙";
 }
 
 /* ---------- EKRAN 2: menü ---------- */
@@ -321,6 +369,9 @@ async function openRestaurant(name){
   }
   rest = name;
   const nb = nearby.find(x => x.name === name);
+  restKapali = !!(nb && (nb.acik === false || nb.acik === "false"));
+  restAcilis = nb ? (nb.acilis || "") : "";
+  restKapanis = nb ? (nb.kapanis || "") : "";
   if(nb){
     deliveryFee = Math.max(0, Math.round(Number(nb.teslimat_ucreti) || 0));
     minSepet = Math.max(0, Math.round(Number(nb.min_order_amount) || 0));
@@ -351,7 +402,12 @@ function renderMenu(){
       </div>`;
     });
   }
-  html += '</div>'; wrap.innerHTML = html;
+  html += '</div>';
+  const ust = restKapali
+    ? `<div class="kapaliUst">${kapaliIkon(restAcilis,restKapanis)} <b>${rest}</b> şu an kapalı. ${kapaliMetni(restAcilis,restKapanis)}. Menüyü inceleyebilirsin, sipariş açılınca verilebilir.</div>`
+    : "";
+  wrap.innerHTML = ust + `<div class="${restKapali?"kapaliMenu":""}">` + html + `</div>`;
+  if(restKapali) return;
   menu.forEach(m => { if(m.is_available!==false && m.is_available!=="false") renderCtrl(m.id); });
 }
 function renderCtrl(id){
@@ -407,14 +463,19 @@ document.querySelectorAll(".pay .opt").forEach(o => o.onclick = () => {
 /* ---------- ortak ---------- */
 function total(){ return Object.values(cart).reduce((s,c)=>s+c.item.price*c.qty,0); }
 function grand(){ return total() + (Object.keys(cart).length ? deliveryFee : 0); }
-function go1(){ screen=1; show(); }
-function go2(){ screen=2; show(); }
-function go3(){ if(!Object.keys(cart).length) return; screen=3; renderCart(); show(); }
-function goBack(){ if(isDraft){ screen=3; renderCart(); show(); return; } if(screen===3) go2(); else if(screen===2){ if(DIRECT_REST){} else go1(); } }
+function go1(){ screen=1; yon="geri"; show(); }
+function go2(){ screen=2; yon="ileri"; show(); }
+function go3(){ if(!Object.keys(cart).length) return; screen=3; yon="ileri"; renderCart(); show(); }
+function goBack(){
+  if(isDraft){ screen=3; yon="geri"; renderCart(); show(); return; }
+  if(screen===3){ screen=2; yon="geri"; show(); }
+  else if(screen===2){ if(DIRECT_REST){} else go1(); }
+}
 function show(){
-  $("scr1").classList.toggle("on", screen===1);
-  $("scr2").classList.toggle("on", screen===2);
-  $("scr3").classList.toggle("on", screen===3);
+  const ekranlar = [$("scr1"), $("scr2"), $("scr3")];
+  ekranlar.forEach((el, i) => { el.classList.remove("geri"); el.classList.toggle("on", screen===i+1); });
+  const aktif = ekranlar[screen-1];
+  if(aktif && yon==="geri") aktif.classList.add("geri");
   $("back").style.display = (isCat || screen===1 || (screen===2&&DIRECT_REST) || (isDraft&&screen===3)) ? "none" : "block";
   if(!isCat && !isDraft){
     $("hdName").textContent = screen===1 ? "Yakındaki Restoranlar" : (rest||"YemekChat");
@@ -434,6 +495,7 @@ function updateBar(){
     else { go.disabled=false; go.innerHTML=`✓ Siparişi Onayla (${n} ürün · ${t} TL)`; }
   } else if(screen===2){
     go.onclick = go3;
+    if(restKapali){ go.disabled = true; go.textContent = kapaliMetni(restAcilis, restKapanis); return; }
     const eksik = minSepet - t;
     if(n===0){ go.disabled=true; go.textContent="Sepetin boş"; }
     else if(eksik > 0){ go.disabled=true; go.innerHTML=`Min. sepet ${minSepet} TL · ${eksik} TL daha ekle`; }
