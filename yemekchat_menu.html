@@ -119,15 +119,18 @@
   .oneri{margin:13px 14px 0;background:var(--card);border:1px dashed var(--amber);border-radius:14px;padding:13px}
   .oneri .obas{font-size:14px;font-weight:600;color:var(--amber);line-height:1.35}
   .oneri .oalt{font-size:12px;color:var(--txt2);margin-top:4px;line-height:1.45}
-  .oneri .olist{display:flex;gap:9px;overflow-x:auto;margin-top:12px;padding-bottom:3px;scrollbar-width:none}
+  .oneri .olist{display:flex;flex-wrap:nowrap;gap:10px;margin-top:12px;padding-bottom:4px;
+    overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
   .oneri .olist::-webkit-scrollbar{display:none}
-  .oneri .ok{flex-shrink:0;width:108px;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:8px}
-  .oneri .ok img{width:100%;height:78px;object-fit:cover;border-radius:8px;background:var(--bg);display:block}
-  .oneri .ok img.yok{display:none}
-  .oneri .ok .n{font-size:11.5px;margin-top:6px;line-height:1.3;height:29px;overflow:hidden}
-  .oneri .ok .p{font-size:11.5px;color:var(--mint);margin-top:2px}
-  .oneri .ok button{margin-top:7px;background:var(--green);color:#fff;border:none;border-radius:8px;
-    padding:7px;width:100%;font-size:11.5px;font-weight:600;cursor:pointer}
+  .oneri .okrt{flex:0 0 auto;width:124px;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:8px;display:block}
+  /* menudeki kucuk gorselin (54px) iki kati */
+  .oneri .okrt img{width:108px;height:108px;object-fit:cover;border-radius:9px;background:var(--bg);display:block}
+  .oneri .okrt img.yok{display:none}
+  .oneri .okrt .n{font-size:11.5px;margin-top:7px;line-height:1.3;height:29px;overflow:hidden}
+  .oneri .okrt .p{font-size:11.5px;color:var(--mint);margin-top:2px}
+  .oneri .okrt button{margin-top:7px;background:var(--green);color:#fff;border:none;border-radius:8px;
+    padding:8px;width:100%;font-size:11.5px;font-weight:600;cursor:pointer}
+  .oneri .okrt button.sepette{background:var(--card);color:var(--mint);border:1px solid var(--line)}
   .addmore{width:100%;background:var(--card2);border:1px dashed var(--line);color:var(--mint);border-radius:11px;padding:11px;font-size:13px;font-weight:600;cursor:pointer;margin-top:10px}
   .legal{padding:4px 14px 10px;font-size:10px;color:var(--muted);text-align:center;line-height:1.7}
   .legal a{color:var(--txt3)}
@@ -527,13 +530,15 @@ function sheetKapat(){ $("sheet").classList.remove("on"); }
 document.addEventListener("keydown", e => { if(e.key === "Escape") sheetKapat(); });
 
 /* ---------- ekstra harcama önerileri (sepet, ödemeden önce) ---------- */
-const RE_ICECEK = /içecek|icecek|meşrubat|mesrubat|kola|ayran|soda|fanta|sprite|fuse|ice tea|limonata|şalgam|salgam|\bsu\b|çay|kahve/i;
+const RE_ICECEK = /içecek|icecek|meşrubat|mesrubat|kola|cola|pepsi|ayran|soda|gazoz|fanta|sprite|fuse|ice tea|ayran|limonata|şalgam|salgam|maden suyu|meyve suyu|portakal suyu|şeftali|\bsu\b|\bçay\b|kahve|latte|americano/i;
 const RE_TATLI  = /tatlı|tatli|sufle|soufle|tiramisu|künefe|kunefe|baklava|dondurma|kazandibi|profiterol|browni/i;
 const RE_YAN    = /patates|salata|soğan halkası|sogan halkasi|sarımsaklı ekmek|sarimsakli ekmek|kroket|çorba|corba|nugget|aperatif|başlangıç|baslangic|yan ürün|yan urun|ekstra|sos/i;
 
 function urunEtiket(m){ return `${m.category||""} ${m.name||""}`; }
+/* sepet kontrolunde aciklama da okunur: "Menu 1: ... 1 Kutu Coca-Cola" zaten icecek sayilsin */
+function sepetEtiket(m){ return `${m.category||""} ${m.name||""} ${m.description||""}`; }
 function sepetUrunleri(){ return Object.values(cart).map(c => c.item); }
-function sepetteVar(re){ return sepetUrunleri().some(i => re.test(urunEtiket(i))); }
+function sepetteVar(re){ return sepetUrunleri().some(i => re.test(sepetEtiket(i))); }
 function menudenBul(re, hariç){
   return menu.filter(m => m.is_available!==false && m.is_available!=="false"
     && re.test(urunEtiket(m)) && !(hariç && hariç.test(urunEtiket(m)))).slice(0, 12);
@@ -552,16 +557,18 @@ function oneriListesi(){
       urunler: u });
   }
 
-  const kucukVar = sepetUrunleri().some(i => /küçük|kucuk|mini|tek kişilik|porsiyon/i.test(urunEtiket(i)));
-  if(adet <= 2 && kucukVar){
+  // SADECE tek bir kucuk urun varsa: iki kucuk pizza alan zaten doyar
+  const tekUrun = sepetUrunleri()[0];
+  const kucukVar = adet === 1 && tekUrun && /küçük|kucuk|mini|tek kişilik/i.test(urunEtiket(tekUrun));
+  if(kucukVar){
     const u = menudenBul(RE_YAN, RE_ICECEK);
     if(u.length) bloklar.push({
-      bas: "Bununla doyacak mısın?",
-      alt: "Sonra \"doymadım, porsiyon küçük\" deme 😂",
+      bas: "Bununla doyacak mısın Ustam?",
+      alt: 'Sonra yok ben doymadım, yok porsiyon küçüktü deme, <span style="color:var(--amber)">daha fazla ürün ekle</span> 😄',
       urunler: u });
   }
 
-  if(bloklar.length < 2 && !sepetteVar(RE_TATLI)){
+  if(!bloklar.length && !sepetteVar(RE_TATLI)){
     const u = menudenBul(RE_TATLI);
     if(u.length) bloklar.push({
       bas: "Tatlı yemeden kalkılır mı bu sofradan?",
@@ -569,7 +576,48 @@ function oneriListesi(){
       urunler: u });
   }
 
-  return bloklar.slice(0, 2);
+  // hicbiri uymadiysa: karisik yedek blok
+  if(!bloklar.length){
+    const u = karisikOneri();
+    if(u.length) bloklar.push({
+      bas: "Bunlara da bir bak ustam",
+      alt: "Sos, aperatif, tatlı, içecek — yanına gitsin 👀",
+      urunler: u });
+  }
+
+  // son care: restoranin menusunde icecek/tatli/aperatif yoksa bile blok cikmali
+  if(!bloklar.length){
+    const u = digerUrunler();
+    if(u.length) bloklar.push({
+      bas: "Bunlara da bir bak ustam",
+      alt: "Menüde başka neler var, bir göz at 👀",
+      urunler: u });
+  }
+
+  return bloklar.slice(0, 1);
+}
+
+/* sepette olmayan diger urunler, ucuzdan pahaliya */
+function digerUrunler(){
+  const idler = new Set(Object.values(cart).map(c => String(c.item.id || "")));
+  return menu
+    .filter(m => m.is_available !== false && m.is_available !== "false" && !idler.has(String(m.id)))
+    .slice()
+    .sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0))
+    .slice(0, 15);
+}
+
+/* yan urun + tatli + icecek karisik, sirayla harmanlanmis */
+function karisikOneri(){
+  const gruplar = [menudenBul(RE_YAN, RE_ICECEK), menudenBul(RE_TATLI), menudenBul(RE_ICECEK)];
+  const out = [], gorulen = new Set();
+  for(let i = 0; i < 8; i++){
+    for(const g of gruplar){
+      const m = g[i];
+      if(m && !gorulen.has(String(m.id))){ gorulen.add(String(m.id)); out.push(m); }
+    }
+  }
+  return out.slice(0, 15);
 }
 
 function oneriCiz(){
@@ -578,10 +626,10 @@ function oneriCiz(){
   const bloklar = oneriListesi();
   w.innerHTML = bloklar.map(b => `<div class="oneri">
     <div class="obas">${b.bas}</div><div class="oalt">${b.alt}</div>
-    <div class="olist">${b.urunler.map(m => `<div class="ok">
+    <div class="olist">${b.urunler.map(m => `<div class="okrt">
       ${m.image_url?`<img src="${m.image_url}" alt="" loading="lazy" decoding="async" onerror="this.classList.add('yok')">`:""}
       <div class="n">${m.name}</div><div class="p">${m.price} TL</div>
-      <button onclick="oneriEkle('${String(m.id).replace(/'/g,"")}')">+ Ekle</button>
+      <button class="${cart[String(m.id)]?"sepette":""}" onclick="oneriEkle('${String(m.id).replace(/'/g,"")}')">${cart[String(m.id)]?`✓ Sepette (${cart[String(m.id)].qty})`:"+ Ekle"}</button>
     </div>`).join("")}</div>
   </div>`).join("");
 }
