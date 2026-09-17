@@ -15,9 +15,16 @@
   html,body{background:var(--bg);color:var(--txt);font-family:-apple-system,"Segoe UI",Roboto,sans-serif}
   body{max-width:520px;margin:0 auto;padding-bottom:90px}
 
-  .top{background:var(--card);padding:12px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10;border-bottom:.5px solid var(--line)}
+  .top{background:var(--card);padding:12px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10;border-bottom:.5px solid var(--line);overflow:hidden}
+  .top>*{position:relative;z-index:1}
+  /* restoranin kapak fotografi: ortalanmis, yari saydam */
+  .top .kapak{position:absolute;inset:0;z-index:0;background-size:cover;background-position:center center;
+    background-repeat:no-repeat;opacity:0;transition:opacity .35s}
+  .top .kapak.on{opacity:.5}
   .back{background:none;border:none;color:var(--mint);font-size:22px;cursor:pointer;padding:0 4px;display:none}
-  .logo{width:34px;height:34px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;color:#FCEBEB;font-weight:600;font-size:14px;flex-shrink:0}
+  .logo{width:34px;height:34px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;
+    color:#FCEBEB;font-weight:600;font-size:14px;flex-shrink:0;overflow:hidden;background-size:cover;background-position:center}
+  .logo img{width:100%;height:100%;object-fit:cover;display:block}
   .top .name{font-size:15px;font-weight:600}
   .top .sub{font-size:11px;color:var(--mint)}
 
@@ -124,8 +131,11 @@
   .oneri .olist::-webkit-scrollbar{display:none}
   .oneri .okrt{flex:0 0 auto;width:124px;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:8px;display:block}
   /* menudeki kucuk gorselin (54px) iki kati */
-  .oneri .okrt img{width:108px;height:108px;object-fit:cover;border-radius:9px;background:var(--bg);display:block}
-  .oneri .okrt img.yok{display:none}
+  /* fotograf kutusu her zaman ayni yer kaplar: fotosuz urunde de kartlar hizali kalir */
+  .oneri .okrt .okf{position:relative;width:108px;height:108px;border-radius:9px;background:var(--bg);
+    display:flex;align-items:center;justify-content:center;font-size:30px;color:var(--txt3);overflow:hidden}
+  .oneri .okrt .okf img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+  .oneri .okrt .okf img.yok{display:none}
   .oneri .okrt .n{font-size:11.5px;margin-top:7px;line-height:1.3;height:29px;overflow:hidden}
   .oneri .okrt .p{font-size:11.5px;color:var(--mint);margin-top:2px}
   .oneri .okrt button{margin-top:7px;background:var(--green);color:#fff;border:none;border-radius:8px;
@@ -134,6 +144,38 @@
   .addmore{width:100%;background:var(--card2);border:1px dashed var(--line);color:var(--mint);border-radius:11px;padding:11px;font-size:13px;font-weight:600;cursor:pointer;margin-top:10px}
   .legal{padding:4px 14px 10px;font-size:10px;color:var(--muted);text-align:center;line-height:1.7}
   .legal a{color:var(--txt3)}
+  .legal a.soz{color:var(--mint);text-decoration:underline;cursor:pointer}
+
+  /* mesafeli satis sozlesmesi / on bilgilendirme ekrani */
+  #sozWrap{position:fixed;inset:0;z-index:600;background:var(--bg);display:none;flex-direction:column}
+  #sozWrap.on{display:flex}
+  #sozWrap .sbar{display:flex;gap:7px;padding:10px 12px;border-bottom:.5px solid var(--line);background:var(--card);align-items:center}
+  #sozWrap .sbar .stab{flex:1;text-align:center;background:var(--card2);border:1px solid var(--line);color:var(--txt2);
+    border-radius:10px;padding:9px 6px;font-size:12px;cursor:pointer;font-weight:600}
+  #sozWrap .sbar .stab.on{background:var(--green);border-color:var(--green);color:#fff}
+  #sozWrap .sbar .skapat{background:none;border:none;color:var(--mint);font-size:24px;cursor:pointer;padding:0 6px;line-height:1}
+  #sozWrap .sgovde{flex:1;overflow-y:auto;padding:14px 16px 24px;font-size:12.5px;line-height:1.65;color:var(--txt2)}
+  #sozWrap .sgovde h2{font-size:14px;color:var(--txt);margin:0 0 10px;line-height:1.4}
+  #sozWrap .sgovde h3{font-size:12.5px;color:var(--mint);margin:16px 0 5px;text-transform:none;letter-spacing:0}
+  #sozWrap .sgovde p{margin:0 0 7px}
+  #sozWrap .sgovde table{width:100%;border-collapse:collapse;margin:7px 0 10px;font-size:11.5px}
+  #sozWrap .sgovde th,#sozWrap .sgovde td{border:1px solid var(--line);padding:6px 7px;text-align:left;vertical-align:top}
+  #sozWrap .sgovde th{background:var(--card);color:var(--txt2);font-weight:600}
+  #sozWrap .sgovde td.sag{text-align:right;white-space:nowrap}
+  #sozWrap .sgovde .kv{display:flex;gap:8px;margin-bottom:3px}
+  #sozWrap .sgovde .kv b{flex:0 0 118px;color:var(--txt3);font-weight:600}
+  #sozWrap .sgovde .eksik{color:var(--amber)}
+  #sozWrap .syazdir{margin:14px 0 0;width:100%;background:var(--card2);border:1px solid var(--line);color:var(--txt);
+    border-radius:11px;padding:12px;font-size:13px;cursor:pointer}
+  @media print{
+    body>*{display:none!important}
+    #sozWrap{display:block!important;position:static;background:#fff}
+    #sozWrap .sbar,#sozWrap .syazdir{display:none!important}
+    #sozWrap .sgovde{color:#000;overflow:visible;padding:0}
+    #sozWrap .sgovde h2,#sozWrap .sgovde h3{color:#000}
+    #sozWrap .sgovde .kv b{color:#333}
+    #sozWrap .sgovde th{background:#eee;color:#000}
+  }
   #payWrap{position:fixed;inset:0;z-index:500;background:var(--bg);padding:10px 10px 24px;overflow-y:auto;-webkit-overflow-scrolling:touch}
   #payAc{display:block;text-align:center;background:var(--green);color:var(--greenDark);font-weight:700;font-size:14px;padding:13px;border-radius:11px;text-decoration:none;margin-bottom:10px}
   #payFrame{width:100%;min-height:calc(100vh - 130px);border:none;border-radius:12px;background:#fff}
@@ -164,8 +206,9 @@
 <body>
 
   <div class="top">
+    <div class="kapak" id="kapakArka"></div>
     <button class="back" id="back">‹</button>
-    <div class="logo">YC</div>
+    <div class="logo" id="logoKutu"><img src="yemekchat-logo.png" alt="YemekChat" onerror="this.remove()"></div>
     <div>
       <div class="name" id="hdName">YemekChat</div>
       <div class="sub" id="hdSub">güvenli sipariş</div>
@@ -199,6 +242,7 @@
       <input class="fld" id="sipnot" placeholder="Örn: soğansız olsun, acısız, zile basmayın">
     </div>
     <div class="sec"><h3>Teslimat adresi</h3>
+      <input class="fld" id="adsoyad" placeholder="Ad Soyad">
       <input class="fld" id="bina" placeholder="Bina adı / sokak no">
       <div class="row2"><input class="fld" id="kat" placeholder="Kat"><input class="fld" id="daire" placeholder="Daire"></div>
       <input class="fld" id="adnot" placeholder="Kuryeye not (isteğe bağlı)">
@@ -207,7 +251,17 @@
         Bu adresi kaydet, bir daha yazmayayım
       </label>
     </div>
-    <div class="legal">Siparişi tamamlayarak <a href="https://yemekchat.com/yasal.html#kullanici" target="_blank">Kullanıcı Sözleşmesi</a>'ni kabul etmiş olursun · <a href="https://yemekchat.com/yasal.html#kvkk" target="_blank">KVKK Aydınlatma Metni</a></div>
+    <div class="legal">Bu siparişi tamamlayarak <a href="https://yemekchat.com/yasal.html#kullanici" target="_blank">Kullanıcı Sözleşmesi</a>, <a href="https://yemekchat.com/yasal.html#kvkk" target="_blank">KVKK Aydınlatma Metni</a> ve <a class="soz" onclick="sozAc('mss')">Mesafeli Satış Sözleşmesi</a>'ni kabul etmiş olursun · <a class="soz" onclick="sozAc('on')">Ön Bilgilendirme Formu</a></div>
+  </div>
+
+  <!-- mesafeli satis sozlesmesi / on bilgilendirme -->
+  <div id="sozWrap">
+    <div class="sbar">
+      <div class="stab" id="sTabOn"  onclick="sozAc('on')">Ön Bilgilendirme Formu</div>
+      <div class="stab" id="sTabMss" onclick="sozAc('mss')">Mesafeli Satış Sözleşmesi</div>
+      <button class="skapat" onclick="sozKapat()">×</button>
+    </div>
+    <div class="sgovde" id="sozGovde"></div>
   </div>
 
   <!-- acilir alt sekme -->
@@ -286,12 +340,51 @@ $("back").onclick = goBack;
 if(MASCOT_URL) $("mascotTop").innerHTML = `<img src="${MASCOT_URL}" alt="">`;
 if(MASCOT_RUN_URL) $("okVisual").innerHTML = `<div class="runwrap"><img src="${MASCOT_RUN_URL}" alt=""></div>`;
 
+/* ---------- üst blok: logo, kapak fotoğrafı, puan rengi ---------- */
+const LOGO_URL = "yemekchat-logo.png";   // depoya taşındığında tam adres yazılabilir
+
+/* 2.0 kırmızı → 5.0 yeşil */
+function puanRengi(p){
+  const s = Number(p);
+  if(!isFinite(s) || s <= 0) return null;
+  const t = Math.max(0, Math.min(1, (s - 2) / 3));
+  return `hsl(${Math.round(120*t)},62%,38%)`;
+}
+function basHarf(ad){
+  return String(ad||"").replace(/[^\p{L}\p{N} ]/gu,"").trim().split(/\s+/)
+    .slice(0,2).map(x=>x[0]||"").join("").toLocaleUpperCase("tr") || "YC";
+}
+
+/* Üst bloğu ekrana göre giydirir */
+function ustBlok(){
+  const kutu = $("logoKutu"), kap = $("kapakArka");
+  if(!kutu || !kap) return;
+  const nb = rest ? nearby.find(x => x.name === rest) : null;
+  const kapakUrl = (nb && nb.kapak) || saticiBilgi.kapak || "";
+
+  if(rest && screen !== 1){
+    // restoran ekranı: baş harf + puana göre renk + kapak fotoğrafı
+    const renk = puanRengi(nb && nb.rating);
+    kutu.innerHTML = basHarf(rest);
+    kutu.style.background = renk || "var(--red)";
+    kutu.style.color = "#fff";
+    if(kapakUrl){ kap.style.backgroundImage = `url('${kapakUrl}')`; kap.classList.add("on"); }
+    else { kap.classList.remove("on"); kap.style.backgroundImage = ""; }
+  } else {
+    // restoran listesi: YemekChat logosu, kapak yok
+    kutu.innerHTML = `<img src="${LOGO_URL}" alt="YemekChat" onerror="this.parentElement.textContent='YC'">`;
+    kutu.style.background = "var(--red)";
+    kap.classList.remove("on"); kap.style.backgroundImage = "";
+  }
+}
+
 /* ---------- kayıtlı adres ---------- */
 const ADR_KEY = "yc_adres";
 function adresYukle(){
   let a = null;
   try{ a = JSON.parse(localStorage.getItem(ADR_KEY) || "null"); }catch(e){}
   if(!a) return;
+  if($("adsoyad")) $("adsoyad").value = a.ad || "";
   if($("bina"))  $("bina").value  = a.bina  || "";
   if($("kat"))   $("kat").value   = a.kat   || "";
   if($("daire")) $("daire").value = a.daire || "";
@@ -303,6 +396,7 @@ function adresKaydet(){
   if(!k) return;
   if(k.checked){
     localStorage.setItem(ADR_KEY, JSON.stringify({
+      ad: $("adsoyad").value.trim(),
       bina: $("bina").value.trim(), kat: $("kat").value.trim(),
       daire: $("daire").value.trim(), not: $("adnot").value.trim()
     }));
@@ -431,6 +525,8 @@ async function openRestaurant(name){
   restKapali = !!(nb && (nb.acik === false || nb.acik === "false"));
   restAcilis = nb ? (nb.acilis || "") : "";
   restKapanis = nb ? (nb.kapanis || "") : "";
+  saticiBilgi = nb ? { unvan: nb.unvan, adres: nb.adres, vergi_no: nb.vergi_no,
+                       telefon: nb.telefon, eposta: nb.eposta, kapak: nb.kapak } : {};
   if(nb){
     deliveryFee = Math.max(0, Math.round(Number(nb.teslimat_ucreti) || 0));
     minSepet = Math.max(0, Math.round(Number(nb.min_order_amount) || 0));
@@ -515,6 +611,172 @@ function renderCart(){
   });
   const am = $("addMore"); if(am) am.onclick = () => openRestaurant(rest);
 }
+
+/* ============================================================
+   MESAFELİ SATIŞ SÖZLEŞMESİ + ÖN BİLGİLENDİRME FORMU ÜRETİCİSİ
+   Her sipariş için, sipariş verilerinden anlık olarak üretilir.
+   ============================================================ */
+
+/* Platformun (aracı hizmet sağlayıcı) kendi bilgileri — BİR KEZ DOLDUR */
+const YC_BILGI = {
+  unvan:   "Atilla Alperen Ülker (Şahıs İşletmesi)",
+  marka:   "YemekChat",
+  adres:   "",                                  // ← DOLDURULACAK: işletme adresi
+  vergi:   "",                                  // ← DOLDURULACAK: vergi dairesi / no
+  mersis:  "",                                  // ← varsa MERSİS no
+  eposta:  "yemekchat.yonetim@gmail.com",
+  telefon: "+90 505 489 88 26",
+  web:     "www.yemekchat.com"
+};
+const SOZ_SURUM = "1.0";
+
+let sozAktif = "mss";
+let saticiBilgi = {};     // sipariş edilen restoranın yasal bilgileri
+
+function sozAlan(v, etiket){
+  v = String(v == null ? "" : v).trim();
+  return v ? esc(v) : `<span class="eksik">${etiket}</span>`;
+}
+function esc(s){
+  return String(s == null ? "" : s)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+function sozTarih(){
+  const d = new Date();
+  const ik = x => ("0"+x).slice(-2);
+  return `${ik(d.getDate())}.${ik(d.getMonth()+1)}.${d.getFullYear()} ${ik(d.getHours())}:${ik(d.getMinutes())}`;
+}
+
+/* Satıcı = restoran. Yasal alanlar backend'den geldiğinde otomatik dolar. */
+function saticiKutusu(){
+  const s = saticiBilgi || {};
+  return `<div class="kv"><b>Unvan</b><span>${sozAlan(s.unvan || rest, "Ticari unvan girilmemiş")}</span></div>
+  <div class="kv"><b>Adres</b><span>${sozAlan(s.adres, "Adres girilmemiş")}</span></div>
+  <div class="kv"><b>Vergi D. / No</b><span>${sozAlan(s.vergi_no, "Vergi bilgisi girilmemiş")}</span></div>
+  <div class="kv"><b>Telefon</b><span>${sozAlan(s.telefon, "Telefon girilmemiş")}</span></div>
+  <div class="kv"><b>E-posta</b><span>${sozAlan(s.eposta, "E-posta girilmemiş")}</span></div>`;
+}
+function araciKutusu(){
+  return `<div class="kv"><b>Unvan</b><span>${esc(YC_BILGI.unvan)} ("${esc(YC_BILGI.marka)}")</span></div>
+  <div class="kv"><b>Adres</b><span>${sozAlan(YC_BILGI.adres, "Adres girilmemiş")}</span></div>
+  <div class="kv"><b>Vergi D. / No</b><span>${sozAlan(YC_BILGI.vergi, "Vergi bilgisi girilmemiş")}</span></div>
+  <div class="kv"><b>Telefon</b><span>${esc(YC_BILGI.telefon)}</span></div>
+  <div class="kv"><b>E-posta</b><span>${esc(YC_BILGI.eposta)}</span></div>`;
+}
+function aliciKutusu(){
+  const ad = ($("adsoyad") ? $("adsoyad").value : "").trim();
+  const bina = ($("bina") ? $("bina").value : "").trim();
+  const kat = ($("kat") ? $("kat").value : "").trim();
+  const daire = ($("daire") ? $("daire").value : "").trim();
+  const adres = [bina, kat && "Kat "+kat, daire && "Daire "+daire].filter(Boolean).join(", ");
+  return `<div class="kv"><b>Ad Soyad</b><span>${sozAlan(ad, "Ad soyad girilmedi")}</span></div>
+  <div class="kv"><b>Telefon</b><span>${sozAlan(TEL, "Telefon yok")}</span></div>
+  <div class="kv"><b>Teslimat adresi</b><span>${sozAlan(adres, "Adres girilmedi")}</span></div>`;
+}
+function urunTablosu(){
+  const satir = Object.values(cart).map(c =>
+    `<tr><td>${esc(c.item.name)}</td><td class="sag">${c.qty}</td><td class="sag">${c.item.price} TL</td><td class="sag">${c.item.price*c.qty} TL</td></tr>`
+  ).join("");
+  const ek = deliveryFee > 0
+    ? `<tr><td colspan="3">Teslimat (getirme) ücreti — SATICI&apos;ya aittir</td><td class="sag">${deliveryFee} TL</td></tr>` : "";
+  return `<table><thead><tr><th>Ürün</th><th class="sag">Adet</th><th class="sag">Birim</th><th class="sag">Tutar</th></tr></thead>
+  <tbody>${satir}${ek}
+  <tr><th colspan="3">TOPLAM (KDV dâhil)</th><th class="sag">${grand()} TL</th></tr></tbody></table>`;
+}
+function odemeMetni(){
+  if(pay === "Online") return "Online ödeme (lisanslı ödeme kuruluşu PayTR altyapısı)";
+  if(pay === "Nakit") return "Kapıda nakit ödeme";
+  if(pay === "Kredi Kartı") return "Kapıda kredi/banka kartı ile ödeme";
+  return "Sipariş onayında seçilecektir";
+}
+
+const SOZ_ORTAK = `
+<h3>Cayma hakkı</h3>
+<p>Mesafeli Sözleşmeler Yönetmeliği'nin 15. maddesi uyarınca, çabuk bozulabilen veya son kullanma tarihi geçebilecek malların teslimine ilişkin sözleşmelerde <b>cayma hakkı bulunmamaktadır</b>. Sipariş konusu hazır gıda ürünleri bu kapsamda olduğundan ALICI'nın cayma hakkı yoktur. ALICI bu durumdan sözleşmenin kurulmasından önce bilgilendirilmiştir.</p>
+<p>Bu durum, ALICI'nın ayıplı mal ve hizmetlere ilişkin 6502 sayılı Tüketicinin Korunması Hakkında Kanun'dan doğan haklarını ortadan kaldırmaz.</p>
+
+<h3>Sipariş iptali</h3>
+<p>Sipariş, SATICI hazırlığa başlamadan önce iptal edilebilir. Hazırlık aşamasına geçmiş veya yola çıkmış siparişler iptal edilemez.</p>
+
+<h3>Ayıplı, eksik veya hatalı ürün</h3>
+<p>Ürünün ayıplı, eksik veya hatalı teslim edilmesi hâlinde sorumluluk SATICI'ya aittir. Online ödemeli siparişlerde, SATICI'nın iadeyi kabul etmesi veya kusurun kayıtlarla sabit olması hâlinde iade bedeli ödeme kuruluşu aracılığıyla ALICI'ya iade edilir. Kapıda ödemeli siparişlerde iade ve değişim teslimat anında veya sonrasında taraflar arasında çözülür.</p>
+
+<h3>Şikâyet ve başvuru yolları</h3>
+<p>ALICI, şikâyetlerini YemekChat WhatsApp hattına iletebilir; şikâyet SATICI'ya aktarılır ve yanıtı aynı kanaldan ALICI'ya iletilir. ALICI ayrıca, uyuşmazlık hâlinde Ticaret Bakanlığı'nca ilan edilen parasal sınırlar çerçevesinde, kendi yerleşim yerindeki veya tüketici işleminin yapıldığı yerdeki <b>Tüketici Hakem Heyetine</b> ya da <b>Tüketici Mahkemesine</b> başvurabilir.</p>
+
+<h3>Aracı hizmet sağlayıcının konumu</h3>
+<p>YemekChat, 6563 sayılı Elektronik Ticaretin Düzenlenmesi Hakkında Kanun kapsamında <b>aracı hizmet sağlayıcıdır</b>; işbu satış sözleşmesinin tarafı değildir. Ürünün hazırlanması, gıda güvenliği mevzuatına uygunluğu, paketlenmesi ve teslimi münhasıran SATICI'nın sorumluluğundadır. YemekChat'in kurye ağı bulunmamakta olup teslimat SATICI tarafından gerçekleştirilir. Kullanıcıya satış belgesi (fiş/fatura) düzenleme yükümlülüğü SATICI'ya aittir. Aracı hizmet sağlayıcının mevzuattan doğan sorumlulukları saklıdır.</p>
+
+<h3>Kişisel veriler</h3>
+<p>ALICI'nın ad, telefon, adres ve sipariş bilgileri, yalnızca siparişin ifası amacıyla SATICI ile paylaşılır. Ayrıntılı bilgi için <a href="https://yemekchat.com/yasal.html#kvkk" target="_blank">KVKK Aydınlatma Metni</a>.</p>`;
+
+function sozOnForm(){
+  return `<h2>ÖN BİLGİLENDİRME FORMU</h2>
+<p>Bu form, Mesafeli Sözleşmeler Yönetmeliği uyarınca, siparişiniz kesinleşmeden <b>önce</b> bilgilendirilmeniz amacıyla düzenlenmiştir.</p>
+<div class="kv"><b>Düzenleme tarihi</b><span>${sozTarih()}</span></div>
+<div class="kv"><b>Form sürümü</b><span>${SOZ_SURUM}</span></div>
+
+<h3>Satıcı (ürünü satan ve teslim eden)</h3>${saticiKutusu()}
+<h3>Aracı hizmet sağlayıcı (platform)</h3>${araciKutusu()}
+<h3>Alıcı</h3>${aliciKutusu()}
+
+<h3>Sözleşme konusu ürünler ve toplam bedel</h3>
+${urunTablosu()}
+<p>Fiyatlara KDV dâhildir. Sepet ekranında ayrıca gösterilen teslimat (getirme) ücreti SATICI&apos;ya ait olup SATICI tarafından tahsil edilir. ALICI&apos;dan, ürün bedeli ve teslimat ücreti dışında başkaca bir masraf talep edilmez. YemekChat&apos;in aracılık komisyonu SATICI&apos;dan tahsil edilir ve ALICI&apos;ya yansıtılmaz.</p>
+
+<h3>Ödeme şekli</h3><p>${esc(odemeMetni())}</p>
+
+<h3>Teslimat</h3>
+<p>Ürünler, ALICI'nın yukarıda belirttiği adrese SATICI tarafından teslim edilir. Hazır gıda niteliği gereği teslimat, siparişin onaylanmasının ardından SATICI'nın ilan ettiği hazırlık ve yol süresi içinde, en geç 30 gün içinde gerçekleştirilir. Teslimat, SATICI'nın çalışma saatleri ve teslimat bölgesi ile sınırlıdır.</p>
+${SOZ_ORTAK}
+<p style="margin-top:14px"><b>ALICI</b>, bu formda yer alan tüm bilgileri sipariş vermeden önce okuduğunu ve teyit ettiğini kabul eder.</p>
+<button class="syazdir" onclick="window.print()">Yazdır / PDF olarak kaydet</button>`;
+}
+
+function sozMssForm(){
+  return `<h2>MESAFELİ SATIŞ SÖZLEŞMESİ</h2>
+<div class="kv"><b>Sözleşme tarihi</b><span>${sozTarih()}</span></div>
+<div class="kv"><b>Sipariş no</b><span>${sonSiparisNo ? esc(sonSiparisNo) : "sipariş tamamlandığında oluşur"}</span></div>
+<div class="kv"><b>Sözleşme sürümü</b><span>${SOZ_SURUM}</span></div>
+
+<h3>Madde 1 – Taraflar</h3>
+<p><b>SATICI</b> (ürünü hazırlayan, satan ve teslim eden):</p>${saticiKutusu()}
+<p style="margin-top:8px"><b>ARACI HİZMET SAĞLAYICI</b> (satışın tarafı değildir):</p>${araciKutusu()}
+<p style="margin-top:8px"><b>ALICI</b> (tüketici):</p>${aliciKutusu()}
+
+<h3>Madde 2 – Konu</h3>
+<p>İşbu sözleşmenin konusu; ALICI'nın, YemekChat platformu üzerinden SATICI'ya ait aşağıda nitelikleri ve satış bedeli belirtilen ürünlere ilişkin olarak verdiği siparişe dair, 6502 sayılı Tüketicinin Korunması Hakkında Kanun ve Mesafeli Sözleşmeler Yönetmeliği hükümleri uyarınca tarafların hak ve yükümlülüklerinin belirlenmesidir.</p>
+
+<h3>Madde 3 – Sözleşme konusu ürünler ve bedel</h3>
+${urunTablosu()}
+<p>Fiyatlara KDV dâhildir. Sepet ekranında ayrıca gösterilen teslimat (getirme) ücreti SATICI&apos;ya ait olup SATICI tarafından tahsil edilir. ALICI&apos;dan, ürün bedeli ve teslimat ücreti dışında başkaca bir masraf talep edilmez. YemekChat&apos;in aracılık komisyonu SATICI&apos;dan tahsil edilir ve ALICI&apos;ya yansıtılmaz.</p>
+<div class="kv"><b>Ödeme şekli</b><span>${esc(odemeMetni())}</span></div>
+
+<h3>Madde 4 – Genel hükümler</h3>
+<p>4.1. ALICI, Madde 3'te belirtilen ürünlerin temel nitelikleri, satış bedeli, ödeme şekli ve teslimata ilişkin ön bilgileri okuyup bilgi sahibi olduğunu ve elektronik ortamda gerekli teyidi verdiğini kabul eder.</p>
+<p>4.2. Ürünler, ALICI'nın belirttiği teslimat adresine SATICI tarafından teslim edilir. Teslim anında ALICI'nın adreste bulunmaması veya ürünü teslim almaktan kaçınması hâlinde SATICI, edimini yerine getirmiş sayılır.</p>
+<p>4.3. Ürünlerin ALICI'ya tesliminden önce hasar görmesi veya kaybolması riski SATICI'ya aittir.</p>
+<p>4.4. ALICI, sipariş verirken bildirdiği bilgilerin doğru ve eksiksiz olduğunu taahhüt eder. Yanlış veya eksik bilgiden kaynaklanan teslimat aksaklıklarından SATICI ve aracı hizmet sağlayıcı sorumlu tutulamaz.</p>
+<p>4.5. 18 yaşından küçükler bu sözleşmeye taraf olamaz.</p>
+${SOZ_ORTAK}
+
+<h3>Madde 5 – Yürürlük</h3>
+<p>İşbu sözleşme, ALICI'nın siparişi elektronik ortamda onaylamasıyla kurulmuş ve yürürlüğe girmiştir. Sözleşmenin bir örneği ALICI'nın erişimine sunulmuş olup ALICI dilediği zaman bu ekrandan görüntüleyebilir, yazdırabilir veya kaydedebilir.</p>
+<button class="syazdir" onclick="window.print()">Yazdır / PDF olarak kaydet</button>`;
+}
+
+let sonSiparisNo = "";
+
+function sozAc(tip){
+  sozAktif = tip || "mss";
+  $("sTabOn").classList.toggle("on", sozAktif === "on");
+  $("sTabMss").classList.toggle("on", sozAktif === "mss");
+  $("sozGovde").innerHTML = sozAktif === "on" ? sozOnForm() : sozMssForm();
+  $("sozGovde").scrollTop = 0;
+  $("sozWrap").classList.add("on");
+}
+function sozKapat(){ $("sozWrap").classList.remove("on"); }
+
 /* ---------- açılır alt sekme ---------- */
 function urunAc(k){
   const c = cart[k]; if(!c) return;
@@ -527,7 +789,7 @@ function urunAc(k){
   $("sheet").classList.add("on");
 }
 function sheetKapat(){ $("sheet").classList.remove("on"); }
-document.addEventListener("keydown", e => { if(e.key === "Escape") sheetKapat(); });
+document.addEventListener("keydown", e => { if(e.key === "Escape"){ sheetKapat(); sozKapat(); } });
 
 /* ---------- ekstra harcama önerileri (sepet, ödemeden önce) ---------- */
 const RE_ICECEK = /içecek|icecek|meşrubat|mesrubat|kola|cola|pepsi|ayran|soda|gazoz|fanta|sprite|fuse|ice tea|ayran|limonata|şalgam|salgam|maden suyu|meyve suyu|portakal suyu|şeftali|\bsu\b|\bçay\b|kahve|latte|americano/i;
@@ -627,7 +889,7 @@ function oneriCiz(){
   w.innerHTML = bloklar.map(b => `<div class="oneri">
     <div class="obas">${b.bas}</div><div class="oalt">${b.alt}</div>
     <div class="olist">${b.urunler.map(m => `<div class="okrt">
-      ${m.image_url?`<img src="${m.image_url}" alt="" loading="lazy" decoding="async" onerror="this.classList.add('yok')">`:""}
+      <div class="okf">🍽${m.image_url?`<img src="${m.image_url}" alt="" loading="lazy" decoding="async" onerror="this.classList.add('yok')">`:""}</div>
       <div class="n">${m.name}</div><div class="p">${m.price} TL</div>
       <button class="${cart[String(m.id)]?"sepette":""}" onclick="oneriEkle('${String(m.id).replace(/'/g,"")}')">${cart[String(m.id)]?`✓ Sepette (${cart[String(m.id)].qty})`:"+ Ekle"}</button>
     </div>`).join("")}</div>
@@ -676,6 +938,7 @@ function show(){
     $("hdSub").textContent = screen===2 ? "menü · sepetine ekle" : "sepetin hazır · ödeme & adres";
   }
   $("bar").classList.toggle("on", screen===2 || screen===3);
+  ustBlok();
   window.scrollTo(0,0); updateBar();
 }
 function updateBar(){
@@ -702,17 +965,22 @@ function updateBar(){
 }
 
 async function submitOrder(){
+  const adSoyad = $("adsoyad").value.trim();
+  if(!adSoyad){ alert("Lütfen ad soyad gir — mesafeli satış sözleşmesi için gerekli ustam."); return; }
   const bina = $("bina").value.trim();
   if(!bina){ alert("Lütfen bina adı / adres gir."); return; }
   const kat=$("kat").value.trim(), daire=$("daire").value.trim(), nt=$("adnot").value.trim();
   adresKaydet();
-  const address = `${bina}${kat?", Kat "+kat:""}${daire?", Daire "+daire:""}${nt?" ("+nt+")":""}`;
+  const address = `${adSoyad} — ${bina}${kat?", Kat "+kat:""}${daire?", Daire "+daire:""}${nt?" ("+nt+")":""}`;
   let details = Object.values(cart).map(c=>`${c.item.name} x${c.qty}`).join(", ");
   const musteriNot = ($("sipnot") ? $("sipnot").value : "").trim();
   const tumNot = [draftNote, musteriNot].filter(Boolean).join(" · ");
   if(tumNot) details += ` — 📝 ${tumNot}`;
   if(deliveryFee > 0) details += ` — 🛵 Getirme: ${deliveryFee} TL`;
-  const payload = { restaurant_name:rest, customer_phone:TEL, order_details:details, total_amount:grand(), payment_method:(pay==="Online"?"Online (bekliyor)":pay), address, lat:musteriLat||"", lng:musteriLng||"" };
+  const payload = { restaurant_name:rest, customer_phone:TEL, order_details:details, total_amount:grand(), payment_method:(pay==="Online"?"Online (bekliyor)":pay), address, lat:musteriLat||"", lng:musteriLng||"",
+    customer_name: adSoyad,
+    sozlesme_surum: SOZ_SURUM,
+    sozlesme_onay: new Date().toISOString() };
   const go=$("go"); go.disabled=true; go.textContent="Gönderiliyor…";
   try{
     const r = await fetch(CONFIG.ORDER,{ method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload) });
@@ -722,6 +990,7 @@ async function submitOrder(){
       go.disabled=false; updateBar(); return;
     }
     const oid = res.order_id || res.id;
+    if(oid) sonSiparisNo = String(oid);
     if(pay==="Online" && oid){
       go.textContent = "Ödeme sayfası açılıyor…";
       try{
@@ -783,6 +1052,9 @@ async function draftInit(){
     minSepet   = Math.max(0, Math.round(Number(d.min_sepet) || 0));
     deliveryFee = Math.max(0, Math.round(Number(d.teslimat_ucreti) || 0));
     if(d.lat && d.lng){ musteriLat = d.lat; musteriLng = d.lng; }
+    saticiBilgi = { unvan: d.unvan, adres: d.adres, vergi_no: d.vergi_no,
+                    telefon: d.telefon, eposta: d.eposta, kapak: d.kapak };
+    ustBlok();
     $("hdName").textContent = d.restaurant_name;
     $("hdSub").textContent = "sepetin hazır · ödeme & adres";
     screen = 3; renderCart(); show();
