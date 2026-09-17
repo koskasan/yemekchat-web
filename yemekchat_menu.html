@@ -328,7 +328,7 @@ const CATERING = p.get("catering");       // kurumsal mod (çalışan kodu)
 const DRAFT = p.get("draft");             // yazarak sipariş taslağı (Path B)
 
 let screen = 1, nearby = [], menu = [], rest = null, pay = null, catFilter = "Tümü";
-let restKapali = false, restAcilis = "", restKapanis = "", yon = "ileri";
+let restKapali = false, restAcilis = "", restKapanis = "", restGunler = null, yon = "ileri";
 let isCat = false, catInfo = null, isDraft = false, draftNote = "", deliveryFee = 0, minSepet = 0;
 let musteriLat = LAT || "", musteriLng = LNG || "";   // kurye yol tarifi için
 const cart = {};  // id -> {item, qty}
@@ -464,7 +464,7 @@ function renderNearby(){
     const kapali = (r.acik === false || r.acik === "false");
     return `<div class="rc ${kapali?"kapali":""}" style="${bg}" onclick="openRestaurant('${r.name.replace(/'/g,"\\'")}')">
     <div class="rinfo">
-      <div class="rn">${r.name}${kapali?`<span class="kpl">${kapaliIkon(r.acilis,r.kapanis)} ${kapaliMetni(r.acilis,r.kapanis)}</span>`:""}</div>
+      <div class="rn">${r.name}${kapali?`<span class="kpl">${kapaliIkon(r.acilis,r.kapanis,r.kapali_gunler)} ${kapaliMetni(r.acilis,r.kapanis,r.kapali_gunler)}</span>`:""}</div>
       <div class="rm"><span class="star">★</span> ${r.rating||"-"} &nbsp;·&nbsp; ${r.dist_km} km &nbsp;·&nbsp; ${r.min_order_amount?("Min "+r.min_order_amount+"₺"):"Min yok"} &nbsp;·&nbsp; 🛵 ${Number(r.teslimat_ucreti)>0 ? r.teslimat_ucreti+"₺" : "Ücretsiz"}</div>
       ${r.category?`<div class="rcat">${r.category}</div>`:""}
     </div>
@@ -504,12 +504,28 @@ function saatIcinde(a, k){
   const d = new Date(), s = d.getHours()*60 + d.getMinutes();
   return pa <= pk ? (s >= pa && s < pk) : (s >= pa || s < pk);   // gece asan saatler
 }
-/* Kapali restoranin sebebi: calisma saatindeyse geçici kapatma demektir */
-function kapaliMetni(a, k){
+/* ---- haftalık kapalı günler (0=Pazar ... 6=Cumartesi) ---- */
+const GUN_ADI = ["Pazar","Pazartesi","Salı","Çarşamba","Perşembe","Cuma","Cumartesi"];
+function kapaliGunler(v){
+  if(v === null || v === undefined || v === "") return [];
+  const ham = Array.isArray(v) ? v : String(v).replace(/[{}\[\]"]/g, "").split(",");
+  return ham.map(x => Number(String(x).trim())).filter(x => Number.isInteger(x) && x >= 0 && x <= 6);
+}
+function bugunKapaliGun(v){ return kapaliGunler(v).includes(new Date().getDay()); }
+function kapaliGunMetni(v){
+  const g = kapaliGunler(v);
+  if(!g.length) return "";
+  return g.map(x => GUN_ADI[x]).join(" ve ") + " günleri kapalı";
+}
+
+/* Kapali restoranin sebebi: gun > saat > yogunluk sirasiyla */
+function kapaliMetni(a, k, gunler){
+  if(bugunKapaliGun(gunler)) return kapaliGunMetni(gunler);
   const ic = saatIcinde(a, k);
   return (ic === null || ic === true) ? "Yoğunluktan dolayı kapalı" : acilisMetni(a);
 }
-function kapaliIkon(a, k){
+function kapaliIkon(a, k, gunler){
+  if(bugunKapaliGun(gunler)) return "📅";
   const ic = saatIcinde(a, k);
   return (ic === null || ic === true) ? "🔥" : "🌙";
 }
@@ -525,6 +541,7 @@ async function openRestaurant(name){
   restKapali = !!(nb && (nb.acik === false || nb.acik === "false"));
   restAcilis = nb ? (nb.acilis || "") : "";
   restKapanis = nb ? (nb.kapanis || "") : "";
+  restGunler = nb ? (nb.kapali_gunler || null) : null;
   saticiBilgi = nb ? { unvan: nb.unvan, adres: nb.adres, vergi_no: nb.vergi_no, kep: nb.kep,
                        mersis: nb.mersis, telefon: nb.telefon, eposta: nb.eposta, kapak: nb.kapak } : {};
   if(nb){
@@ -559,7 +576,7 @@ function renderMenu(){
   }
   html += '</div>';
   const ust = restKapali
-    ? `<div class="kapaliUst">${kapaliIkon(restAcilis,restKapanis)} <b>${rest}</b> şu an kapalı. ${kapaliMetni(restAcilis,restKapanis)}. Menüyü inceleyebilirsin, sipariş açılınca verilebilir.</div>`
+    ? `<div class="kapaliUst">${kapaliIkon(restAcilis,restKapanis,restGunler)} <b>${rest}</b> şu an kapalı. ${kapaliMetni(restAcilis,restKapanis,restGunler)}. Menüyü inceleyebilirsin, sipariş açılınca verilebilir.</div>`
     : "";
   wrap.innerHTML = ust + `<div class="${restKapali?"kapaliMenu":""}">` + html + `</div>`;
   if(restKapali) return;
@@ -951,7 +968,7 @@ function updateBar(){
     else { go.disabled=false; go.innerHTML=`✓ Siparişi Onayla (${n} ürün · ${t} TL)`; }
   } else if(screen===2){
     go.onclick = go3;
-    if(restKapali){ go.disabled = true; go.textContent = kapaliMetni(restAcilis, restKapanis); return; }
+    if(restKapali){ go.disabled = true; go.textContent = kapaliMetni(restAcilis, restKapanis, restGunler); return; }
     const eksik = minSepet - t;
     if(n===0){ go.disabled=true; go.textContent="Sepetin boş"; }
     else if(eksik > 0){ go.disabled=true; go.innerHTML=`Min. sepet ${minSepet} TL · ${eksik} TL daha ekle`; }
@@ -1056,6 +1073,7 @@ async function draftInit(){
     if(d.lat && d.lng){ musteriLat = d.lat; musteriLng = d.lng; }
     saticiBilgi = { unvan: d.unvan, adres: d.adres, vergi_no: d.vergi_no, kep: d.kep,
                     mersis: d.mersis, telefon: d.telefon, eposta: d.eposta, kapak: d.kapak };
+    restGunler = d.kapali_gunler || null;
     ustBlok();
     $("hdName").textContent = d.restaurant_name;
     $("hdSub").textContent = "sepetin hazır · ödeme & adres";
