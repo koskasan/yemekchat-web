@@ -459,7 +459,7 @@ function renderNearby(){
   const arr = catFilter==="Tümü" ? nearby : nearby.filter(r => r.category===catFilter);
   if(!arr.length){ list.innerHTML = '<div class="empty">Bu konuma yakın restoran yok.</div>'; return; }
   list.innerHTML = arr.map(r => {
-    const img = CATEGORY_IMG[(r.category||"").trim().toLowerCase()] || "";
+    const img = (r.kapak||"").trim() || CATEGORY_IMG[(r.category||"").trim().toLowerCase()] || "";
     const bg = img ? `background-image:linear-gradient(90deg, rgba(28,42,32,0.97) 45%, rgba(28,42,32,0.55)), url('${img}');background-size:cover;background-position:right center;` : "";
     const kapali = (r.acik === false || r.acik === "false");
     return `<div class="rc ${kapali?"kapali":""}" style="${bg}" onclick="openRestaurant('${r.name.replace(/'/g,"\\'")}')">
@@ -525,8 +525,8 @@ async function openRestaurant(name){
   restKapali = !!(nb && (nb.acik === false || nb.acik === "false"));
   restAcilis = nb ? (nb.acilis || "") : "";
   restKapanis = nb ? (nb.kapanis || "") : "";
-  saticiBilgi = nb ? { unvan: nb.unvan, adres: nb.adres, vergi_no: nb.vergi_no,
-                       telefon: nb.telefon, eposta: nb.eposta, kapak: nb.kapak } : {};
+  saticiBilgi = nb ? { unvan: nb.unvan, adres: nb.adres, vergi_no: nb.vergi_no, kep: nb.kep,
+                       mersis: nb.mersis, telefon: nb.telefon, eposta: nb.eposta, kapak: nb.kapak } : {};
   if(nb){
     deliveryFee = Math.max(0, Math.round(Number(nb.teslimat_ucreti) || 0));
     minSepet = Math.max(0, Math.round(Number(nb.min_order_amount) || 0));
@@ -654,7 +654,9 @@ function saticiKutusu(){
   <div class="kv"><b>Adres</b><span>${sozAlan(s.adres, "Adres girilmemiş")}</span></div>
   <div class="kv"><b>Vergi D. / No</b><span>${sozAlan(s.vergi_no, "Vergi bilgisi girilmemiş")}</span></div>
   <div class="kv"><b>Telefon</b><span>${sozAlan(s.telefon, "Telefon girilmemiş")}</span></div>
-  <div class="kv"><b>E-posta</b><span>${sozAlan(s.eposta, "E-posta girilmemiş")}</span></div>`;
+  <div class="kv"><b>E-posta</b><span>${sozAlan(s.eposta, "E-posta girilmemiş")}</span></div>
+  ${s.mersis ? `<div class="kv"><b>MERSİS no</b><span>${esc(s.mersis)}</span></div>` : ""}
+  ${s.kep ? `<div class="kv"><b>KEP adresi</b><span>${esc(s.kep)}</span></div>` : ""}`;
 }
 function araciKutusu(){
   return `<div class="kv"><b>Unvan</b><span>${esc(YC_BILGI.unvan)} ("${esc(YC_BILGI.marka)}")</span></div>
@@ -1052,8 +1054,8 @@ async function draftInit(){
     minSepet   = Math.max(0, Math.round(Number(d.min_sepet) || 0));
     deliveryFee = Math.max(0, Math.round(Number(d.teslimat_ucreti) || 0));
     if(d.lat && d.lng){ musteriLat = d.lat; musteriLng = d.lng; }
-    saticiBilgi = { unvan: d.unvan, adres: d.adres, vergi_no: d.vergi_no,
-                    telefon: d.telefon, eposta: d.eposta, kapak: d.kapak };
+    saticiBilgi = { unvan: d.unvan, adres: d.adres, vergi_no: d.vergi_no, kep: d.kep,
+                    mersis: d.mersis, telefon: d.telefon, eposta: d.eposta, kapak: d.kapak };
     ustBlok();
     $("hdName").textContent = d.restaurant_name;
     $("hdSub").textContent = "sepetin hazır · ödeme & adres";
