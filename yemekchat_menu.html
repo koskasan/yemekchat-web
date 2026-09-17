@@ -86,6 +86,48 @@
   .cartline .cq{color:var(--txt3);font-size:12px;margin:0 10px}
   .cartline .cl-t{min-width:62px;text-align:right}
   .cartline .stp{margin:0 8px;padding:3px 8px}
+  /* sepet satiri: menudeki gorunumun aynisi */
+  .citem{background:var(--card);border-radius:12px;padding:11px 12px;margin-bottom:7px;display:flex;align-items:center;gap:11px;cursor:pointer}
+  .citem .thumb{width:54px;height:54px;border-radius:9px;object-fit:cover;flex-shrink:0;background:var(--card2)}
+  .citem .thumb.yok{display:none}
+  .citem .info{flex:1;min-width:0}
+  .citem .nm{font-size:14px}
+  .citem .ds{font-size:11px;color:var(--txt3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .citem .pr{font-size:12px;color:var(--mint);margin-top:3px}
+  .citem .stp{margin:0}
+
+  /* acilir alt sekme: buyuk fotograf */
+  .sheet{position:fixed;inset:0;z-index:70;display:none}
+  .sheet.on{display:block}
+  .sheet .perde{position:absolute;inset:0;background:rgba(0,0,0,.62);opacity:0;transition:opacity .22s}
+  .sheet.on .perde{opacity:1}
+  .sheet .panel{position:absolute;left:0;right:0;bottom:0;background:var(--card);border-radius:18px 18px 0 0;
+    padding:10px 16px calc(18px + env(safe-area-inset-bottom));max-height:90vh;overflow:auto;
+    transform:translateY(100%);transition:transform .26s cubic-bezier(.22,.61,.36,1)}
+  .sheet.on .panel{transform:none}
+  .sheet .tut{width:42px;height:4px;border-radius:2px;background:var(--line);margin:2px auto 12px}
+  .sheet .bimg{width:100%;aspect-ratio:1/1;max-height:58vh;object-fit:contain;border-radius:14px;background:var(--card2);display:block}
+  .sheet .bimg.yok{display:none}
+  .sheet .bad{font-size:17px;font-weight:600;margin-top:13px}
+  .sheet .bds{font-size:13px;color:var(--txt2);margin-top:5px;line-height:1.5}
+  .sheet .bpr{font-size:15px;color:var(--mint);margin-top:9px;font-weight:600}
+  .sheet .kapat{width:100%;margin-top:14px;background:var(--card2);border:1px solid var(--line);color:var(--txt);
+    border-radius:11px;padding:12px;font-size:14px;cursor:pointer}
+  @media (prefers-reduced-motion:reduce){.sheet .panel,.sheet .perde{transition:none}}
+
+  /* ekstra harcama onerileri */
+  .oneri{margin:13px 14px 0;background:var(--card);border:1px dashed var(--amber);border-radius:14px;padding:13px}
+  .oneri .obas{font-size:14px;font-weight:600;color:var(--amber);line-height:1.35}
+  .oneri .oalt{font-size:12px;color:var(--txt2);margin-top:4px;line-height:1.45}
+  .oneri .olist{display:flex;gap:9px;overflow-x:auto;margin-top:12px;padding-bottom:3px;scrollbar-width:none}
+  .oneri .olist::-webkit-scrollbar{display:none}
+  .oneri .ok{flex-shrink:0;width:108px;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:8px}
+  .oneri .ok img{width:100%;height:78px;object-fit:cover;border-radius:8px;background:var(--bg);display:block}
+  .oneri .ok img.yok{display:none}
+  .oneri .ok .n{font-size:11.5px;margin-top:6px;line-height:1.3;height:29px;overflow:hidden}
+  .oneri .ok .p{font-size:11.5px;color:var(--mint);margin-top:2px}
+  .oneri .ok button{margin-top:7px;background:var(--green);color:#fff;border:none;border-radius:8px;
+    padding:7px;width:100%;font-size:11.5px;font-weight:600;cursor:pointer}
   .addmore{width:100%;background:var(--card2);border:1px dashed var(--line);color:var(--mint);border-radius:11px;padding:11px;font-size:13px;font-weight:600;cursor:pointer;margin-top:10px}
   .legal{padding:4px 14px 10px;font-size:10px;color:var(--muted);text-align:center;line-height:1.7}
   .legal a{color:var(--txt3)}
@@ -142,6 +184,7 @@
   <!-- EKRAN 3: ÖDEME + ADRES -->
   <div class="screen" id="scr3">
     <div class="sec"><h3>Sepetin</h3><div id="cartLines"></div></div>
+    <div id="oneriWrap"></div>
     <div class="sec"><h3>Ödeme yöntemi</h3>
       <div class="pay">
         <div class="opt" data-pay="Nakit"><div class="ic">₺</div><div class="lb">Nakit</div></div>
@@ -162,6 +205,19 @@
       </label>
     </div>
     <div class="legal">Siparişi tamamlayarak <a href="https://yemekchat.com/yasal.html#kullanici" target="_blank">Kullanıcı Sözleşmesi</a>'ni kabul etmiş olursun · <a href="https://yemekchat.com/yasal.html#kvkk" target="_blank">KVKK Aydınlatma Metni</a></div>
+  </div>
+
+  <!-- acilir alt sekme -->
+  <div class="sheet" id="sheet">
+    <div class="perde" onclick="sheetKapat()"></div>
+    <div class="panel">
+      <div class="tut"></div>
+      <img class="bimg" id="shImg" alt="" onerror="this.classList.add('yok')">
+      <div class="bad" id="shAd"></div>
+      <div class="bds" id="shDs"></div>
+      <div class="bpr" id="shPr"></div>
+      <button class="kapat" onclick="sheetKapat()">Kapat</button>
+    </div>
   </div>
 
   <div class="bar" id="bar">
@@ -396,7 +452,7 @@ function renderMenu(){
     cats[c].forEach(m => {
       const on = (m.is_available!==false && m.is_available!=="false");
       html += `<div class="item ${on?"":"off"}">
-        ${m.image_url?`<img class="thumb" src="${m.image_url}" alt="" onerror="this.style.display='none'">`:""}
+        ${m.image_url?`<img class="thumb" src="${m.image_url}" alt="" loading="lazy" decoding="async" onerror="this.style.display='none'">`:""}
         <div class="info"><div class="nm">${m.name}</div>${m.description?`<div class="ds">${m.description}</div>`:""}<div class="pr">${m.price} TL</div></div>
         <div class="ctrl" data-id="${m.id}">${on?"":'<span style="font-size:11px;color:var(--txt3)">Tükendi</span>'}</div>
       </div>`;
@@ -430,9 +486,14 @@ function renderCart(){
   const keys = Object.keys(cart);
   let html = keys.map(k => {
     const c = cart[k];
-    return `<div class="cartline"><span class="cn">${c.item.name}</span>
-      <div class="stp" data-k="${k}"><button>−</button><span class="qt">${c.qty}</span><button>+</button></div>
-      <span class="cl-t">${c.item.price*c.qty} TL</span></div>`;
+    const foto = c.item.image_url
+      ? `<img class="thumb" src="${c.item.image_url}" alt="" loading="lazy" decoding="async" onerror="this.classList.add('yok')">`
+      : "";
+    const ds = c.item.description ? `<div class="ds">${c.item.description}</div>` : "";
+    return `<div class="citem" onclick="urunAc('${k}')">${foto}
+      <div class="info"><div class="nm">${c.item.name}</div>${ds}<div class="pr">${c.item.price*c.qty} TL</div></div>
+      <div class="stp" data-k="${k}" onclick="event.stopPropagation()"><button>−</button><span class="qt">${c.qty}</span><button>+</button></div>
+    </div>`;
   }).join("");
   if(keys.length){
     if(minSepet > 0 && total() < minSepet) html += `<div class="cartline" style="border:none"><span class="cn" style="color:var(--amber)">🧺 Bu bölgede minimum sepet ${minSepet} TL — ${minSepet-total()} TL daha ekle</span></div>`;
@@ -444,12 +505,94 @@ function renderCart(){
   if(draftNote) html += `<div class="cartline" style="border:none"><span class="cn" style="color:var(--amber)">📝 Not: ${draftNote}</span></div>`;
   if(isDraft) html += `<button class="addmore" id="addMore">➕ Menüden başka bir şey ekle</button>`;
   $("cartLines").innerHTML = html;
+  oneriCiz();
   document.querySelectorAll("#cartLines .stp").forEach(s => {
     const k = s.dataset.k; const [mB,pB] = s.querySelectorAll("button");
     mB.onclick = () => cartChg(k,-1); pB.onclick = () => cartChg(k,1);
   });
   const am = $("addMore"); if(am) am.onclick = () => openRestaurant(rest);
 }
+/* ---------- açılır alt sekme ---------- */
+function urunAc(k){
+  const c = cart[k]; if(!c) return;
+  const im = $("shImg");
+  if(c.item.image_url){ im.classList.remove("yok"); im.src = c.item.image_url; }
+  else { im.classList.add("yok"); im.removeAttribute("src"); }
+  $("shAd").textContent = c.item.name;
+  $("shDs").textContent = c.item.description || "";
+  $("shPr").textContent = `${c.item.price} TL  ·  ${c.qty} adet  ·  toplam ${c.item.price*c.qty} TL`;
+  $("sheet").classList.add("on");
+}
+function sheetKapat(){ $("sheet").classList.remove("on"); }
+document.addEventListener("keydown", e => { if(e.key === "Escape") sheetKapat(); });
+
+/* ---------- ekstra harcama önerileri (sepet, ödemeden önce) ---------- */
+const RE_ICECEK = /içecek|icecek|meşrubat|mesrubat|kola|ayran|soda|fanta|sprite|fuse|ice tea|limonata|şalgam|salgam|\bsu\b|çay|kahve/i;
+const RE_TATLI  = /tatlı|tatli|sufle|soufle|tiramisu|künefe|kunefe|baklava|dondurma|kazandibi|profiterol|browni/i;
+const RE_YAN    = /patates|salata|soğan halkası|sogan halkasi|sarımsaklı ekmek|sarimsakli ekmek|kroket|çorba|corba|nugget|aperatif|başlangıç|baslangic|yan ürün|yan urun|ekstra|sos/i;
+
+function urunEtiket(m){ return `${m.category||""} ${m.name||""}`; }
+function sepetUrunleri(){ return Object.values(cart).map(c => c.item); }
+function sepetteVar(re){ return sepetUrunleri().some(i => re.test(urunEtiket(i))); }
+function menudenBul(re, hariç){
+  return menu.filter(m => m.is_available!==false && m.is_available!=="false"
+    && re.test(urunEtiket(m)) && !(hariç && hariç.test(urunEtiket(m)))).slice(0, 12);
+}
+
+function oneriListesi(){
+  if(!Array.isArray(menu) || !menu.length) return [];
+  const bloklar = [];
+  const adet = Object.values(cart).reduce((s,c) => s + c.qty, 0);
+
+  if(!sepetteVar(RE_ICECEK)){
+    const u = menudenBul(RE_ICECEK);
+    if(u.length) bloklar.push({
+      bas: "Bir daha mı geleceğiz dünyaya!",
+      alt: "Kuru kuru yeme, yanına bir içecek at 🥤",
+      urunler: u });
+  }
+
+  const kucukVar = sepetUrunleri().some(i => /küçük|kucuk|mini|tek kişilik|porsiyon/i.test(urunEtiket(i)));
+  if(adet <= 2 && kucukVar){
+    const u = menudenBul(RE_YAN, RE_ICECEK);
+    if(u.length) bloklar.push({
+      bas: "Bununla doyacak mısın?",
+      alt: "Sonra \"doymadım, porsiyon küçük\" deme 😂",
+      urunler: u });
+  }
+
+  if(bloklar.length < 2 && !sepetteVar(RE_TATLI)){
+    const u = menudenBul(RE_TATLI);
+    if(u.length) bloklar.push({
+      bas: "Tatlı yemeden kalkılır mı bu sofradan?",
+      alt: "Üstüne bir tatlı, günü tamamla 🍮",
+      urunler: u });
+  }
+
+  return bloklar.slice(0, 2);
+}
+
+function oneriCiz(){
+  const w = $("oneriWrap"); if(!w) return;
+  if(!Object.keys(cart).length){ w.innerHTML = ""; return; }
+  const bloklar = oneriListesi();
+  w.innerHTML = bloklar.map(b => `<div class="oneri">
+    <div class="obas">${b.bas}</div><div class="oalt">${b.alt}</div>
+    <div class="olist">${b.urunler.map(m => `<div class="ok">
+      ${m.image_url?`<img src="${m.image_url}" alt="" loading="lazy" decoding="async" onerror="this.classList.add('yok')">`:""}
+      <div class="n">${m.name}</div><div class="p">${m.price} TL</div>
+      <button onclick="oneriEkle('${String(m.id).replace(/'/g,"")}')">+ Ekle</button>
+    </div>`).join("")}</div>
+  </div>`).join("");
+}
+
+function oneriEkle(id){
+  const m = menu.find(x => String(x.id) === String(id)); if(!m) return;
+  const k = String(id);
+  cart[k] = { item: m, qty: (cart[k]?.qty || 0) + 1 };
+  renderCart(); renderCtrl(k); updateBar();
+}
+
 function cartChg(k,d){
   const c = cart[k]; if(!c) return;
   c.qty += d; if(c.qty<=0) delete cart[k];
@@ -574,7 +717,19 @@ async function draftInit(){
     rest = d.restaurant_name;
     let items = d.items;
     if(typeof items === "string") items = JSON.parse(items);
-    items.forEach((it,i)=>{ cart["d"+i] = { item:{ name:it.name, price:Number(it.price) }, qty:Number(it.qty)||1 }; });
+    // WhatsApp taslagi: urun adlarini gercek menuyle eslestir (fotograf + aciklama + oneriler icin)
+    try{
+      const rm = await fetch(`${CONFIG.MENU}?restaurant=${encodeURIComponent(d.restaurant_name)}`);
+      let md = await rm.json(); if(!Array.isArray(md)) md = md.data || [];
+      menu = md;
+    }catch(e){ menu = []; }
+    const sadeleştir = s => String(s||"").toLocaleLowerCase("tr").replace(/\s+/g," ").trim();
+    items.forEach((it,i)=>{
+      const eş = menu.find(m => sadeleştir(m.name) === sadeleştir(it.name));
+      cart["d"+i] = { item:{ name:it.name, price:Number(it.price),
+        image_url: eş ? eş.image_url : "", description: eş ? eş.description : "",
+        category: eş ? eş.category : "" }, qty:Number(it.qty)||1 };
+    });
     draftNote = (d.note||"").trim();
     if(["null","undefined","="].includes(draftNote.toLowerCase())) draftNote = "";
     minSepet   = Math.max(0, Math.round(Number(d.min_sepet) || 0));
