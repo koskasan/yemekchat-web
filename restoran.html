@@ -363,11 +363,9 @@
           </div>
           <button class="sw" id="sKapali" onclick="this.classList.toggle('on')"></button>
         </div>
-        <h4 style="margin-top:20px">🛵 Teslimat Tarifeniz</h4>
-        <div class="hint">Getirme ücreti = <b>taban + (mesafe × km ücreti)</b>. Ücretsiz teslimat için ikisini de 0 yazın. Maksimum mesafenin dışındaki müşterilere hiç görünmezsiniz.</div>
+        <h4 style="margin-top:20px">🛵 Teslimat Mesafeniz</h4>
+        <div class="hint">YemekChat'te müşteriden getirme ücreti alınmaz; teslimat maliyeti minimum sepet tutarlarıyla dengelenir. Maksimum mesafenin dışındaki müşterilere hiç görünmezsiniz.</div>
         <div class="s3">
-          <div><label>Taban (₺)</label><input id="sTaban" type="number" inputmode="decimal" placeholder="20"></div>
-          <div><label>Km ücreti (₺)</label><input id="sKm" type="number" inputmode="decimal" placeholder="10"></div>
           <div><label>Maks. km</label><input id="sMax" type="number" inputmode="decimal" placeholder="6"></div>
         </div>
         <button class="sbtn" id="sSave">Ayarları kaydet</button>
@@ -447,10 +445,9 @@
         <p>Menü sekmesinin üstündeki araçla tek seferde zam/indirim yapabilirsiniz: kategori seçin (ya da "Tüm ürünler"), <b>TL</b> veya <b>yüzde</b> seçin, sayıyı yazın. <b>Zam için 20</b>, <b>indirim için -20</b> gibi. Örnek: tüm ürünlere %10 zam → Tüm ürünler + Yüzde + 10.</p>
         <h4>🕒 Çalışma Saatleri</h4>
         <p><b>Ayarlar</b> sekmesinden açılış-kapanış saatinizi girin — restoranınız o saatlerde <b>otomatik açılır</b>, dışında müşteriye "kapalı" görünür ve sipariş gelmez. Gece yarısını aşan saatler desteklenir (11:00 – 03:00). Yoğunluk veya arıza durumunda <b>"Şu an siparişe kapalıyım"</b> anahtarını açın; saatlerinizi bozmadan geçici olarak kapanırsınız, unutmayın açmayı 🙂</p>
-        <h4>🛵 Getirme Ücreti — 2 yöntem</h4>
-        <p><b>1) Mesafeye göre (basit):</b> Tarifenizi <b>Ayarlar</b> sekmesinden belirlersiniz: <b>taban ücret + km başına ücret</b>. Örnek: taban 20₺ + km 10₺ ise 2 km'deki müşteri 40₺ öder. Ücretsiz teslimat için ikisini de 0 yapın. <b>Maksimum km</b> dışındaki müşterilere hiç görünmezsiniz.</p>
-        <p><b>2) Haritadan bölge seçerek (hassas):</b> Ayarlar sekmesindeki <b>"🗺️ Teslimat bölgelerini haritada düzenle"</b> butonuna girin. Üç yolla bölge tanımlayabilirsiniz: <b>🍯 Petek</b> (haritadaki altıgenlere dokunarak boyama; boyalı peteği "Böl" ile daha küçük parçalara ayırıp sokak sokak ücret verebilirsiniz), <b>✏️ Çizim</b> (poligon, daire, dikdörtgen çizme) ve <b>🏘️ Mahalle</b> (mahalle adı yazıp sınırını otomatik ekleme). <b>Kaydet</b>'e basmayı unutmayın.</p>
-        <p><b>🧺 Minimum sepet / 🛵 Getirme ücreti:</b> Harita ekranında üstteki iki düğmeden hangisini boyadığınızı seçersiniz. <b>Minimum sepet</b> modunda her renk bir alt limit gösterir (100₺, 200₺, 300₺…) — o bölgedeki müşteri bu tutarın altında sipariş veremez, sepetinde "X₺ daha ekle" yazar. <b>Getirme ücreti</b> modunda ise renkler teslimat ücretini gösterir. Bir bölge ikisini birlikte de taşıyabilir (örn. min 300₺ + 45₺ getirme).</p>
+        <h4>🗺️ Teslimat Bölgeleri</h4>
+        <p><b>Haritadan bölge seçimi:</b> Ayarlar sekmesindeki <b>"🗺️ Teslimat bölgelerini haritada düzenle"</b> butonuna girin. Üç yolla bölge tanımlayabilirsiniz: <b>🍯 Petek</b> (haritadaki altıgenlere dokunarak boyama; boyalı peteği "Böl" ile daha küçük parçalara ayırıp sokak sokak ücret verebilirsiniz), <b>✏️ Çizim</b> (poligon, daire, dikdörtgen çizme) ve <b>🏘️ Mahalle</b> (mahalle adı yazıp sınırını otomatik ekleme). <b>Kaydet</b>'e basmayı unutmayın.</p>
+        <p><b>🧺 Minimum sepet:</b> Harita ekranında her renk bir minimum sepet tutarını gösterir; o bölgedeki müşteri bu tutarın altında sipariş veremez, sepetinde "X₺ daha ekle" yazar. YemekChat'te müşteriden getirme ücreti alınmaz.</p>
         <p><b>🎨 Renk paleti:</b> Renk şeritlerinden birini seçip boyarsınız. <b>"Düzenle"</b> ile hem renkleri hem tutarları kendinize göre değiştirebilir, renk ekleyip çıkarabilirsiniz. Bir rengin tutarını değiştirdiğinizde o renkle boyadığınız <b>tüm bölgeler otomatik güncellenir</b> — tek tek uğraşmanız gerekmez. Tek bir bölgeyi farklı yapmak isterseniz üzerine dokunup değerini elle girebilirsiniz.</p>
         <div class="warn">💡 Bölge tanımladığınız anda mesafeye göre ücret devre dışı kalır ve <b>bölge ücretleri</b> geçerli olur. Çizdiğiniz bölgelerin <b>dışındaki</b> müşteriler sizi hiç görmez — teslimat yaptığınız her yeri boyadığınızdan emin olun.</div>
         <h4>📊 Rapor / Gün Sonu</h4>
@@ -474,6 +471,26 @@
   </div>
 
 <script>
+
+/* ---- oturum anahtari: her panel istegine eklenir, sunucu restorani bununla dogrular (2026-10-07) ---- */
+const TOKEN_KEY = "yc_panel_token";
+function panelAnahtar(){ try{ return localStorage.getItem(TOKEN_KEY) || ""; }catch(e){ return ""; } }
+let _oturumBitti = false;
+function oturumBitti(){
+  if(_oturumBitti) return; _oturumBitti = true;
+  try{ localStorage.removeItem("yc_rest"); localStorage.removeItem(TOKEN_KEY); }catch(e){}
+  alert("Güvenlik için yeniden giriş yapman gerekiyor.");
+  location.href = "restoran.html";
+}
+const _fetch = window.fetch.bind(window);
+window.fetch = (url, opt) => {
+  const u = String(url);
+  if(!/webhook\.yemekchat\.com\/webhook\/(panel-|catering-)/.test(u) || /\/panel-login/.test(u)) return _fetch(url, opt);
+  const t = panelAnahtar(); opt = Object.assign({}, opt || {});
+  if((opt.method || "GET").toUpperCase() === "GET") url = u + (u.includes("?") ? "&" : "?") + "token=" + encodeURIComponent(t);
+  else if(typeof opt.body === "string"){ try{ const b = JSON.parse(opt.body); b.token = t; opt.body = JSON.stringify(b); }catch(e){} }
+  return _fetch(url, opt).then(r => { if(r.status === 401) oturumBitti(); return r; });
+};
 // ===================== AYAR =====================
 const API = {
   LOGIN:  "https://webhook.yemekchat.com/webhook/panel-login",
@@ -516,7 +533,7 @@ function setAlarm(mode){
 document.getElementById("btnLogin").onclick = login;
 document.getElementById("inPass").addEventListener("keydown", e => { if(e.key==="Enter") login(); });
 document.getElementById("btnOut").onclick = () => {
-  localStorage.removeItem("yc_rest"); clearInterval(timer); location.reload();
+  localStorage.removeItem("yc_rest"); localStorage.removeItem(TOKEN_KEY); clearInterval(timer); location.reload();
 };
 
 // sekmeler
@@ -547,8 +564,8 @@ async function login(){
   try{
     const r = await fetch(API.LOGIN, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ restaurant, sifre }) });
     const res = await r.json();
-    if(res.ok){ REST = res.restaurant; localStorage.setItem("yc_rest", REST); startPanel(); }
-    else err.textContent = "Restoran adı veya şifre hatalı.";
+    if(res.ok){ REST = res.restaurant; localStorage.setItem("yc_rest", REST); localStorage.setItem(TOKEN_KEY, res.token || ""); startPanel(); }
+    else err.textContent = res.bekle ? "Çok fazla hatalı deneme. 15 dakika sonra tekrar dene." : "Restoran adı veya şifre hatalı.";
   }catch(e){ err.textContent = "Bağlantı hatası, tekrar dene."; }
 }
 
@@ -1407,8 +1424,6 @@ async function loadSettings(){
     const s = await r.json();
     document.getElementById("sAcilis").value  = s.acilis || "";
     document.getElementById("sKapanis").value = s.kapanis || "";
-    document.getElementById("sTaban").value   = s.taban ?? "";
-    document.getElementById("sKm").value      = s.km_ucreti ?? "";
     document.getElementById("sMax").value     = s.max_km ?? "";
     document.getElementById("sKapali").classList.toggle("on", s.kapali===true || s.kapali==="true");
     document.getElementById("sOtoFis").classList.toggle("on", otoFisAcikMi());
@@ -1425,8 +1440,8 @@ document.getElementById("sSave").onclick = async () => {
     acilis:  document.getElementById("sAcilis").value,
     kapanis: document.getElementById("sKapanis").value,
     kapali:  document.getElementById("sKapali").classList.contains("on") ? "true" : "false",
-    taban:   document.getElementById("sTaban").value,
-    km_ucreti: document.getElementById("sKm").value,
+    taban:   0,
+    km_ucreti: 0,
     max_km:  document.getElementById("sMax").value
   };
   try{
@@ -1464,6 +1479,7 @@ document.getElementById("bkGo").onclick = async () => {
 
 /* ---------- YARDIM & YENİLİKLER ---------- */
 const NEWS = [
+  { d:"07.10.2026", t:"🛵 Getirme ücreti kaldırıldı", x:"YemekChat'te artık müşteriden getirme ücreti alınmıyor. Teslimat maliyetini bölgelerinizdeki minimum sepet tutarlarıyla dengeliyoruz. Ayarlardaki tarife kutuları ve haritadaki getirme modu kaldırıldı; maksimum teslimat mesafeniz aynen duruyor." },
   { d:"31.07.2026", t:"📊 Rapor sekmesi + gün sonu", x:"Yeni 'Rapor' sekmesi: bugün, dün, son 7 gün veya seçtiğiniz tarih aralığı için sipariş adedi, ciro, ortalama sepet, iptal ve ödeme türü dağılımı. Komisyon ve net hakediş otomatik hesaplanıyor, gün sonu özetini termal fiş olarak yazdırabiliyorsunuz." },
   { d:"31.07.2026", t:"✅ Siparişleri otomatik kabul et", x:"Ayarlar'daki yeni anahtarla siparişler düşer düşmez otomatik 'Hazırlanıyor' olur ve müşteriye bildirim gider; yoğun saatte tek tek onaylamazsınız. Ödemesi tamamlanmamış online siparişler otomatik kabul edilmez." },
   { d:"31.07.2026", t:"🖨 Fiş yazdırma geldi", x:"Her siparişin altında 'Fiş yazdır' düğmesi var: 80 mm termal fiş olarak ürünler, müşteri notu, adres, ödeme durumu ve toplam çıkıyor. Ayarlar'dan 'Yeni siparişi otomatik yazdır' anahtarını açarsanız sipariş düştüğü an fiş kendiliğinden yazıcıya gider; ekrana bakmanıza gerek kalmaz. Onay penceresi çıkmasın isterseniz kılavuzdaki Chrome ayarına bakın." },
@@ -1501,7 +1517,7 @@ document.getElementById("itemForm").addEventListener("click", e => { if(e.target
 
 /* ---------- otomatik giriş (en sonda: tüm tanımlar hazır olsun) ---------- */
 const kayitliRest = localStorage.getItem("yc_rest");
-if(kayitliRest){ REST = kayitliRest; startPanel(); }
+if(kayitliRest && panelAnahtar()){ REST = kayitliRest; startPanel(); }   // anahtari olmayan eski oturum yeniden giris yapar
 </script>
 </body>
 </html>
