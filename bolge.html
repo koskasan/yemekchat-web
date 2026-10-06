@@ -172,6 +172,26 @@
 <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
 <script src="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.14.2/dist/leaflet-geoman.min.js"></script>
 <script>
+
+/* ---- oturum anahtari: her panel istegine eklenir, sunucu restorani bununla dogrular (2026-10-07) ---- */
+const TOKEN_KEY = "yc_panel_token";
+function panelAnahtar(){ try{ return localStorage.getItem(TOKEN_KEY) || ""; }catch(e){ return ""; } }
+let _oturumBitti = false;
+function oturumBitti(){
+  if(_oturumBitti) return; _oturumBitti = true;
+  try{ localStorage.removeItem("yc_rest"); localStorage.removeItem(TOKEN_KEY); }catch(e){}
+  alert("Güvenlik için yeniden giriş yapman gerekiyor.");
+  location.href = "restoran.html";
+}
+const _fetch = window.fetch.bind(window);
+window.fetch = (url, opt) => {
+  const u = String(url);
+  if(!/webhook\.yemekchat\.com\/webhook\/(panel-|catering-)/.test(u) || /\/panel-login/.test(u)) return _fetch(url, opt);
+  const t = panelAnahtar(); opt = Object.assign({}, opt || {});
+  if((opt.method || "GET").toUpperCase() === "GET") url = u + (u.includes("?") ? "&" : "?") + "token=" + encodeURIComponent(t);
+  else if(typeof opt.body === "string"){ try{ const b = JSON.parse(opt.body); b.token = t; opt.body = JSON.stringify(b); }catch(e){} }
+  return _fetch(url, opt).then(r => { if(r.status === 401) oturumBitti(); return r; });
+};
 // ===================== AYAR =====================
 const API = {
   ZONES: "https://webhook.yemekchat.com/webhook/panel-zones",
@@ -183,7 +203,7 @@ const REF_LAT        = 39;   // Türkiye ortalaması (ızgara ölçeği için)
 // ================================================
 
 const REST = localStorage.getItem("yc_rest");
-if(!REST){ location.href = "restoran.html"; }
+if(!REST || !panelAnahtar()){ location.href = "restoran.html"; }
 
 let map, zones = [], mode = "hex", hexLayer = null, dirty = false;
 const $ = id => document.getElementById(id);
@@ -242,7 +262,7 @@ function koyuMu(hex){
 }
 function paletCiz(){
   const el = $("palbar");
-  const modBtn = ["min","ucret"].map(m =>
+  const modBtn = ["min"].map(m =>   // getirme ücreti modu kaldırıldı (2026-10-07)
     `<div class="mchip ${m===boyaMod?"on":""}" onclick="boyaModSec('${m}')">${MOD_ETIKET[m]}</div>`
   ).join("");
   el.innerHTML = modBtn + `<span class="ayirac"></span>` + palet().map((p,i) =>
