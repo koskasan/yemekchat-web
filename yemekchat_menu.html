@@ -1124,7 +1124,8 @@ async function draftInit(){
     const sadeleştir = s => String(s||"").toLocaleLowerCase("tr").replace(/\s+/g," ").trim();
     items.forEach((it,i)=>{
       const eş = menu.find(m => sadeleştir(m.name) === sadeleştir(it.name));
-      cart["d"+i] = { item:{ name:it.name, price:Number(it.price),
+      // fiyat HER ZAMAN menüden gelir; taslaktaki fiyata güvenilmez (yapay zeka uydurabilir)
+      cart["d"+i] = { item:{ name: eş ? eş.name : it.name, price: eş ? Number(eş.price) : Number(it.price),
         image_url: eş ? eş.image_url : "", description: eş ? eş.description : "",
         category: eş ? eş.category : "" }, qty:Number(it.qty)||1 };
     });
