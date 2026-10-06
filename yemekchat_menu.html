@@ -429,6 +429,7 @@ const CATEGORY_IMG = {
 
 const p = new URLSearchParams(location.search);
 const TEL = p.get("tel") || "";
+const IMZA = p.get("s") || "";          // botun linke koyduğu imza: TEL'in değiştirilmediğini kanıtlar
 const LAT = p.get("lat"); const LNG = p.get("lng");
 const DIRECT_REST = p.get("restaurant");  // tek restoran modu (yazarak/eski)
 const CATERING = p.get("catering");       // kurumsal mod (çalışan kodu)
@@ -437,7 +438,7 @@ const KESFET = p.get("eski") !== "1";   // yeni Keşfet ekranı; ?eski=1 eski re
 
 let screen = 1, nearby = [], menu = [], rest = null, pay = null, catFilter = "Tümü";
 let restKapali = false, restAcilis = "", restKapanis = "", restGunler = null, yon = "ileri";
-let isCat = false, catInfo = null, isDraft = false, draftNote = "", deliveryFee = 0, minSepet = 0;
+let isCat = false, catInfo = null, isDraft = false, draftNote = "", minSepet = 0;
 let musteriLat = LAT || "", musteriLng = LNG || "";   // kurye yol tarifi için
 const cart = {};  // id -> {item, qty}
 
@@ -653,7 +654,6 @@ async function openRestaurant(name){
   saticiBilgi = nb ? { unvan: nb.unvan, adres: nb.adres, vergi_no: nb.vergi_no, kep: nb.kep,
                        mersis: nb.mersis, telefon: nb.telefon, eposta: nb.eposta, kapak: nb.kapak } : {};
   if(nb){
-    deliveryFee = Math.max(0, Math.round(Number(nb.teslimat_ucreti) || 0));
     minSepet = Math.max(0, Math.round(Number(nb.min_order_amount) || 0));
   }
   $("menuWrap").innerHTML = '<div class="spin">Menü yükleniyor…</div>';
@@ -727,7 +727,6 @@ function renderCart(){
       html += `<div class="cartline"><span class="cn">Ara toplam</span><span class="cl-t">${total()} TL</span></div>`;
       html += `<div class="cartline"><span class="cn" style="color:var(--ok)">🎉 ${esc(rest)} indirimi (%${_kd.oran})</span><span class="cl-t" style="color:var(--ok)">−${_ind} TL</span></div>`;
     }
-    if(deliveryFee > 0) html += `<div class="cartline"><span class="cn">🛵 Getirme ücreti</span><span class="cl-t">${deliveryFee} TL</span></div>`;
     html += `<div class="cartline" style="border:none;font-weight:600"><span class="cn">Toplam</span><span style="font-family:var(--fMono);font-weight:600;font-variant-numeric:tabular-nums;font-size:16px">${grand()} TL</span></div>`;
   } else {
     html = '<div class="empty" style="padding:22px">Sepet boş.</div>';
@@ -752,8 +751,8 @@ function renderCart(){
 const YC_BILGI = {
   unvan:   "Atilla Alperen Ülker (Şahıs İşletmesi)",
   marka:   "YemekChat",
-  adres:   "",                                  // ← DOLDURULACAK: işletme adresi
-  vergi:   "",                                  // ← DOLDURULACAK: vergi dairesi / no
+  adres:   "Kızılırmak Mah. 1450. Sok. No:16 İç Kapı No:22, Çankaya / Ankara",
+  vergi:   "Çankaya V.D. / 9060411758",
   mersis:  "",                                  // ← varsa MERSİS no
   eposta:  "eniyisi@yemekchat.com",
   telefon: "+90 505 489 88 26",
@@ -813,10 +812,8 @@ function urunTablosu(){
   const indT = indirimTutari();
   const ind = indT > 0
     ? `<tr><td colspan="3">${esc(rest)} sepet indirimi (%${indirimKademesi().oran})</td><td class="sag">−${indT} TL</td></tr>` : "";
-  const ek = deliveryFee > 0
-    ? `<tr><td colspan="3">Teslimat (getirme) ücreti — SATICI&apos;ya aittir</td><td class="sag">${deliveryFee} TL</td></tr>` : "";
   return `<table><thead><tr><th>Ürün</th><th class="sag">Adet</th><th class="sag">Birim</th><th class="sag">Tutar</th></tr></thead>
-  <tbody>${satir}${ind}${ek}
+  <tbody>${satir}${ind}
   <tr><th colspan="3">TOPLAM (KDV dâhil)</th><th class="sag">${grand()} TL</th></tr></tbody></table>`;
 }
 function odemeMetni(){
@@ -858,7 +855,7 @@ function sozOnForm(){
 
 <h3>Sözleşme konusu ürünler ve toplam bedel</h3>
 ${urunTablosu()}
-<p>Fiyatlara KDV dâhildir. Sepet ekranında ayrıca gösterilen teslimat (getirme) ücreti SATICI&apos;ya ait olup SATICI tarafından tahsil edilir. ALICI&apos;dan, ürün bedeli ve teslimat ücreti dışında başkaca bir masraf talep edilmez. YemekChat&apos;in aracılık komisyonu SATICI&apos;dan tahsil edilir ve ALICI&apos;ya yansıtılmaz.</p>
+<p>Fiyatlara KDV dâhildir. ALICI&apos;dan teslimat (getirme) ücreti alınmaz; ALICI&apos;dan ürün bedeli dışında herhangi bir ücret talep edilmez. YemekChat&apos;in aracılık komisyonu SATICI&apos;dan tahsil edilir ve ALICI&apos;ya yansıtılmaz.</p>
 
 <h3>Ödeme şekli</h3><p>${esc(odemeMetni())}</p>
 
@@ -885,7 +882,7 @@ function sozMssForm(){
 
 <h3>Madde 3 – Sözleşme konusu ürünler ve bedel</h3>
 ${urunTablosu()}
-<p>Fiyatlara KDV dâhildir. Sepet ekranında ayrıca gösterilen teslimat (getirme) ücreti SATICI&apos;ya ait olup SATICI tarafından tahsil edilir. ALICI&apos;dan, ürün bedeli ve teslimat ücreti dışında başkaca bir masraf talep edilmez. YemekChat&apos;in aracılık komisyonu SATICI&apos;dan tahsil edilir ve ALICI&apos;ya yansıtılmaz.</p>
+<p>Fiyatlara KDV dâhildir. ALICI&apos;dan teslimat (getirme) ücreti alınmaz; ALICI&apos;dan ürün bedeli dışında herhangi bir ücret talep edilmez. YemekChat&apos;in aracılık komisyonu SATICI&apos;dan tahsil edilir ve ALICI&apos;ya yansıtılmaz.</p>
 <div class="kv"><b>Ödeme şekli</b><span>${esc(odemeMetni())}</span></div>
 
 <h3>Madde 4 – Genel hükümler</h3>
@@ -1094,8 +1091,8 @@ function indirimTutari(){
   const k = indirimKademesi();
   return k ? Math.round(total() * k.oran / 100) : 0;
 }
-/* indirim yalnızca ürün toplamına uygulanır, getirme ücretine uygulanmaz */
-function grand(){ return total() - indirimTutari() + (Object.keys(cart).length ? deliveryFee : 0); }
+/* ödenecek tutar = ürün toplamı − restoran indirimi (getirme ücreti yok) */
+function grand(){ return total() - indirimTutari(); }
 function go1(){ screen=1; yon="geri"; show(); }
 function go2(){ screen=2; yon="ileri"; show(); }
 function go3(){ if(!Object.keys(cart).length) return; screen=3; yon="ileri"; renderCart(); show(); odemeHakkiUygula(); }
@@ -1156,8 +1153,7 @@ async function submitOrder(){
   const musteriNot = ($("sipnot") ? $("sipnot").value : "").trim();
   const tumNot = [draftNote, musteriNot].filter(Boolean).join(" · ");
   if(tumNot) details += ` — 📝 ${tumNot}`;
-  if(deliveryFee > 0) details += ` — 🛵 Getirme: ${deliveryFee} TL`;
-  const payload = { restaurant_name:rest, customer_phone:TEL, order_details:details, total_amount:grand(), payment_method:(pay==="Online"?"Online (bekliyor)":pay), address, lat:musteriLat||"", lng:musteriLng||"",
+  const payload = { restaurant_name:rest, customer_phone:TEL, imza:IMZA, order_details:details, total_amount:grand(), payment_method:(pay==="Online"?"Online (bekliyor)":pay), address, lat:musteriLat||"", lng:musteriLng||"",
     customer_name: adSoyad,
     sozlesme_surum: SOZ_SURUM,
     sozlesme_onay: new Date().toISOString() };
@@ -1232,7 +1228,6 @@ async function draftInit(){
     draftNote = (d.note||"").trim();
     if(["null","undefined","="].includes(draftNote.toLowerCase())) draftNote = "";
     minSepet   = Math.max(0, Math.round(Number(d.min_sepet) || 0));
-    deliveryFee = Math.max(0, Math.round(Number(d.teslimat_ucreti) || 0));
     if(d.lat && d.lng){ musteriLat = d.lat; musteriLng = d.lng; }
     saticiBilgi = { unvan: d.unvan, adres: d.adres, vergi_no: d.vergi_no, kep: d.kep,
                     mersis: d.mersis, telefon: d.telefon, eposta: d.eposta, kapak: d.kapak };
@@ -1610,7 +1605,6 @@ function kfRestoranHazirla(r){
   const nb = r.nb;
   rest = r.ad; restKapali = !r.acik; restAcilis = r.acilis; restKapanis = r.kapanis; restGunler = r.gunler;
   saticiBilgi = { unvan: nb.unvan, adres: nb.adres, vergi_no: nb.vergi_no, kep: nb.kep, mersis: nb.mersis, telefon: nb.telefon, eposta: nb.eposta, kapak: nb.kapak };
-  deliveryFee = Math.max(0, Math.round(Number(nb.teslimat_ucreti) || 0));
   minSepet = r.min;
   menu = r.menu; renderMenu();
   return true;
