@@ -58,6 +58,7 @@
     <div class="tab" data-d="kullanici">Kullanıcı Sözleşmesi</div>
     <div class="tab" data-d="teslimat">Teslimat &amp; İade</div>
     <div class="tab" data-d="ticari">Ticari İleti Onayı</div>
+    <div class="tab" data-d="restoran">Restoranlar için KVKK</div>
   </div>
 
   <!-- ============ KVKK ============ -->
@@ -204,6 +205,30 @@
     <p>Ticari elektronik ileti onayı vermemeniz, YemekChat üzerinden sipariş vermenize engel değildir. Kişisel verilerinizin işlenmesine ilişkin ayrıntılı bilgi için <a href="#kvkk" onclick="openDoc('kvkk')">YemekChat Kişisel Verilerin Korunması Aydınlatma Metni</a>'ne bakınız.</p>
   </div>
 
+  <!-- ============ RESTORANLAR İÇİN KVKK ============ -->
+  <div class="doc" id="restoran">
+    <h1>Restoran Başvurusu ve Restoran Yetkilileri Aydınlatma Metni</h1>
+    <div class="upd">Son güncelleme: 06.10.2026</div>
+
+    <h2>1. VERİ SORUMLUSU</h2>
+    <p>6698 sayılı Kişisel Verilerin Korunması Kanunu (“KVKK”) uyarınca veri sorumlusu, “YemekChat” markası altında faaliyet gösteren Atilla Alperen Ülker'dir (Şahıs İşletmesi), Kızılırmak Mah. 1450. Sok. No:16 İç Kapı No:22, Çankaya / Ankara. Bu metin; yemekchat.com üzerinden başvuru yapan ve YemekChat ile sözleşme imzalayan restoranların yetkililerini ve çalışanlarını kapsar.</p>
+
+    <h2>2. İŞLENEN KİŞİSEL VERİLER</h2>
+    <p>Kimlik (ad, soyad; şahıs işletmesinde vergi kimlik numarası), iletişim (cep telefonu, e-posta, işletme adresi, KEP adresi), işletme konumu, finansal (IBAN, vergi dairesi ve numarası, fatura ve ödeme kayıtları), işlem güvenliği (restoran paneli giriş ve işlem kayıtları) ile başvuru formunda iletilen menü ve fiyat bilgileri.</p>
+
+    <h2>3. İŞLEME AMAÇLARI VE HUKUKİ SEBEPLER</h2>
+    <p>Başvurunun değerlendirilmesi, sizinle iletişime geçilmesi, sözleşmenin kurulması ve ifası, sipariş bildirimleri, hakediş ödemeleri ve faturalama (KVKK m.5/2-c); vergi ve ticaret mevzuatından doğan yükümlülükler ile tüketicilere sunulan Ön Bilgilendirme Formu ve Mesafeli Satış Sözleşmesi'nde satıcı bilgilerinin gösterilmesi (m.5/2-ç); hukuki uyuşmazlıklarda hakların korunması (m.5/2-e) ve sistem güvenliği (m.5/2-f). Bu işlemeler için ayrıca açık rızanız alınmaz.</p>
+
+    <h2>4. AKTARIM</h2>
+    <p>Verileriniz; ödeme kuruluşu, e-Fatura/e-Arşiv entegratörü, mali müşavir, kanunen yetkili kamu kurumları ile barındırma, veri tabanı ve WhatsApp Business hizmeti sağlayan teknoloji tedarikçilerine, yalnızca yukarıdaki amaçlarla sınırlı olarak aktarılabilir. Bu tedarikçilerin bir kısmının sunucuları yurt dışında bulunduğundan aktarım KVKK m.9'da öngörülen usullerle gerçekleştirilir. Şahıs işletmesinin unvanı ve adresi, mevzuat gereği tüketicilere satıcı bilgisi olarak gösterilir.</p>
+
+    <h2>5. SAKLAMA SÜRELERİ</h2>
+    <p>Sözleşme süresince ve sona ermesinden itibaren vergi ve ticaret mevzuatındaki süreler (genel olarak 10 yıl) boyunca saklanır. Sözleşmeye dönüşmeyen başvurular 1 yıl sonra silinir.</p>
+
+    <h2>6. HAKLARINIZ</h2>
+    <p>KVKK m.11 kapsamındaki haklarınıza (verilerinizin işlenip işlenmediğini öğrenme, düzeltilmesini veya silinmesini isteme, itiraz etme vb.) ilişkin başvurularınızı <a href="mailto:eniyisi@yemekchat.com">eniyisi@yemekchat.com</a> adresine veya KEP aracılığıyla iletebilirsiniz.</p>
+  </div>
+
   <div class="foot">
     YemekChat · Atilla Alperen Ülker (Şahıs İşletmesi)<br>
     Kızılırmak Mah. 1450. Sok. No:16 İç Kapı No:22, Çankaya / Ankara<br>
@@ -219,7 +244,7 @@ function openDoc(id){
 }
 document.querySelectorAll(".tab").forEach(t => t.onclick = () => openDoc(t.dataset.d));
 const h = location.hash.replace("#","");
-openDoc(["kvkk","kullanici","teslimat","ticari"].includes(h) ? h : "kvkk");
+openDoc(["kvkk","kullanici","teslimat","ticari","restoran"].includes(h) ? h : "kvkk");
 </script>
 </body>
 </html>
