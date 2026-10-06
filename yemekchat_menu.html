@@ -223,6 +223,82 @@
   .ok h2{font-size:20px;margin-bottom:8px}
   .ok p{color:var(--txt2);font-size:14px;line-height:1.6}
   .ok .no{font-size:15px;color:var(--accent);font-weight:600;margin-top:10px}
+
+  /* ===== KEŞFET (yeni 1. ekran) ===== */
+  #kf{--kfPaper:#FFFCF6;--kfOkSoft:#E3F3EA;--kfWarn:#A8550C;--kfWarnSoft:#FBEEDD;--kfSoft:#FCE9E7;--kfLogo:#FA0202;
+      padding:6px 14px 24px;overflow-x:hidden;--kfSh:0 1px 2px rgba(40,20,15,.06),0 6px 20px rgba(40,20,15,.07)}
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) #kf{--kfPaper:#272320;--kfOkSoft:#173326;--kfWarn:#F1A24E;--kfWarnSoft:#3A2A17;--kfSoft:#3A1D1A;--kfSh:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35)}}
+  :root[data-theme="dark"] #kf{--kfPaper:#272320;--kfOkSoft:#173326;--kfWarn:#F1A24E;--kfWarnSoft:#3A2A17;--kfSoft:#3A1D1A;--kfSh:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35)}
+  #kf button{font:inherit;color:inherit;cursor:pointer}
+  #kf h2,#kf h3{margin:0;letter-spacing:-.01em}
+  .kf-hello{display:grid;grid-template-columns:min(36%,150px) minmax(0,1fr);gap:10px;align-items:stretch;margin-top:8px}
+  .kf-masc{width:100%;height:100%;min-height:0;object-fit:contain;object-position:center bottom;display:block}
+  .kf-bub{align-self:end;background:var(--card);border:1px solid var(--line);border-radius:18px 18px 18px 4px;padding:11px 14px;box-shadow:var(--kfSh);min-width:0}
+  .kf-bub p{margin:0;font-size:15px;line-height:1.4}.kf-bub small{display:block;margin-top:4px;color:var(--txt2);font-size:12px;line-height:1.4}
+  .kf-prefs{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .kf-pref{display:inline-flex;gap:6px;align-items:center;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:7px 12px;font-size:13.5px}
+  .kf-pref span{color:var(--accent);font-weight:700;font-size:12px}
+  .kf-opts{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .kf-opt{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:6px 11px;font-size:13px}
+  .kf-opt[aria-pressed="true"],.kf-chip[aria-pressed="true"]{background:var(--txt);color:var(--bg);border-color:var(--txt)}
+  .kf-sec{margin-top:26px}
+  .kf-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:12px}
+  .kf-h h2{font-size:19px;font-weight:800}.kf-h span{font-size:12.5px;color:var(--txt2);white-space:nowrap}
+  .kf-rail{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;margin-inline:-14px;padding:2px 14px 10px;scrollbar-width:none}
+  .kf-rail::-webkit-scrollbar{display:none}
+  .kf-fis{flex:0 0 86%;scroll-snap-align:start;background:var(--kfPaper);border-radius:14px 14px 4px 4px;box-shadow:var(--kfSh);display:flex;flex-direction:column;min-width:0;position:relative}
+  .kf-fis::after{content:"";position:absolute;left:0;right:0;bottom:-7px;height:8px;background:radial-gradient(circle at 6px 0,transparent 6px,var(--kfPaper) 6.5px) 0 0/12px 8px repeat-x}
+  .kf-ph{aspect-ratio:16/8;max-width:100%;border-radius:14px 14px 0 0;overflow:hidden;position:relative;background:var(--card2)}
+  .kf-ph img,.kf-dph img,.kf-cv img{width:100%;height:100%;object-fit:cover;display:block}
+  .kf-tag{position:absolute;left:10px;top:10px;background:var(--brand);color:var(--brandInk);font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:4px 9px;border-radius:999px}
+  .kf-bd{padding:12px 14px 16px;display:flex;flex-direction:column;gap:10px;flex:1}
+  .kf-who{display:flex;justify-content:space-between;align-items:baseline;gap:8px}.kf-who h3{font-size:16px;font-weight:800}.kf-who span{font-size:12px;color:var(--txt2);white-space:nowrap}
+  .kf-lines{display:flex;flex-direction:column;gap:4px;border-top:1.5px dashed var(--line);border-bottom:1.5px dashed var(--line);padding:9px 0}
+  .kf-ln{display:flex;gap:8px;font-size:13.5px}.kf-ln .q{color:var(--txt3);flex:none;width:2.2em;font-family:var(--fMono)}
+  .kf-ln .n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.kf-ln .p{flex:none;font-family:var(--fMono);font-variant-numeric:tabular-nums}
+  .kf-ln.ek .n{color:var(--kfWarn)}
+  .kf-tot{display:flex;justify-content:space-between;align-items:center}.kf-tot span{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--txt2)}
+  .kf-tot b{font:600 23px var(--fMono);font-variant-numeric:tabular-nums}
+  .kf-fit{font-size:12.5px;font-weight:600;padding:4px 9px;border-radius:999px;align-self:flex-start}
+  .kf-fit.ok{background:var(--kfOkSoft);color:var(--ok)}.kf-fit.over{background:var(--kfWarnSoft);color:var(--kfWarn)}
+  .kf-why{font-size:12.5px;color:var(--txt2);margin:0}
+  .kf-cta{margin-top:auto;background:var(--brand);color:var(--brandInk)!important;border:0;border-radius:12px;padding:12px 14px;font-weight:700;font-size:15px;width:100%}
+  .kf-cta.ghost{background:transparent;color:var(--txt)!important;border:1.5px solid var(--line)}
+  .kf-empty{background:var(--card);border:1px dashed var(--line);border-radius:14px;padding:16px;color:var(--txt2);font-size:14px}
+  .kf-trust{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:14px}
+  .kf-trust div{background:var(--card);padding:12px;display:flex;flex-direction:column;gap:2px;min-width:0}
+  .kf-trust b{font-size:14px}.kf-trust span{font-size:12.5px;color:var(--txt2);overflow-wrap:anywhere}
+  .kf-chips{display:flex;gap:8px;overflow-x:auto;margin-inline:-14px;padding:0 14px 4px;scrollbar-width:none}.kf-chips::-webkit-scrollbar{display:none}
+  .kf-chip{flex:none;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:8px 14px;font-size:14px;font-weight:600}
+  .kf-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .kf-dish{background:var(--card);border-radius:14px;overflow:hidden;border:1px solid var(--line);display:flex;flex-direction:column;min-width:0}
+  .kf-dph{aspect-ratio:1/1;max-width:100%;background:var(--kfSoft);position:relative;overflow:hidden}
+  .kf-noimg{position:absolute;inset:0;display:grid;place-items:center;font-weight:800;font-size:32px;color:var(--brand);opacity:.55}
+  .kf-dbd{padding:9px 10px 10px;display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}
+  .kf-dbd .n{font-weight:600;font-size:14px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .kf-dbd .r{font-size:12px;color:var(--txt2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .kf-dft{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:6px}.kf-dft b{font:600 15px var(--fMono)}
+  .kf-plus{width:34px;height:34px;border-radius:50%;border:0;background:var(--brand);color:var(--brandInk)!important;font:700 20px/1 sans-serif;display:grid;place-items:center}
+  .kf-more{margin-top:12px;width:100%;background:transparent;border:1.5px solid var(--line);border-radius:12px;padding:11px;font-weight:600}
+  .kf-rlist{display:flex;flex-direction:column;gap:10px}
+  .kf-rc{display:flex;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px;min-width:0;cursor:pointer}
+  .kf-rc.off{opacity:.55}
+  .kf-cv{width:84px;height:84px;border-radius:10px;overflow:hidden;flex:none;background:var(--kfSoft);position:relative}
+  .kf-rtx{min-width:0;display:flex;flex-direction:column;gap:3px;flex:1}.kf-rtx h3{font-size:15.5px;font-weight:800}
+  .kf-rl{font-size:12.5px;color:var(--txt2)}
+  .kf-bs{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+  .kf-b{font-size:11.5px;font-weight:600;padding:3px 8px;border-radius:999px;background:var(--bg);border:1px solid var(--line)}
+  .kf-b.ok{background:var(--kfOkSoft);color:var(--ok);border-color:transparent}.kf-b.warn{background:var(--kfWarnSoft);color:var(--kfWarn);border-color:transparent}
+  .kf-subh{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--txt2);margin:18px 0 8px}
+  .kf-closed summary{cursor:pointer;list-style:none;font-size:14px;color:var(--txt2);padding:12px 0}
+  .kf-closed summary::-webkit-details-marker{display:none}
+  .kf-steps{display:grid;gap:10px;counter-reset:s}
+  .kf-step{display:flex;gap:12px;align-items:flex-start}
+  .kf-step::before{counter-increment:s;content:counter(s);flex:none;width:28px;height:28px;border-radius:50%;background:var(--txt);color:var(--bg);display:grid;place-items:center;font-weight:800;font-size:14px}
+  .kf-step p{margin:3px 0 0;font-size:14px}.kf-step b{display:block;font-size:15px}
+  .kf-foot{margin-top:26px;font-size:12.5px;color:var(--txt2);border-top:1px solid var(--line);padding-top:14px;display:grid;gap:4px;overflow-wrap:anywhere}
+  .kf-foot a{color:var(--txt);text-underline-offset:2px;padding-block:4px;display:inline-block}
+  .kf-site{display:block;width:max-content;max-width:100%;margin:24px auto 0;padding:10px 4px;font-weight:800;font-size:19px;color:var(--kfLogo);text-decoration:none}
 </style>
 </head>
 <body>
@@ -239,6 +315,7 @@
 
   <!-- EKRAN 1: RESTORANLAR -->
   <div class="screen on" id="scr1">
+    <div id="kf" style="display:none"></div>
     <div class="mascot" id="mascotTop"></div>
     <div class="chips" id="chips"></div>
     <div class="rlist" id="rlist"><div class="spin">Yakındaki restoranlar yükleniyor…</div></div>
@@ -355,7 +432,8 @@ const TEL = p.get("tel") || "";
 const LAT = p.get("lat"); const LNG = p.get("lng");
 const DIRECT_REST = p.get("restaurant");  // tek restoran modu (yazarak/eski)
 const CATERING = p.get("catering");       // kurumsal mod (çalışan kodu)
-const DRAFT = p.get("draft");             // yazarak sipariş taslağı (Path B)
+const DRAFT = p.get("draft");
+const KESFET = p.get("eski") !== "1";   // yeni Keşfet ekranı; ?eski=1 eski restoran listesini açar             // yazarak sipariş taslağı (Path B)
 
 let screen = 1, nearby = [], menu = [], rest = null, pay = null, catFilter = "Tümü";
 let restKapali = false, restAcilis = "", restKapanis = "", restGunler = null, yon = "ileri";
@@ -440,7 +518,7 @@ adresYukle();
 if(DRAFT){ draftInit(); }
 else if(CATERING){ cateringInit(); }
 else if(DIRECT_REST){ openRestaurant(DIRECT_REST); }
-else if(LAT && LNG){ loadNearby(); }
+else if(LAT && LNG){ KESFET ? kfBaslat() : loadNearby(); }
 else { $("rlist").innerHTML = '<div class="empty">Konum bulunamadı. WhatsApp\'tan tekrar başla.</div>'; }
 
 /* ---------- EKRAN 1: yakın restoranlar ---------- */
@@ -1033,7 +1111,7 @@ function show(){
   if(aktif && yon==="geri") aktif.classList.add("geri");
   $("back").style.display = (isCat || screen===1 || (screen===2&&DIRECT_REST) || (isDraft&&screen===3)) ? "none" : "block";
   if(!isCat && !isDraft){
-    $("hdName").textContent = screen===1 ? "Yakındaki Restoranlar" : (rest||"YemekChat");
+    $("hdName").textContent = screen===1 ? (KESFET ? "YemekChat" : "Yakındaki Restoranlar") : (rest||"YemekChat");
     $("hdSub").textContent = screen===1 ? "konumuna göre" : (screen===3?"sepet & ödeme":"menü");
   } else if(isDraft){
     $("hdName").textContent = rest || "YemekChat";
@@ -1093,6 +1171,7 @@ async function submitOrder(){
     }
     const oid = res.order_id || res.id;
     if(oid) sonSiparisNo = String(oid);
+    if(oid) try{ kfSiparisKaydet(rest, total()); }catch(e){}   // Keşfet kişiselleştirmesi (sadece bu cihazda)
     if(pay==="Online" && oid){
       go.textContent = "Ödeme sayfası açılıyor…";
       try{
@@ -1289,6 +1368,263 @@ async function cateringSubmit(){
     $("okScreen").style.display="flex";
     setTimeout(()=>{ try{window.close();}catch(e){} }, 3500);
   }catch(e){ alert("Bağlantı hatası, tekrar dene."); go.disabled=false; updateBar(); }
+}
+
+/* ================= KEŞFET: yeni 1. ekran =================
+   Yapay zeka (Gemini) kullanılmaz; öneriler kural tabanlı ve müşterinin telefonunda hesaplanır.
+   Kişiselleştirme cihazda tutulur (localStorage "yc_kf"): seçilen bütçe/kişi + bu cihazdan verilen son siparişler.
+   Sepet seçimi mevcut 2. ve 3. ekrana (menü, sepet/ödeme) devredilir; ödeme akışı değişmez. */
+const KF_SAKLA = "yc_kf";
+function kfOku(){ try{ return JSON.parse(localStorage.getItem(KF_SAKLA)) || {}; }catch(e){ return {}; } }
+function kfYaz(o){ try{ localStorage.setItem(KF_SAKLA, JSON.stringify(o)); }catch(e){} }
+function kfSiparisKaydet(r, t){
+  if(!r) return;
+  const o = kfOku();
+  o.gecmis = [{ r, t: Math.round(Number(t) || 0), ts: Date.now() }].concat(o.gecmis || []).slice(0, 10);
+  kfYaz(o);
+}
+const kfTL = n => Math.round(n).toLocaleString("tr-TR") + " TL";
+const kfTr = s => String(s || "").normalize("NFC").toLocaleLowerCase("tr");
+const KF_RX = {
+  icecek: /içecek|meşrubat|\bsu\b|ayran|kola|cola|fanta|sprite|soda|gazoz|ice ?tea|şalgam|limonata|pepsi|yedigün|maden|meyve suyu|churchill/,
+  sos: /\bsos|soslar|ketçap|mayonez|poşet|ekstra/,
+  tatli: /tatlı|baklava|sütlaç|künefe|cheesecake|brownie|kazandibi|profiterol|waffle|tiramisu|puding|magnolia/,
+  yan: /yan ürün|yanlar|patates|atıştırmalık|çıtır|kızartma|soğan halkası|meze|nugget|mozzarella|cips|turşu/,
+  icecekli: /içecek|ayran|kola|cola|meşrubat|kutu/
+};
+const KF_KATS = [
+  ["Tümü", null], ["Döner", /döner|dürüm|tantuni/], ["Burger", /burger/], ["Pizza", /pizza/], ["Pide", /pide|lahmacun/],
+  ["Ev yemeği", /ev yemek|pilav|makarna|ana yemek|beyaz et|güveç/], ["Kebap & ızgara", /kebap|ızgara|köfte|şiş|kırmızı et/],
+  ["Mantı", /mantı/], ["Kumpir", /kumpir/], ["Salata & bowl", /salata|bowl/], ["Tatlı", /tatlı|baklava|künefe|sütlaç|cheesecake/]
+];
+const KF_BUTCE = [200, 300, 400, 500, 750, 1000, 1500, 2500], KF_KISI = [1, 2, 3, 4, 5, 6];
+let KF = { V: [], B: 400, P: 1, kaynak: "tahmini", gecmis: [], kat: 0, limit: 8, acikSecim: null };
+
+const kfKatUyar = (u, k) => !KF_KATS[k][1] || KF_KATS[k][1].test(kfTr(u.r.kat + " " + u.c + " " + u.n));
+const kfAcikMi = r => !(r.acik === false || r.acik === "false");
+const kfTatliKat = () => /tatlı/.test(KF_KATS[KF.kat][0].toLocaleLowerCase("tr"));
+
+function kfProfil(){
+  const o = kfOku(), g = o.gecmis || [];
+  KF.gecmis = [...new Set(g.map(x => x.r))].slice(0, 3);
+  if(o.B){ KF.B = o.B; KF.kaynak = "secim"; }
+  else if(g.length){
+    const s = g.slice(0, 5).map(x => x.t).filter(Boolean).sort((a, b) => a - b);
+    KF.B = s.length ? Math.max(150, Math.round(s[Math.floor(s.length / 2)] / 50) * 50) : 400;
+    KF.kaynak = s.length ? "gecmis" : "tahmini";
+  } else { KF.B = 400; KF.kaynak = "tahmini"; }
+  KF.P = o.P || 1;
+}
+async function kfHavuz(arr, n, f){
+  const out = new Array(arr.length); let i = 0;
+  await Promise.all(Array.from({ length: Math.min(n, arr.length) }, async () => { while(i < arr.length){ const j = i++; out[j] = await f(arr[j]); } }));
+  return out;
+}
+
+async function kfBaslat(){
+  ["mascotTop", "chips", "rlist"].forEach(id => { const e = $(id); if(e) e.style.display = "none"; });
+  const k = $("kf"); k.style.display = "block";
+  k.innerHTML = '<div class="spin">Yakındaki lezzetler hazırlanıyor…</div>';
+  try{
+    const r = await fetch(`${CONFIG.NEARBY}?lat=${LAT}&lng=${LNG}`);
+    const t = await r.text(); let d = t ? JSON.parse(t) : [];
+    if(!Array.isArray(d)) d = d.data || [];
+    nearby = d.filter(x => x && x.name);
+  }catch(e){ nearby = []; }
+  if(!nearby.length){ k.style.display = "none"; $("rlist").style.display = ""; kapsamaEkrani(); return; }
+  kfProfil();
+  const acik = nearby.filter(kfAcikMi);
+  const menuler = await kfHavuz(acik, 5, async r => {
+    try{ const x = await fetch(`${CONFIG.MENU}?restaurant=${encodeURIComponent(r.name)}`); const d = await x.json(); return Array.isArray(d) ? d : (d.data || []); }
+    catch(e){ return []; }
+  });
+  const mm = {}; acik.forEach((r, i) => mm[r.name] = menuler[i] || []);
+  KF.V = nearby.map((nb, ri) => {
+    const o = { i: ri, nb, ad: nb.name, kat: nb.category || "", puan: Number(nb.rating) || 0,
+      min: Math.max(0, Math.round(Number(nb.min_order_amount) || 0)), km: Number(nb.dist_km) || 0,
+      acik: kfAcikMi(nb), acilis: nb.acilis || "", kapanis: nb.kapanis || "", gunler: nb.kapali_gunler || null,
+      kf: nb.kapak || "", menu: mm[nb.name] || [], urun: [] };
+    o.urun = o.menu.filter(m => m.is_available !== false && m.is_available !== "false" && Number(m.price) > 0).map(m => {
+      const s = kfTr((m.category || "") + " " + m.name);
+      let t = "ana";
+      if(KF_RX.icecek.test(s)) t = "icecek"; else if(KF_RX.sos.test(s)) t = "sos";
+      else if(KF_RX.tatli.test(s)) t = "tatli"; else if(KF_RX.yan.test(s) || Number(m.price) < 60) t = "yan";
+      return { m, n: m.name, d: m.description || "", p: Number(m.price), c: m.category || "", f: m.image_url || "", t,
+               icecekli: /menü|menu/.test(s) || KF_RX.icecekli.test(kfTr(m.description)), r: o };
+    });
+    return o;
+  });
+  kfCiz();
+}
+
+/* ---- hazır sepet: her ana yemek için kişi başı porsiyon + içecek + yer kalırsa yan ürün + gerekirse minimum tamamlayıcı ---- */
+function kfKur(r, m, B, P, icecek, yan){
+  const satir = [{ u: m, q: P }]; let ara = m.p * P;
+  const kalan = () => B - ara;
+  if(!m.icecekli && icecek.length){ const d = icecek.find(x => x.p * P <= kalan()); if(d){ satir.push({ u: d, q: P }); ara += d.p * P; } }
+  const y = yan.filter(x => x.p <= kalan()).pop(); if(y){ satir.push({ u: y, q: 1 }); ara += y.p; }
+  let minEk = null;
+  if(ara < r.min){
+    const fark = r.min - ara;
+    const e = yan.concat(icecek).filter(x => x.p >= fark).sort((a, b) => a.p - b.p)[0];
+    if(e && e.p < m.p){ satir.push({ u: e, q: 1, ek: true }); ara += e.p; minEk = e; }
+    else { while(ara < r.min){ satir[0].q++; ara += m.p; } satir[0].ek = true; }
+  }
+  const asim = Math.max(0, ara - B), bos = Math.max(0, B - ara);
+  const icecekVar = m.icecekli || satir.some(s => s.u.t === "icecek");
+  const imza = kfTr(r.ad + " " + r.kat).split(/\s+/).some(k => k.length > 3 && kfTr(m.n + " " + m.c).includes(k));
+  const uyum = -(asim / B) * 4 - (bos / B) * 1.2 + (icecekVar ? 0.2 : 0) + (imza ? 0.15 : 0) + Math.min(0.8, m.p * P / ara) * 0.15 + (m.f ? 0.05 : 0);
+  return { r, satir, toplam: ara, fark: B - ara, minEk, uyum };
+}
+function kfSepet(r, B, P){
+  if(!r.acik) return null;
+  const tur = kfTatliKat() ? "tatli" : "ana";
+  const mains = r.urun.filter(u => u.t === tur && kfKatUyar(u, KF.kat));
+  if(!mains.length) return null;
+  const tum = r.urun.filter(u => u.t === "icecek").sort((a, b) => a.p - b.p);
+  const iyi = tum.filter(u => !/\bsu\b|maden|soda/.test(kfTr(u.n)));
+  const yan = r.urun.filter(u => u.t === "yan").sort((a, b) => a.p - b.p);
+  return mains.map(m => kfKur(r, m, B, P, iyi.length ? iyi : tum, yan)).reduce((a, b) => b.uyum > a.uyum ? b : a);
+}
+function kfSepetler(){
+  const all = KF.V.map(r => kfSepet(r, KF.B, KF.P)).filter(Boolean).map(b => {
+    let s = 1 + b.uyum + (KF.gecmis.includes(b.r.ad) ? 0.25 : 0) + (b.r.puan ? (b.r.puan - 4.3) * 0.25 : 0) - b.r.km * 0.02 + (b.satir[0].u.f ? 0.06 : 0);
+    return Object.assign(b, { s });
+  }).sort((a, b) => b.s - a.s);
+  const out = [], katlar = [];
+  for(const b of all){
+    if(out.length === 3) break;
+    if(out.length && b.s - (katlar.includes(b.r.kat) ? 0.15 : 0) < out[out.length - 1].s - 0.5) continue;
+    out.push(b); katlar.push(b.r.kat);
+  }
+  return out;
+}
+function kfNedenler(b){
+  const n = [];
+  if(KF.gecmis.includes(b.r.ad)) n.push("Daha önce buradan söyledin");
+  if(b.r.puan >= 4.7) n.push("Puanı " + b.r.puan.toFixed(1));
+  if(b.r.km && b.r.km < 2) n.push("Yakında, " + b.r.km.toLocaleString("tr-TR", { maximumFractionDigits: 1 }) + " km");
+  if(b.minEk) n.push("Minimum " + kfTL(b.r.min) + " için " + b.minEk.n + " eklendi");
+  return n.slice(0, 3);
+}
+function kfLezzetler(){
+  const kisi = KF.B / KF.P, tatli = kfTatliKat(), pool = [];
+  KF.V.forEach(r => {
+    if(!r.acik) return;
+    const uygunR = r.min <= KF.B * 1.1;
+    r.urun.forEach(u => {
+      if(!(u.t === "ana" || (tatli && u.t === "tatli")) || !kfKatUyar(u, KF.kat)) return;
+      const uygun = uygunR && u.p <= kisi * 1.05;
+      let s = (uygun ? 1 : 0) + (1 - Math.min(1, Math.abs(u.p - kisi * 0.7) / kisi)) * 0.6 + (KF.gecmis.includes(r.ad) ? 0.2 : 0) + (u.f ? 0.25 : 0) + (r.puan ? (r.puan - 4.3) * 0.15 : 0);
+      pool.push({ u, s, uygun });
+    });
+  });
+  pool.sort((a, b) => b.s - a.s);
+  const out = [], say = {};
+  for(const x of pool){ const k = x.u.r.ad; say[k] = (say[k] || 0) + 1; if(say[k] > 4 && out.length < 12) continue; out.push(x); }
+  return out;
+}
+
+/* ---- çizim ---- */
+const kfFoto = (src, alt) => src ? `<img src="${esc(src)}" alt="" loading="lazy" decoding="async" onerror="this.remove()">` : `<span class="kf-noimg">${esc((alt || "?").trim().charAt(0))}</span>`;
+function kfCiz(){
+  const k = $("kf"), B = KF.B, P = KF.P;
+  const fis = kfSepetler(), uygun = fis.filter(b => b.fark >= -B * 0.05);
+  const selam = uygun.length
+    ? `Ustam, ${kfTL(B)}${P > 1 ? " ve " + P + " kişiye" : "'ne"} göre baktım: ${uygun.length} hazır sepet çıkardım.`
+    : `Ustam, ${kfTL(B)}'ye bu çevrede doyurucu sepet zor. En yakınlarını aşağıya koydum.`;
+  const alt = KF.kaynak === "secim" ? "Bütçeni en son " + kfTL(B) + " seçmiştin, istersen değiştirebilirsin."
+            : KF.kaynak === "gecmis" ? "Son siparişlerine göre " + kfTL(B) + " aldım, istersen değiştirebilirsin."
+            : "Bütçeni seçmedin, " + kfTL(B) + "'ye göre kurdum; istersen değiştirebilirsin.";
+  const fisHtml = fis.length ? fis.map((b, i) => {
+    const ana = b.satir[0].u;
+    const fit = b.fark >= 0 ? `<span class="kf-fit ok">${b.fark < 1 ? "Bütçene tam oturuyor" : "Bütçene uygun · " + kfTL(b.fark) + " kalıyor"}</span>`
+                            : `<span class="kf-fit over">Bütçeni ${kfTL(-b.fark)} aşıyor</span>`;
+    return `<article class="kf-fis"><div class="kf-ph">${kfFoto(ana.f || b.r.kf, ana.n)}${i === 0 ? '<span class="kf-tag">Senin için</span>' : ""}</div>
+      <div class="kf-bd"><div class="kf-who"><h3>${esc(b.r.ad)}</h3><span>${b.r.puan ? "★ " + b.r.puan.toFixed(1) : ""}${b.r.km ? " · " + b.r.km.toLocaleString("tr-TR", { maximumFractionDigits: 1 }) + " km" : ""}</span></div>
+      <div class="kf-lines">${b.satir.map(s => `<div class="kf-ln${s.ek ? " ek" : ""}"><span class="q">${s.q}×</span><span class="n">${esc(s.u.n)}</span><span class="p">${kfTL(s.u.p * s.q)}</span></div>`).join("")}</div>
+      <div class="kf-tot"><span>Toplam</span><b>${kfTL(b.toplam)}</b></div>${fit}
+      <p class="kf-why">${esc(kfNedenler(b).join(" · "))}</p>
+      <button class="kf-cta${i ? " ghost" : ""}" data-fis="${i}">Bu sepeti seç</button></div></article>`;
+  }).join("") : '<div class="kf-empty">Seçtiğin türde şu an açık bir yerden sepet çıkmadı. Kategoriyi "Tümü" yapmayı dene.</div>';
+
+  const katlar = KF_KATS.map((x, i) => (i && !KF.V.some(r => r.acik && r.urun.some(u => (u.t === "ana" || u.t === "tatli") && kfKatUyar(u, i)))) ? ""
+    : `<button class="kf-chip" data-k="${i}" aria-pressed="${KF.kat === i}">${esc(x[0])}</button>`).join("");
+  const lz = kfLezzetler(), nU = lz.filter(x => x.uygun).length, liste = (nU ? lz.filter(x => x.uygun) : lz);
+  const grid = liste.slice(0, KF.limit).map(x => `<article class="kf-dish" data-r="${x.u.r.i}" data-u="${x.u.r.urun.indexOf(x.u)}">
+      <div class="kf-dph">${kfFoto(x.u.f, x.u.n)}</div><div class="kf-dbd"><span class="n">${esc(x.u.n)}</span><span class="r">${esc(x.u.r.ad)}</span>
+      <div class="kf-dft"><b>${kfTL(x.u.p)}</b><button class="kf-plus" aria-label="${esc(x.u.n)} ekle">+</button></div></div></article>`).join("")
+    || '<div class="kf-empty" style="grid-column:1/-1">Bu türde şu an açık bir yer yok.</div>';
+
+  const say = r => r.urun.filter(u => u.t === "ana" && u.p <= B / P * 1.05 && kfKatUyar(u, KF.kat)).length;
+  const kart = r => {
+    const yeter = r.min <= B * 1.1;
+    return `<article class="kf-rc${r.acik ? "" : " off"}" data-ad="${esc(r.ad)}"><div class="kf-cv">${kfFoto(r.kf, r.ad)}</div><div class="kf-rtx">
+      <h3>${esc(r.ad)}</h3><span class="kf-rl">${esc(r.kat)}${r.puan ? " · ★ " + r.puan.toFixed(1) : ""}${r.acik ? (r.km ? " · " + r.km.toLocaleString("tr-TR", { maximumFractionDigits: 1 }) + " km" : "") : " · " + esc(kapaliMetni(r.acilis, r.kapanis, r.gunler))}</span>
+      <div class="kf-bs">${r.acik ? (yeter ? `<span class="kf-b ok">Bütçene uygun ${say(r)} ürün</span><span class="kf-b">Min ${kfTL(r.min)}</span>` : `<span class="kf-b warn">Min ${kfTL(r.min)} · kalabalık siparişe uygun</span>`) : ""}</div></div></article>`;
+  };
+  const filt = r => !r.urun.length || r.urun.some(u => kfKatUyar(u, KF.kat));
+  const ac = KF.V.filter(r => r.acik && filt(r)), kap = KF.V.filter(r => !r.acik);
+  const srt = a => a.sort((x, y) => (KF.gecmis.includes(y.ad) - KF.gecmis.includes(x.ad)) || (y.puan - x.puan) || (x.km - y.km));
+  const yeten = srt(ac.filter(r => r.min <= B * 1.1)), toplu = srt(ac.filter(r => r.min > B * 1.1));
+
+  k.innerHTML = `
+  <section class="kf-hello"><img class="kf-masc" src="maskot.png" alt="" onerror="this.remove()"><div class="kf-bub"><p>${esc(selam)}</p><small>${esc(alt)}</small></div></section>
+  <div class="kf-prefs"><button class="kf-pref" data-ac="B">Bütçe <b>${kfTL(B)}</b> <span>Değiştir</span></button><button class="kf-pref" data-ac="P"><b>${P} kişi</b> <span>Değiştir</span></button></div>
+  ${KF.acikSecim ? '<div class="kf-opts">' : ""}${KF.acikSecim === "B" ? KF_BUTCE.map(v => `<button class="kf-opt" data-b="${v}" aria-pressed="${v === B}">${v === 2500 ? "Fark etmez" : kfTL(v)}</button>`).join("")
+     : KF.acikSecim === "P" ? KF_KISI.map(v => `<button class="kf-opt" data-p="${v}" aria-pressed="${v === P}">${v}${v === 6 ? "+" : ""} kişi</button>`).join("") : ""}${KF.acikSecim ? "</div>" : ""}
+  <section class="kf-sec"><div class="kf-h"><h2>Senin için hazır sepetler</h2><span>${fis.length > 1 ? "kaydır →" : ""}</span></div><div class="kf-rail">${fisHtml}</div></section>
+  <div class="kf-trust"><div><b>Kapıda öde</b><span>Nakit ya da kart, teslimatta</span></div><div><b>Sürpriz ücret yok</b><span>Gördüğün tutar, ödediğin tutar</span></div>
+    <div><b>Sahte İndirim YOK!</b><span>Fiyatı şişirip indirimli göstermiyoruz</span></div><div><b>Sorun mu var?</b><span>eniyisi@yemekchat.com'a yaz, çözelim</span></div></div>
+  <section class="kf-sec"><div class="kf-h"><h2>Canın ne çekiyor?</h2></div><div class="kf-chips">${katlar}</div></section>
+  <section class="kf-sec" style="margin-top:14px"><div class="kf-h"><h2>${nU ? "Bütçene uygun lezzetler" : "Bu çevredeki lezzetler"}</h2><span>${nU ? nU + " lezzet" : "bütçeni biraz aşanlar"}</span></div>
+    <div class="kf-grid">${grid}</div>${KF.limit < liste.length ? '<button class="kf-more" id="kfMore">Daha fazla göster</button>' : ""}</section>
+  <section class="kf-sec"><div class="kf-h"><h2>Restoranlar</h2><span>${ac.length} açık</span></div>
+    ${yeten.length ? '<div class="kf-rlist">' + yeten.map(kart).join("") + "</div>" : ""}
+    ${toplu.length ? '<div class="kf-subh">Kalabalık siparişte açılan yerler</div><div class="kf-rlist">' + toplu.map(kart).join("") + "</div>" : ""}
+    ${kap.length ? `<details class="kf-closed"><summary>Şu an kapalı (${kap.length}) ▾</summary><div class="kf-rlist">${kap.map(kart).join("")}</div></details>` : ""}</section>
+  <section class="kf-sec"><div class="kf-h"><h2>Nasıl çalışıyor?</h2></div><div class="kf-steps">
+    <div class="kf-step"><p><b>Seç</b>Hazır sepeti ya da istediğin yemeği seç.</p></div>
+    <div class="kf-step"><p><b>Adresi ve ödemeyi gir</b>Kapıda nakit/kart ya da online. Tutarın tamamını ödemeden önce görürsün.</p></div>
+    <div class="kf-step"><p><b>Kapına gelsin</b>Restoran siparişi onaylayınca WhatsApp'tan haber veririz.</p></div></div>
+    <div class="kf-foot"><span>YemekChat · Kızılırmak Mah. 1450. Sk. No 16/22 Hayat Plaza</span><span>Destek: Eniyisi@yemekchat.com</span>
+      <span><a href="yasal.html#kullanici" target="_blank" rel="noopener">Kullanıcı Sözleşmesi</a> · <a href="yasal.html#kvkk" target="_blank" rel="noopener">KVKK Aydınlatma Metni</a> · <a href="yasal.html#ticari" target="_blank" rel="noopener">Ticari İleti Onayı</a></span></div>
+    <a class="kf-site" href="https://yemekchat.com" target="_blank" rel="noopener">www.YemekChat.Com</a></section>`;
+
+  k.querySelectorAll("[data-ac]").forEach(b => b.onclick = () => { KF.acikSecim = KF.acikSecim === b.dataset.ac ? null : b.dataset.ac; kfCiz(); });
+  k.querySelectorAll("[data-b]").forEach(b => b.onclick = () => { KF.B = +b.dataset.b; KF.kaynak = "secim"; KF.acikSecim = null; const o = kfOku(); o.B = KF.B; kfYaz(o); kfCiz(); });
+  k.querySelectorAll("[data-p]").forEach(b => b.onclick = () => { KF.P = +b.dataset.p; KF.acikSecim = null; const o = kfOku(); o.P = KF.P; kfYaz(o); kfCiz(); });
+  k.querySelectorAll("[data-k]").forEach(b => b.onclick = () => { KF.kat = +b.dataset.k; KF.limit = 8; kfCiz(); });
+  k.querySelectorAll("[data-fis]").forEach(b => b.onclick = () => kfSepetSec(fis[+b.dataset.fis]));
+  k.querySelectorAll(".kf-dish").forEach(a => a.querySelector(".kf-plus").onclick = () => { const r = KF.V[+a.dataset.r]; kfUrunEkle(r, r.urun[+a.dataset.u]); });
+  k.querySelectorAll(".kf-rc").forEach(a => a.onclick = () => openRestaurant(a.dataset.ad));
+  const mo = $("kfMore"); if(mo) mo.onclick = () => { KF.limit += 8; kfCiz(); };
+}
+
+/* ---- mevcut menü/sepet ekranlarına devir (openRestaurant ile aynı durum alanları) ---- */
+function kfRestoranHazirla(r){
+  if(rest && rest !== r.ad && Object.keys(cart).length){
+    if(!confirm("Başka restorana geçiyorsun, sepetin sıfırlanacak. Devam?")) return false;
+  }
+  if(rest !== r.ad) for(const k in cart) delete cart[k];
+  const nb = r.nb;
+  rest = r.ad; restKapali = !r.acik; restAcilis = r.acilis; restKapanis = r.kapanis; restGunler = r.gunler;
+  saticiBilgi = { unvan: nb.unvan, adres: nb.adres, vergi_no: nb.vergi_no, kep: nb.kep, mersis: nb.mersis, telefon: nb.telefon, eposta: nb.eposta, kapak: nb.kapak };
+  deliveryFee = Math.max(0, Math.round(Number(nb.teslimat_ucreti) || 0));
+  minSepet = r.min;
+  menu = r.menu; renderMenu();
+  return true;
+}
+function kfSepetSec(b){
+  if(!b || !kfRestoranHazirla(b.r)) return;
+  for(const k in cart) delete cart[k];
+  b.satir.forEach(s => { const id = s.u.m.id; cart[id] = { item: s.u.m, qty: (cart[id]?.qty || 0) + s.q }; });
+  renderMenu(); go3();
+}
+function kfUrunEkle(r, u){
+  if(!r || !u || !kfRestoranHazirla(r)) return;
+  const id = u.m.id; cart[id] = { item: u.m, qty: (cart[id]?.qty || 0) + 1 };
+  renderMenu(); go2();
 }
 </script>
 </body>
