@@ -85,6 +85,7 @@
   .pay .opt .lb{font-size:11px;color:var(--txt2);margin-top:3px}
   .pay .opt.on{background:var(--green);border-color:var(--green)}
   .pay .opt.on .ic,.pay .opt.on .lb{color:var(--greenDark);font-weight:600}
+  .pay .opt.kapali{opacity:.38;cursor:not-allowed;filter:grayscale(1)}
   .fld{width:100%;background:var(--card);border:1px solid var(--line);border-radius:11px;padding:12px;font-size:14px;color:var(--txt);margin-bottom:7px;font-family:inherit}
   .fld::placeholder{color:var(--muted)}
   .row2{display:grid;grid-template-columns:1fr 1fr;gap:7px}
@@ -301,12 +302,20 @@ const CONFIG = {
   CATERING_GUNLUK:  "https://webhook.yemekchat.com/webhook/catering-gunluk",
   CATERING_SIPARIS: "https://webhook.yemekchat.com/webhook/catering-siparis",
   DRAFT: "https://webhook.yemekchat.com/webhook/draft",
-  PAYTR: "https://webhook.yemekchat.com/webhook/paytr-create"
+  PAYTR: "https://webhook.yemekchat.com/webhook/paytr-create",
+  ODEME_HAKKI: "https://webhook.yemekchat.com/webhook/odeme-hakki"
 };
 
 // Maskot görselleri — arkadaşın hazırlayınca URL'leri buraya yapıştır (boşsa görünmez)
 const MASCOT_URL = "";       // üstte karşılama maskotu (restoran listesi ekranı)
 const MASCOT_RUN_URL = "";   // sipariş sonrası koşan maskot (başarı ekranı)
+
+// Restorana özel sepet indirimi — eşik (ürün toplamı, TL) ve oran (%).
+// BÜYÜKTEN KÜÇÜĞE sıralı yaz. İndirim yalnızca sepet/ödeme ekranında görünür,
+// minimum sepet kontrolü her zaman İNDİRİMSİZ tutar üzerinden yapılır.
+const INDIRIM = {
+  "Janti Döner": [ {esik:750, oran:20}, {esik:500, oran:15}, {esik:300, oran:10} ]
+};
 
 // Kategoriye göre kart arka plan görseli (restoran resmi olmayınca kategori resmi)
 const CATEGORY_IMG = {
@@ -613,6 +622,12 @@ function renderCart(){
   }).join("");
   if(keys.length){
     if(minSepet > 0 && total() < minSepet) html += `<div class="cartline" style="border:none"><span class="cn" style="color:var(--amber)">🧺 Bu bölgede minimum sepet ${minSepet} TL — ${minSepet-total()} TL daha ekle</span></div>`;
+    const _ind = indirimTutari();
+    if(_ind > 0){
+      const _kd = indirimKademesi();
+      html += `<div class="cartline"><span class="cn">Ara toplam</span><span class="cl-t">${total()} TL</span></div>`;
+      html += `<div class="cartline"><span class="cn" style="color:var(--mint)">🎉 ${esc(rest)} indirimi (%${_kd.oran})</span><span class="cl-t" style="color:var(--mint)">−${_ind} TL</span></div>`;
+    }
     if(deliveryFee > 0) html += `<div class="cartline"><span class="cn">🛵 Getirme ücreti</span><span class="cl-t">${deliveryFee} TL</span></div>`;
     html += `<div class="cartline" style="border:none;font-weight:600"><span class="cn">Toplam</span><span style="color:var(--mint)">${grand()} TL</span></div>`;
   } else {
@@ -696,10 +711,13 @@ function urunTablosu(){
   const satir = Object.values(cart).map(c =>
     `<tr><td>${esc(c.item.name)}</td><td class="sag">${c.qty}</td><td class="sag">${c.item.price} TL</td><td class="sag">${c.item.price*c.qty} TL</td></tr>`
   ).join("");
+  const indT = indirimTutari();
+  const ind = indT > 0
+    ? `<tr><td colspan="3">${esc(rest)} sepet indirimi (%${indirimKademesi().oran})</td><td class="sag">−${indT} TL</td></tr>` : "";
   const ek = deliveryFee > 0
     ? `<tr><td colspan="3">Teslimat (getirme) ücreti — SATICI&apos;ya aittir</td><td class="sag">${deliveryFee} TL</td></tr>` : "";
   return `<table><thead><tr><th>Ürün</th><th class="sag">Adet</th><th class="sag">Birim</th><th class="sag">Tutar</th></tr></thead>
-  <tbody>${satir}${ek}
+  <tbody>${satir}${ind}${ek}
   <tr><th colspan="3">TOPLAM (KDV dâhil)</th><th class="sag">${grand()} TL</th></tr></tbody></table>`;
 }
 function odemeMetni(){
@@ -928,16 +946,60 @@ function cartChg(k,d){
   renderCart(); renderCtrl(k); updateBar();
 }
 document.querySelectorAll(".pay .opt").forEach(o => o.onclick = () => {
+  if(o.classList.contains("kapali")) return;
   document.querySelectorAll(".pay .opt").forEach(x=>x.classList.remove("on"));
   o.classList.add("on"); pay=o.dataset.pay; updateBar();
 });
 
+/* ---- kapıda ödeme hakkı: art arda sahte sipariş koruması ----
+   Sunucu "kapida:false" derse nakit/kart seçenekleri kilitlenir, online seçilir.
+   Webhook'a ulaşılamazsa hiçbir şey değişmez (gerçek müşteri mağdur olmasın). */
+let odemeHakki = null;
+async function odemeHakkiUygula(){
+  const eski = $("odemeUyari"); if(eski) eski.remove();
+  const opts = [...document.querySelectorAll(".pay .opt")];
+  const kapidalar = opts.filter(o => o.dataset.pay !== "Online");
+  kapidalar.forEach(o => o.classList.remove("kapali"));
+  if(!TEL) return;
+  let d = null;
+  try{
+    const r = await fetch(`${CONFIG.ODEME_HAKKI}?tel=${encodeURIComponent(TEL)}`);
+    d = await r.json();
+    if(Array.isArray(d)) d = d[0];
+    if(d && d.kapida_odeme_hakki) d = d.kapida_odeme_hakki;
+    if(typeof d === "string") d = JSON.parse(d);
+  }catch(e){ return; }
+  odemeHakki = d;
+  if(!d || d.kapida !== false) return;
+  kapidalar.forEach(o => { o.classList.add("kapali"); o.classList.remove("on"); });
+  const on = document.querySelector('.pay .opt[data-pay="Online"]');
+  if(on){ on.classList.add("on"); pay = "Online"; }
+  const box = document.createElement("div");
+  box.id = "odemeUyari"; box.className = "cartline"; box.style.cssText = "border:none;margin-top:8px";
+  box.innerHTML = `<span class="cn" style="color:var(--amber)">🔒 ${esc(d.sebep || "Bu siparişi online ödemeyle tamamlaman gerekiyor ustam.")}</span>`;
+  const p = document.querySelector(".pay"); if(p && p.parentNode) p.parentNode.appendChild(box);
+  updateBar();
+}
+
 /* ---------- ortak ---------- */
 function total(){ return Object.values(cart).reduce((s,c)=>s+c.item.price*c.qty,0); }
-function grand(){ return total() + (Object.keys(cart).length ? deliveryFee : 0); }
+/* ---- restorana özel sepet indirimi ---- */
+function indirimKademesi(){
+  const kademeler = INDIRIM[String(rest || "").trim()];
+  if(!kademeler || !kademeler.length) return null;
+  const t = total();
+  for(const k of kademeler){ if(t >= k.esik) return k; }
+  return null;
+}
+function indirimTutari(){
+  const k = indirimKademesi();
+  return k ? Math.round(total() * k.oran / 100) : 0;
+}
+/* indirim yalnızca ürün toplamına uygulanır, getirme ücretine uygulanmaz */
+function grand(){ return total() - indirimTutari() + (Object.keys(cart).length ? deliveryFee : 0); }
 function go1(){ screen=1; yon="geri"; show(); }
 function go2(){ screen=2; yon="ileri"; show(); }
-function go3(){ if(!Object.keys(cart).length) return; screen=3; yon="ileri"; renderCart(); show(); }
+function go3(){ if(!Object.keys(cart).length) return; screen=3; yon="ileri"; renderCart(); show(); odemeHakkiUygula(); }
 function goBack(){
   if(isDraft){ screen=3; yon="geri"; renderCart(); show(); return; }
   if(screen===3){ screen=2; yon="geri"; show(); }
