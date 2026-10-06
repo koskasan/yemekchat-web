@@ -3,13 +3,34 @@
 <head>
 <link rel="icon" type="image/png" href="YemekChat-Kafa.png">
 <meta charset="UTF-8">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#F7F5F4" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#141211" media="(prefers-color-scheme: dark)">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>YemekChat - Sipariş</title>
 <style>
+  /* Kesfet ile ayni palet: acik zemin, beyaz kart, kirmizi sadece eylemde; telefon gece modundaysa koyu */
   :root{
-    --bg:#111B14; --card:#1C2A20; --card2:#243530; --line:#2C3E32;
-    --txt:#F1EFE8; --txt2:#B4B2A9; --txt3:#888780; --muted:#5F5E5A;
-    --green:#1D9E75; --greenDark:#04342C; --mint:#9FE1CB; --red:#E24B4A; --amber:#EF9F27;
+    --bg:#F7F5F4; --card:#FFFFFF; --card2:#F1ECE9; --line:#E6E0DC;
+    --txt:#1D1A19; --txt2:#5F5855; --txt3:#857D79; --muted:#A39C98;
+    --brand:#D9261C; --brandInk:#FFFFFF; --accent:#C42018; --red:#D9261C; --amber:#A8550C; --ok:#1C7A4B;
+    --danger:#B3201A; --dangerSoft:#FCE9E7; --dangerLine:#F3C2BD;
+    --rcA:rgba(255,255,255,.96); --rcB:rgba(255,255,255,.55); --kapakOp:.2;
+    --fMono:ui-monospace,"SF Mono","Cascadia Mono","Roboto Mono",Consolas,monospace;
+  }
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+    --bg:#141211; --card:#1F1C1B; --card2:#2A2624; --line:#35302D;
+    --txt:#F2EEEB; --txt2:#BDB6B2; --txt3:#8F8884; --muted:#6E6764;
+    --brand:#E0352B; --brandInk:#FFFFFF; --accent:#FF6B5F; --red:#E0352B; --amber:#F1A24E; --ok:#52C68D;
+    --danger:#FFB3AD; --dangerSoft:#3A1D1A; --dangerLine:#5A2B28;
+    --rcA:rgba(31,28,27,.97); --rcB:rgba(31,28,27,.55); --kapakOp:.5; color-scheme:dark;
+  }}
+  :root[data-theme="dark"]{
+    --bg:#141211; --card:#1F1C1B; --card2:#2A2624; --line:#35302D;
+    --txt:#F2EEEB; --txt2:#BDB6B2; --txt3:#8F8884; --muted:#6E6764;
+    --brand:#E0352B; --brandInk:#FFFFFF; --accent:#FF6B5F; --red:#E0352B; --amber:#F1A24E; --ok:#52C68D;
+    --danger:#FFB3AD; --dangerSoft:#3A1D1A; --dangerLine:#5A2B28;
+    --rcA:rgba(31,28,27,.97); --rcB:rgba(31,28,27,.55); --kapakOp:.5; color-scheme:dark;
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   html,body{background:var(--bg);color:var(--txt);font-family:-apple-system,"Segoe UI",Roboto,sans-serif}
@@ -20,13 +41,13 @@
   /* restoranin kapak fotografi: ortalanmis, yari saydam */
   .top .kapak{position:absolute;inset:0;z-index:0;background-size:cover;background-position:center center;
     background-repeat:no-repeat;opacity:0;transition:opacity .35s}
-  .top .kapak.on{opacity:.5}
-  .back{background:none;border:none;color:var(--mint);font-size:22px;cursor:pointer;padding:0 4px;display:none}
+  .top .kapak.on{opacity:var(--kapakOp)}
+  .back{background:none;border:none;color:var(--accent);font-size:22px;cursor:pointer;padding:0 4px;display:none}
   .logo{width:34px;height:34px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;
-    color:#FCEBEB;font-weight:600;font-size:14px;flex-shrink:0;overflow:hidden;background-size:cover;background-position:center}
+    color:var(--brandInk);font-weight:600;font-size:14px;flex-shrink:0;overflow:hidden;background-size:cover;background-position:center}
   .logo img{width:100%;height:100%;object-fit:cover;display:block}
   .top .name{font-size:15px;font-weight:600}
-  .top .sub{font-size:11px;color:var(--mint)}
+  .top .sub{font-size:11px;color:var(--txt2)}
 
   .screen{display:none}
   .screen.on{display:block;animation:scrGir .24s cubic-bezier(.22,.61,.36,1) both}
@@ -39,7 +60,7 @@
   .chips{display:flex;gap:7px;overflow-x:auto;padding:12px 14px 4px;scrollbar-width:none}
   .chips::-webkit-scrollbar{display:none}
   .chip{flex-shrink:0;background:var(--card);border:1px solid var(--line);color:var(--txt2);border-radius:18px;padding:7px 14px;font-size:13px;cursor:pointer;white-space:nowrap}
-  .chip.on{background:var(--green);border-color:var(--green);color:var(--greenDark);font-weight:600}
+  .chip.on{background:var(--txt);border-color:var(--txt);color:var(--bg);font-weight:600}
 
   /* restoran kart */
   .rlist{padding:8px 14px}
@@ -48,43 +69,43 @@
   .rc .rn{font-size:15px;font-weight:600}
   .rc .rm{font-size:12px;color:var(--txt2);margin-top:3px}
   .rc .rm .star{color:var(--amber)}
-  .rc .rcat{font-size:11px;color:var(--mint);background:var(--card2);padding:2px 9px;border-radius:12px;display:inline-block;margin-top:5px}
+  .rc .rcat{font-size:11px;color:var(--accent);background:var(--card2);padding:2px 9px;border-radius:12px;display:inline-block;margin-top:5px}
   .rc .arrow{color:var(--txt3);font-size:20px}
   .rc.kapali{opacity:.5}
-  .rc .kpl{font-size:11px;color:var(--red);background:#2e1817;padding:2px 9px;border-radius:12px;display:inline-block;margin-top:5px;margin-left:5px}
+  .rc .kpl{font-size:11px;color:var(--danger);background:var(--dangerSoft);padding:2px 9px;border-radius:12px;display:inline-block;margin-top:5px;margin-left:5px}
 
   /* kapali restoran: menu incelenebilir ama tiklanamaz */
-  .kapaliUst{margin:12px 14px 0;background:#2e1817;border:1px solid #5a2b28;color:#ffb3ad;border-radius:12px;padding:11px 13px;font-size:13px;line-height:1.45}
-  .kapaliUst b{color:#fff}
+  .kapaliUst{margin:12px 14px 0;background:var(--dangerSoft);border:1px solid var(--dangerLine);color:var(--danger);border-radius:12px;padding:11px 13px;font-size:13px;line-height:1.45}
+  .kapaliUst b{color:var(--txt)}
   .kapaliMenu{opacity:.5;pointer-events:none;user-select:none;filter:grayscale(.15)}
 
   /* menü */
   .sec{padding:12px 14px 2px}
   .sec h3{font-size:11px;letter-spacing:.4px;color:var(--txt3);font-weight:600;margin-bottom:6px;text-transform:uppercase}
-  .cat{font-size:13px;color:var(--mint);font-weight:600;margin:14px 0 8px}
+  .cat{font-size:13px;color:var(--accent);font-weight:600;margin:14px 0 8px}
   .item{background:var(--card);border-radius:12px;padding:11px 12px;margin-bottom:7px;display:flex;align-items:center;gap:11px}
   .item.off{opacity:.45}
   .item .thumb{width:54px;height:54px;border-radius:9px;object-fit:cover;flex-shrink:0;background:var(--card2)}
   .item.secim{cursor:pointer}
-  .item.secim.on{border:1.5px solid var(--green);background:var(--card2)}
+  .item.secim.on{border:1.5px solid var(--brand);background:var(--card2)}
   .item.secim .tik{width:26px;height:26px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;color:var(--txt3);font-size:15px;flex-shrink:0}
-  .item.secim.on .tik{color:var(--mint)}
+  .item.secim.on .tik{color:var(--accent)}
   .item .info{flex:1;min-width:0}
   .item .nm{font-size:14px}
   .item .ds{font-size:11px;color:var(--txt3);margin-top:1px}
-  .item .pr{font-size:12px;color:var(--mint);margin-top:3px}
+  .item .pr{font-size:12.5px;color:var(--txt);margin-top:3px;font-family:var(--fMono);font-weight:600;font-variant-numeric:tabular-nums}
   .stp{display:flex;align-items:center;gap:11px;background:var(--bg);border-radius:9px;padding:5px 9px;flex-shrink:0}
-  .stp button{background:none;border:none;color:var(--mint);font-size:20px;line-height:1;cursor:pointer;width:20px;height:20px}
+  .stp button{background:none;border:none;color:var(--accent);font-size:20px;line-height:1;cursor:pointer;width:20px;height:20px}
   .stp .qt{font-size:14px;font-weight:600;min-width:14px;text-align:center}
-  .add{background:var(--card2);border:none;color:var(--mint);border-radius:9px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer}
+  .add{background:var(--card2);border:none;color:var(--accent);border-radius:9px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer}
 
   /* ödeme + adres */
   .pay{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
   .pay .opt{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:11px 4px;text-align:center;cursor:pointer}
   .pay .opt .ic{font-size:20px;color:var(--txt2)}
   .pay .opt .lb{font-size:11px;color:var(--txt2);margin-top:3px}
-  .pay .opt.on{background:var(--green);border-color:var(--green)}
-  .pay .opt.on .ic,.pay .opt.on .lb{color:var(--greenDark);font-weight:600}
+  .pay .opt.on{background:var(--brand);border-color:var(--brand)}
+  .pay .opt.on .ic,.pay .opt.on .lb{color:var(--brandInk);font-weight:600}
   .pay .opt.kapali{opacity:.38;cursor:not-allowed;filter:grayscale(1)}
   .fld{width:100%;background:var(--card);border:1px solid var(--line);border-radius:11px;padding:12px;font-size:14px;color:var(--txt);margin-bottom:7px;font-family:inherit}
   .fld::placeholder{color:var(--muted)}
@@ -92,7 +113,7 @@
   .cartline{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:.5px solid var(--line);font-size:14px}
   .cartline .cn{flex:1}
   .cartline .cq{color:var(--txt3);font-size:12px;margin:0 10px}
-  .cartline .cl-t{min-width:62px;text-align:right}
+  .cartline .cl-t{min-width:62px;text-align:right;font-family:var(--fMono);font-weight:600;font-variant-numeric:tabular-nums}
   .cartline .stp{margin:0 8px;padding:3px 8px}
   /* sepet satiri: menudeki gorunumun aynisi */
   .citem{background:var(--card);border-radius:12px;padding:11px 12px;margin-bottom:7px;display:flex;align-items:center;gap:11px;cursor:pointer}
@@ -101,7 +122,7 @@
   .citem .info{flex:1;min-width:0}
   .citem .nm{font-size:14px}
   .citem .ds{font-size:11px;color:var(--txt3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .citem .pr{font-size:12px;color:var(--mint);margin-top:3px}
+  .citem .pr{font-size:12.5px;color:var(--txt);margin-top:3px;font-family:var(--fMono);font-weight:600;font-variant-numeric:tabular-nums}
   .citem .stp{margin:0}
 
   /* acilir alt sekme: buyuk fotograf */
@@ -118,7 +139,7 @@
   .sheet .bimg.yok{display:none}
   .sheet .bad{font-size:17px;font-weight:600;margin-top:13px}
   .sheet .bds{font-size:13px;color:var(--txt2);margin-top:5px;line-height:1.5}
-  .sheet .bpr{font-size:15px;color:var(--mint);margin-top:9px;font-weight:600}
+  .sheet .bpr{font-size:16px;color:var(--txt);margin-top:9px;font-family:var(--fMono);font-weight:600;font-variant-numeric:tabular-nums}
   .sheet .kapat{width:100%;margin-top:14px;background:var(--card2);border:1px solid var(--line);color:var(--txt);
     border-radius:11px;padding:12px;font-size:14px;cursor:pointer}
   @media (prefers-reduced-motion:reduce){.sheet .panel,.sheet .perde{transition:none}}
@@ -138,14 +159,14 @@
   .oneri .okrt .okf img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
   .oneri .okrt .okf img.yok{display:none}
   .oneri .okrt .n{font-size:11.5px;margin-top:7px;line-height:1.3;height:29px;overflow:hidden}
-  .oneri .okrt .p{font-size:11.5px;color:var(--mint);margin-top:2px}
-  .oneri .okrt button{margin-top:7px;background:var(--green);color:#fff;border:none;border-radius:8px;
+  .oneri .okrt .p{font-size:12px;color:var(--txt);margin-top:2px;font-family:var(--fMono);font-weight:600;font-variant-numeric:tabular-nums}
+  .oneri .okrt button{margin-top:7px;background:var(--brand);color:var(--brandInk);border:none;border-radius:8px;
     padding:8px;width:100%;font-size:11.5px;font-weight:600;cursor:pointer}
-  .oneri .okrt button.sepette{background:var(--card);color:var(--mint);border:1px solid var(--line)}
-  .addmore{width:100%;background:var(--card2);border:1px dashed var(--line);color:var(--mint);border-radius:11px;padding:11px;font-size:13px;font-weight:600;cursor:pointer;margin-top:10px}
+  .oneri .okrt button.sepette{background:var(--card);color:var(--accent);border:1px solid var(--line)}
+  .addmore{width:100%;background:var(--card2);border:1px dashed var(--line);color:var(--accent);border-radius:11px;padding:11px;font-size:13px;font-weight:600;cursor:pointer;margin-top:10px}
   .legal{padding:4px 14px 10px;font-size:10px;color:var(--muted);text-align:center;line-height:1.7}
   .legal a{color:var(--txt3)}
-  .legal a.soz{color:var(--mint);text-decoration:underline;cursor:pointer}
+  .legal a.soz{color:var(--accent);text-decoration:underline;cursor:pointer}
 
   /* mesafeli satis sozlesmesi / on bilgilendirme ekrani */
   #sozWrap{position:fixed;inset:0;z-index:600;background:var(--bg);display:none;flex-direction:column}
@@ -153,11 +174,11 @@
   #sozWrap .sbar{display:flex;gap:7px;padding:10px 12px;border-bottom:.5px solid var(--line);background:var(--card);align-items:center}
   #sozWrap .sbar .stab{flex:1;text-align:center;background:var(--card2);border:1px solid var(--line);color:var(--txt2);
     border-radius:10px;padding:9px 6px;font-size:12px;cursor:pointer;font-weight:600}
-  #sozWrap .sbar .stab.on{background:var(--green);border-color:var(--green);color:#fff}
-  #sozWrap .sbar .skapat{background:none;border:none;color:var(--mint);font-size:24px;cursor:pointer;padding:0 6px;line-height:1}
+  #sozWrap .sbar .stab.on{background:var(--brand);border-color:var(--brand);color:var(--brandInk)}
+  #sozWrap .sbar .skapat{background:none;border:none;color:var(--accent);font-size:24px;cursor:pointer;padding:0 6px;line-height:1}
   #sozWrap .sgovde{flex:1;overflow-y:auto;padding:14px 16px 24px;font-size:12.5px;line-height:1.65;color:var(--txt2)}
   #sozWrap .sgovde h2{font-size:14px;color:var(--txt);margin:0 0 10px;line-height:1.4}
-  #sozWrap .sgovde h3{font-size:12.5px;color:var(--mint);margin:16px 0 5px;text-transform:none;letter-spacing:0}
+  #sozWrap .sgovde h3{font-size:12.5px;color:var(--accent);margin:16px 0 5px;text-transform:none;letter-spacing:0}
   #sozWrap .sgovde p{margin:0 0 7px}
   #sozWrap .sgovde table{width:100%;border-collapse:collapse;margin:7px 0 10px;font-size:11.5px}
   #sozWrap .sgovde th,#sozWrap .sgovde td{border:1px solid var(--line);padding:6px 7px;text-align:left;vertical-align:top}
@@ -178,12 +199,12 @@
     #sozWrap .sgovde th{background:#eee;color:#000}
   }
   #payWrap{position:fixed;inset:0;z-index:500;background:var(--bg);padding:10px 10px 24px;overflow-y:auto;-webkit-overflow-scrolling:touch}
-  #payAc{display:block;text-align:center;background:var(--green);color:var(--greenDark);font-weight:700;font-size:14px;padding:13px;border-radius:11px;text-decoration:none;margin-bottom:10px}
+  #payAc{display:block;text-align:center;background:var(--brand);color:var(--brandInk);font-weight:700;font-size:14px;padding:13px;border-radius:11px;text-decoration:none;margin-bottom:10px}
   #payFrame{width:100%;min-height:calc(100vh - 130px);border:none;border-radius:12px;background:#fff}
 
   .bar{position:fixed;bottom:0;left:0;right:0;max-width:520px;margin:0 auto;background:var(--bg);padding:10px 14px 16px;border-top:.5px solid var(--line);display:none}
   .bar.on{display:block}
-  .go{width:100%;background:var(--green);border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:600;color:var(--greenDark);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+  .go{width:100%;background:var(--brand);border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:600;color:var(--brandInk);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
   .go:disabled{background:var(--card2);color:var(--muted)}
   .note{text-align:center;font-size:10px;color:var(--muted);margin-top:7px}
 
@@ -198,10 +219,10 @@
   .runwrap img{width:120px;animation:ycrun .45s ease-in-out infinite}
 
   .ok{position:fixed;inset:0;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;padding:30px;text-align:center;z-index:50}
-  .ok .ring{width:80px;height:80px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:44px;color:var(--greenDark);margin-bottom:20px}
+  .ok .ring{width:80px;height:80px;border-radius:50%;background:var(--ok);display:flex;align-items:center;justify-content:center;font-size:44px;color:var(--brandInk);margin-bottom:20px}
   .ok h2{font-size:20px;margin-bottom:8px}
   .ok p{color:var(--txt2);font-size:14px;line-height:1.6}
-  .ok .no{font-size:15px;color:var(--mint);font-weight:600;margin-top:10px}
+  .ok .no{font-size:15px;color:var(--accent);font-weight:600;margin-top:10px}
 </style>
 </head>
 <body>
@@ -248,7 +269,7 @@
       <div class="row2"><input class="fld" id="kat" placeholder="Kat"><input class="fld" id="daire" placeholder="Daire"></div>
       <input class="fld" id="adnot" placeholder="Kuryeye not (isteğe bağlı)">
       <label style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12.5px;color:var(--txt2);cursor:pointer">
-        <input type="checkbox" id="adrKaydet" style="width:16px;height:16px;accent-color:var(--green);margin:0">
+        <input type="checkbox" id="adrKaydet" style="width:16px;height:16px;accent-color:var(--brand);margin:0">
         Bu adresi kaydet, bir daha yazmayayım
       </label>
     </div>
@@ -447,15 +468,15 @@ async function kapsamaEkrani(){
   const sehirDisi = (d.durum !== "bolge_disi");
   list.innerHTML = `<div style="text-align:center;padding:28px 20px 34px">
     <img src="maskot.png" alt="" style="width:150px;height:150px;object-fit:contain;display:block;margin:0 auto">
-    <div style="font-size:19px;font-weight:800;margin:6px 0 0;color:#1f2a24">
+    <div style="font-size:19px;font-weight:800;margin:6px 0 0;color:var(--txt)">
       ${sehirDisi ? "Şu an Ankara dışındasın ustam" : "Bu bölgeye henüz gelmiyoruz"}
     </div>
-    <div style="font-size:14px;color:#6b6b6b;line-height:1.75;margin-top:10px">
+    <div style="font-size:14px;color:var(--txt2);line-height:1.75;margin-top:10px">
       ${sehirDisi
         ? "Şu an sadece <b>Ankara</b>'da hizmet veriyoruz. Talebini kaydettik — şehrine açıldığımızda WhatsApp'tan ilk sana haber vereceğiz 🙌"
         : `Ankara'da hizmet veriyoruz ama bu noktaya teslimat yapan restoran henüz yok. En yakınımız <b>${d.en_yakin_km || "?"} km</b> uzakta. Talebini kaydettik, bu bölgeye açılınca haber vereceğiz 🙌`}
     </div>
-    ${d.aktif_restoran ? `<div style="font-size:12.5px;color:#9a9a9a;margin-top:18px">Şu an ${d.aktif_restoran} restoran Ankara'da sipariş alıyor</div>` : ""}
+    ${d.aktif_restoran ? `<div style="font-size:12.5px;color:var(--txt3);margin-top:18px">Şu an ${d.aktif_restoran} restoran Ankara'da sipariş alıyor</div>` : ""}
   </div>`;
 }
 function renderChips(){
@@ -469,7 +490,7 @@ function renderNearby(){
   if(!arr.length){ list.innerHTML = '<div class="empty">Bu konuma yakın restoran yok.</div>'; return; }
   list.innerHTML = arr.map(r => {
     const img = (r.kapak||"").trim() || CATEGORY_IMG[(r.category||"").trim().toLowerCase()] || "";
-    const bg = img ? `background-image:linear-gradient(90deg, rgba(28,42,32,0.97) 45%, rgba(28,42,32,0.55)), url('${img}');background-size:cover;background-position:right center;` : "";
+    const bg = img ? `background-image:linear-gradient(90deg, var(--rcA) 45%, var(--rcB)), url('${img}');background-size:cover;background-position:right center;` : "";
     const kapali = (r.acik === false || r.acik === "false");
     return `<div class="rc ${kapali?"kapali":""}" style="${bg}" onclick="openRestaurant('${r.name.replace(/'/g,"\\'")}')">
     <div class="rinfo">
@@ -626,10 +647,10 @@ function renderCart(){
     if(_ind > 0){
       const _kd = indirimKademesi();
       html += `<div class="cartline"><span class="cn">Ara toplam</span><span class="cl-t">${total()} TL</span></div>`;
-      html += `<div class="cartline"><span class="cn" style="color:var(--mint)">🎉 ${esc(rest)} indirimi (%${_kd.oran})</span><span class="cl-t" style="color:var(--mint)">−${_ind} TL</span></div>`;
+      html += `<div class="cartline"><span class="cn" style="color:var(--ok)">🎉 ${esc(rest)} indirimi (%${_kd.oran})</span><span class="cl-t" style="color:var(--ok)">−${_ind} TL</span></div>`;
     }
     if(deliveryFee > 0) html += `<div class="cartline"><span class="cn">🛵 Getirme ücreti</span><span class="cl-t">${deliveryFee} TL</span></div>`;
-    html += `<div class="cartline" style="border:none;font-weight:600"><span class="cn">Toplam</span><span style="color:var(--mint)">${grand()} TL</span></div>`;
+    html += `<div class="cartline" style="border:none;font-weight:600"><span class="cn">Toplam</span><span style="font-family:var(--fMono);font-weight:600;font-variant-numeric:tabular-nums;font-size:16px">${grand()} TL</span></div>`;
   } else {
     html = '<div class="empty" style="padding:22px">Sepet boş.</div>';
   }
@@ -656,7 +677,7 @@ const YC_BILGI = {
   adres:   "",                                  // ← DOLDURULACAK: işletme adresi
   vergi:   "",                                  // ← DOLDURULACAK: vergi dairesi / no
   mersis:  "",                                  // ← varsa MERSİS no
-  eposta:  "yemekchat.yonetim@gmail.com",
+  eposta:  "eniyisi@yemekchat.com",
   telefon: "+90 505 489 88 26",
   web:     "www.yemekchat.com"
 };
@@ -1197,8 +1218,8 @@ function gunlukEkran(d){
     <div style="padding:10px 2px">
       <input id="katAdres" placeholder="Kat / oda / departman (örn. 3. kat muhasebe)"
              value="${String(localStorage.getItem("yc_katadres") || "").replace(/"/g,"&quot;")}"
-             style="width:100%;box-sizing:border-box;background:#fff;border:1px solid #e3e3e3;border-radius:10px;padding:12px;font-size:14px;font-family:inherit">
-      <div style="font-size:11.5px;color:#8a8a8a;margin-top:6px">Kurye paketi nereye bırakacağını bilsin diye. Bir kez yazman yeterli, sonraki siparişlerde hatırlanır.</div>
+             style="width:100%;box-sizing:border-box;background:var(--card);color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:12px;font-size:14px;font-family:inherit">
+      <div style="font-size:11.5px;color:var(--txt3);margin-top:6px">Kurye paketi nereye bırakacağını bilsin diye. Bir kez yazman yeterli, sonraki siparişlerde hatırlanır.</div>
     </div></div>`;
   $("menuWrap").innerHTML = html;
   gunlukSecim = {};
