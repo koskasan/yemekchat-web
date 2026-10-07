@@ -225,6 +225,9 @@
   .ok .no{font-size:15px;color:var(--accent);font-weight:600;margin-top:10px}
 
   /* ===== KEŞFET (yeni 1. ekran) ===== */
+  .kf-yukle{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:var(--bg);padding:16px}
+  .kf-yuruyen{height:min(42vh,300px);width:auto;display:block}
+  .kf-yukle p{margin:0;color:var(--txt2);font-size:14px}
   #kf{--kfPaper:#FFFCF6;--kfOkSoft:#E3F3EA;--kfWarn:#A8550C;--kfWarnSoft:#FBEEDD;--kfSoft:#FCE9E7;--kfLogo:#FA0202;
       padding:6px 14px 24px;overflow-x:hidden;--kfSh:0 1px 2px rgba(40,20,15,.06),0 6px 20px rgba(40,20,15,.07)}
   @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) #kf{--kfPaper:#272320;--kfOkSoft:#173326;--kfWarn:#F1A24E;--kfWarnSoft:#3A2A17;--kfSoft:#3A1D1A;--kfSh:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35)}}
@@ -1419,14 +1422,14 @@ async function kfHavuz(arr, n, f){
 async function kfBaslat(){
   ["mascotTop", "chips", "rlist"].forEach(id => { const e = $(id); if(e) e.style.display = "none"; });
   const k = $("kf"); k.style.display = "block";
-  k.innerHTML = '<div class="spin">Yakındaki lezzetler hazırlanıyor…</div>';
+  k.innerHTML = ""; kfYukleAc();
   try{
     const r = await fetch(`${CONFIG.NEARBY}?lat=${LAT}&lng=${LNG}`);
     const t = await r.text(); let d = t ? JSON.parse(t) : [];
     if(!Array.isArray(d)) d = d.data || [];
     nearby = d.filter(x => x && x.name);
   }catch(e){ nearby = []; }
-  if(!nearby.length){ k.style.display = "none"; $("rlist").style.display = ""; kapsamaEkrani(); return; }
+  if(!nearby.length){ kfYukleKapat(); k.style.display = "none"; $("rlist").style.display = ""; kapsamaEkrani(); return; }
   kfProfil();
   const acik = nearby.filter(kfAcikMi);
   const menuler = await kfHavuz(acik, 5, async r => {
@@ -1450,6 +1453,26 @@ async function kfBaslat(){
     return o;
   });
   kfCiz();
+}
+
+/* ---- yükleme ekranı: maskot ilk turda 1. kareden, sonra hep 12. kareden yürür (walk cycle kesintisiz döner) ---- */
+/* katman sayfanin kokune eklenir: .screen'deki gecis animasyonu fixed konumu bozmasin diye */
+function kfYukleAc(){
+  if($("kfYukle")) return;
+  const d = document.createElement("div");
+  d.className = "kf-yukle"; d.id = "kfYukle"; d.setAttribute("role", "status");
+  d.innerHTML = '<img class="kf-yuruyen" id="kfYuruyen" src="maskot-yuruyor-giris.webp" alt="" width="198" height="400"><p>Yakındaki lezzetler hazırlanıyor…</p>';
+  document.body.appendChild(d); kfYuruyusBaslat();
+}
+function kfYukleKapat(){ const d = $("kfYukle"); if(d) d.remove(); }
+function kfYuruyusBaslat(){
+  const g = $("kfYuruyen"); if(!g) return;
+  const dongu = new Image(); let girisBitti = false, donguHazir = false;
+  const gec = () => { if(girisBitti && donguHazir && g.isConnected) g.src = dongu.src; };
+  dongu.onload = () => { donguHazir = true; gec(); };
+  dongu.src = "maskot-yuruyor-dongu.webp";
+  const basla = () => setTimeout(() => { girisBitti = true; gec(); }, 11 * 30 + 40);   // ilk 11 kare (30 ms) + küçük pay: son karede bekler, sonra 12. kareye geçer
+  if(g.complete) basla(); else g.addEventListener("load", basla, { once: true });
 }
 
 /* ---- hazır sepet: her ana yemek için kişi başı porsiyon + içecek + yer kalırsa yan ürün + gerekirse minimum tamamlayıcı ---- */
@@ -1523,6 +1546,7 @@ function kfLezzetler(){
 /* ---- çizim ---- */
 const kfFoto = (src, alt) => src ? `<img src="${esc(src)}" alt="" loading="lazy" decoding="async" onerror="this.remove()">` : `<span class="kf-noimg">${esc((alt || "?").trim().charAt(0))}</span>`;
 function kfCiz(){
+  kfYukleKapat();
   const k = $("kf"), B = KF.B, P = KF.P;
   const fis = kfSepetler(), uygun = fis.filter(b => b.fark >= -B * 0.05);
   const selam = uygun.length
