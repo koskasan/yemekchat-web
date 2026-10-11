@@ -206,6 +206,31 @@
   .bar.on{display:block}
   .go{width:100%;background:var(--brand);border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:600;color:var(--brandInk);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
   .go:disabled{background:var(--card2);color:var(--muted)}
+  .go.eksik{background:var(--card2);color:var(--muted)}
+  /* sayfa içi uyarı (WhatsApp tarayıcısı alert/confirm göstermeyebiliyor), sepet baloncuğu, alan hatası */
+  .uyari{position:fixed;inset:0;z-index:800;display:none;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.45);padding:16px}
+  .uyari.on{display:flex}
+  .uyari .kutu{width:100%;max-width:480px;background:var(--card);border-radius:18px;padding:18px 16px 14px;box-shadow:0 10px 40px rgba(0,0,0,.35);margin-bottom:env(safe-area-inset-bottom,0px)}
+  .uyari .kutu.titre{animation:titre .45s}
+  .uyari h3{margin:0 0 6px;font-size:17px;color:var(--txt)}
+  .uyari p{margin:0 0 14px;font-size:14px;line-height:1.45;color:var(--txt2)}
+  .uyari .btns{display:flex;gap:8px}
+  .uyari button{flex:1;border:0;border-radius:12px;padding:13px 10px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer}
+  .uyari .evet{background:var(--brand);color:var(--brandInk)}
+  .uyari .hayir{background:var(--card2);color:var(--txt)}
+  .sepetBalon{position:fixed;right:14px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:55;display:none;align-items:center;gap:7px;
+    background:var(--brand);color:var(--brandInk);border:0;border-radius:999px;padding:13px 18px 13px 15px;font-family:inherit;font-size:15px;font-weight:700;
+    line-height:1;box-shadow:0 8px 24px rgba(217,38,28,.45);cursor:pointer}
+  .sepetBalon.on{display:flex;animation:balonGel .35s ease-out}
+  .sepetBalon .say{position:absolute;top:-6px;right:-4px;min-width:21px;height:21px;border-radius:11px;background:#fff;color:#D9261C;font-size:12px;
+    display:grid;place-items:center;padding:0 5px;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+  .sepetBalon.zipla{animation:zipla .55s}
+  @keyframes balonGel{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+  @keyframes zipla{0%,100%{transform:scale(1)}30%{transform:scale(1.2)}60%{transform:scale(.93)}}
+  @keyframes titre{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+  .fld.hata,.pay.hata{border-color:var(--red)!important;box-shadow:0 0 0 3px rgba(217,38,28,.22);animation:titre .45s}
+  .pay.hata{border-radius:12px}
+  .hataMsj{color:var(--red);font-size:12.5px;font-weight:600;margin:-2px 2px 8px}
   .note{text-align:center;font-size:10px;color:var(--muted);margin-top:7px}
 
   .empty,.spin{text-align:center;padding:44px 20px;color:var(--txt3);font-size:14px}
@@ -334,7 +359,7 @@
     <div class="sec"><h3>Sepetin</h3><div id="cartLines"></div></div>
     <div id="oneriWrap"></div>
     <div class="sec"><h3>Ödeme yöntemi</h3>
-      <div class="pay">
+      <div class="pay" id="odemeSec">
         <div class="opt" data-pay="Nakit"><div class="ic">₺</div><div class="lb">Nakit</div></div>
         <div class="opt" data-pay="Kredi Kartı"><div class="ic">▭</div><div class="lb">Kart</div></div>
         <div class="opt" data-pay="Online"><div class="ic">💳</div><div class="lb">Online Öde</div></div>
@@ -345,6 +370,7 @@
     </div>
     <div class="sec"><h3>Teslimat adresi</h3>
       <input class="fld" id="adsoyad" placeholder="Ad Soyad">
+      <input class="fld" id="iltel" type="tel" inputmode="tel" autocomplete="tel" placeholder="Telefon (kurye arayabilsin) · 05xx xxx xx xx">
       <input class="fld" id="bina" placeholder="Bina adı / sokak no">
       <div class="row2"><input class="fld" id="kat" placeholder="Kat"><input class="fld" id="daire" placeholder="Daire"></div>
       <input class="fld" id="adnot" placeholder="Kuryeye not (isteğe bağlı)">
@@ -383,6 +409,12 @@
     <button class="go" id="go" disabled>Sepetin boş</button>
     <div class="note">Siparişin WhatsApp üzerinden onaylanacak</div>
   </div>
+
+  <div class="uyari" id="uyari" role="dialog" aria-modal="true" aria-labelledby="uyariBaslik">
+    <div class="kutu" id="uyariKutu"><h3 id="uyariBaslik"></h3><p id="uyariMetin"></p>
+      <div class="btns"><button class="hayir" id="uyariHayir">Vazgeç</button><button class="evet" id="uyariEvet">Tamam</button></div></div>
+  </div>
+  <button class="sepetBalon" id="sepetBalon" aria-label="Sepetine git">🛒 <span id="sepetBalonTutar"></span><span class="say" id="sepetBalonSay"></span></button>
 
   <div class="ok" id="okScreen">
     <div id="okVisual"><img src="maskot.png" alt="" style="width:132px;height:132px;object-fit:contain;display:block;margin:0 auto"></div>
@@ -442,6 +474,7 @@ const KESFET = p.get("eski") !== "1";   // yeni Keşfet ekranı; ?eski=1 eski re
 let screen = 1, nearby = [], menu = [], rest = null, pay = null, catFilter = "Tümü";
 let restKapali = false, restAcilis = "", restKapanis = "", restGunler = null, yon = "ileri";
 let isCat = false, catInfo = null, isDraft = false, draftNote = "", minSepet = 0;
+let saticiBilgi = {};     // sipariş edilen restoranın yasal bilgileri (openRestaurant açılışta çağrıldığı için burada tanımlı olmalı)
 let musteriLat = LAT || "", musteriLng = LNG || "";   // kurye yol tarifi için
 const cart = {};  // id -> {item, qty}
 
@@ -490,6 +523,65 @@ function ustBlok(){
   }
 }
 
+/* ---------- sayfa içi uyarı: WhatsApp tarayıcısı alert/confirm'i göstermeden geçebiliyor ---------- */
+function uyariSor(baslik, metin, evet = "Tamam", hayir = "Vazgeç"){
+  return new Promise(coz => {
+    const u = $("uyari"), k = $("uyariKutu"), e = $("uyariEvet"), h = $("uyariHayir");
+    $("uyariBaslik").textContent = baslik; $("uyariMetin").textContent = metin;
+    e.textContent = evet; h.style.display = hayir ? "" : "none"; h.textContent = hayir || "";
+    u.classList.add("on"); k.classList.remove("titre"); void k.offsetWidth; k.classList.add("titre");
+    try{ if(navigator.vibrate) navigator.vibrate([70, 40, 70]); }catch(x){}
+    const bitir = v => { u.classList.remove("on"); e.onclick = h.onclick = u.onclick = null; coz(v); };
+    e.onclick = () => bitir(true); h.onclick = () => bitir(false);
+    u.onclick = ev => { if(ev.target === u) bitir(false); };
+  });
+}
+function bildir(metin, baslik = "Ustam, bir saniye"){ return uyariSor(baslik, metin, "Tamam", null); }
+
+/* eksik/hatalı alan: oraya kaydır, odakla, kırmızı yak, salla, altına sebebini yaz */
+function alanUyar(id, mesaj){
+  const el = $(id); if(!el){ bildir(mesaj); return; }
+  el.classList.remove("hata"); void el.offsetWidth; el.classList.add("hata");
+  let m = el.nextElementSibling;
+  if(!(m && m.classList.contains("hataMsj"))){ m = document.createElement("div"); m.className = "hataMsj"; el.insertAdjacentElement("afterend", m); }
+  m.textContent = mesaj;
+  el.scrollIntoView({ behavior: "smooth", block: "center" });
+  if(el.matches("input,textarea,select")) setTimeout(() => { try{ el.focus({ preventScroll: true }); }catch(x){ el.focus(); } }, 380);
+  try{ if(navigator.vibrate) navigator.vibrate([60, 40, 60]); }catch(x){}
+  const temizle = () => { el.classList.remove("hata"); if(m && m.parentNode) m.remove(); el.removeEventListener("input", temizle); el.removeEventListener("click", temizle); };
+  el.addEventListener("input", temizle); el.addEventListener("click", temizle);
+}
+
+/* ---------- iletişim telefonu (kullanıcı adlı WhatsApp hesaplarında numara gelmiyor) ---------- */
+function telNormal(v){
+  const ham = String(v || "").trim(); let d = ham.replace(/\D/g, "");
+  if(d.startsWith("00")) d = d.slice(2);
+  if(d.length === 12 && d.startsWith("90")) return d;
+  if(d.length === 11 && d.startsWith("0")) return "9" + d;
+  if(d.length === 10 && /^[2-5]/.test(d)) return "90" + d;
+  if(ham.startsWith("+") && d.length >= 8 && d.length <= 15 && !d.startsWith("90")) return d;   // yurt dışı numara
+  return "";
+}
+function telGoster(n){
+  if(!n) return "";
+  if(n.length === 12 && n.startsWith("90")){ const x = n.slice(2); return "0" + x.slice(0, 3) + " " + x.slice(3, 6) + " " + x.slice(6, 8) + " " + x.slice(8); }
+  return "+" + n;
+}
+
+/* ---------- sepet baloncuğu (Keşfet ekranında sepet doluyken sağ altta) ---------- */
+function sepetBalonu(zipla){
+  const b = $("sepetBalon"); if(!b) return;
+  const adet = Object.values(cart).reduce((a, c) => a + (c.qty || 0), 0);
+  const ok = $("okScreen"), goster = adet > 0 && screen === 1 && !isCat && !(ok && ok.style.display === "flex") && !$("payWrap");
+  if(!goster){ b.classList.remove("on"); return; }
+  $("sepetBalonTutar").textContent = total().toLocaleString("tr-TR") + " TL";
+  $("sepetBalonSay").textContent = adet;
+  const ilk = !b.classList.contains("on"); b.classList.add("on");
+  if(!ilk && (zipla || b.dataset.adet !== String(adet))){ b.classList.remove("zipla"); void b.offsetWidth; b.classList.add("zipla"); }
+  b.dataset.adet = String(adet);
+}
+$("sepetBalon").onclick = () => { if(Object.keys(cart).length) go3(); };
+
 /* ---------- kayıtlı adres ---------- */
 const ADR_KEY = "yc_adres";
 function adresYukle(){
@@ -501,6 +593,7 @@ function adresYukle(){
   if($("kat"))   $("kat").value   = a.kat   || "";
   if($("daire")) $("daire").value = a.daire || "";
   if($("adnot")) $("adnot").value = a.not   || "";
+  if($("iltel") && a.tel) $("iltel").value = telGoster(a.tel);
   if($("adrKaydet")) $("adrKaydet").checked = true;
 }
 function adresKaydet(){
@@ -510,13 +603,17 @@ function adresKaydet(){
     localStorage.setItem(ADR_KEY, JSON.stringify({
       ad: $("adsoyad").value.trim(),
       bina: $("bina").value.trim(), kat: $("kat").value.trim(),
-      daire: $("daire").value.trim(), not: $("adnot").value.trim()
+      daire: $("daire").value.trim(), not: $("adnot").value.trim(),
+      tel: telNormal($("iltel").value)
     }));
   } else {
     localStorage.removeItem(ADR_KEY);   // isaret kaldirilinca kayit silinsin
   }
 }
 adresYukle();
+// WhatsApp numarası geldiyse kutu dolu gelsin; kullanıcı adlı hesapta (numara yok) boş ve zorunlu
+if($("iltel") && !$("iltel").value) $("iltel").value = telGoster(telNormal(TEL));
+if($("iltel")) $("iltel").addEventListener("blur", e => { const n = telNormal(e.target.value); if(n) e.target.value = telGoster(n); });
 
 /* ---------- başlangıç ---------- */
 if(DRAFT){ draftInit(); }
@@ -645,7 +742,7 @@ function kapaliIkon(a, k, gunler){
 /* ---------- EKRAN 2: menü ---------- */
 async function openRestaurant(name){
   if(rest && rest!==name && Object.keys(cart).length){
-    if(!confirm("Başka restorana geçiyorsun, sepetin sıfırlanacak. Devam?")) return;
+    if(!(await uyariSor("Sepetinde farklı restorandan ürünler var", `Sepetinde ${rest} ürünleri var. ${name} menüsüne geçersen mevcut sepetin silinir.`, "Sepeti boşalt, geç", "Vazgeç"))){ sepetBalonu(true); return; }
     for(const k in cart) delete cart[k];
   }
   rest = name;
@@ -764,7 +861,6 @@ const YC_BILGI = {
 const SOZ_SURUM = "1.0";
 
 let sozAktif = "mss";
-let saticiBilgi = {};     // sipariş edilen restoranın yasal bilgileri
 
 function sozAlan(v, etiket){
   v = String(v == null ? "" : v).trim();
@@ -805,7 +901,7 @@ function aliciKutusu(){
   const daire = ($("daire") ? $("daire").value : "").trim();
   const adres = [bina, kat && "Kat "+kat, daire && "Daire "+daire].filter(Boolean).join(", ");
   return `<div class="kv"><b>Ad Soyad</b><span>${sozAlan(ad, "Ad soyad girilmedi")}</span></div>
-  <div class="kv"><b>Telefon</b><span>${sozAlan(TEL, "Telefon yok")}</span></div>
+  <div class="kv"><b>Telefon</b><span>${sozAlan(telGoster(telNormal($("iltel") ? $("iltel").value : "")) || telGoster(telNormal(TEL)), "Telefon girilmedi")}</span></div>
   <div class="kv"><b>Teslimat adresi</b><span>${sozAlan(adres, "Adres girilmedi")}</span></div>`;
 }
 function urunTablosu(){
@@ -1123,6 +1219,7 @@ function show(){
 }
 function updateBar(){
   const go = $("go"); const n = Object.keys(cart).length; const t = total();
+  go.classList.remove("eksik"); sepetBalonu();
   if(screen===2 && isCat){
     go.onclick = cateringSubmit;
     if(n===0){ go.disabled=true; go.textContent="Menüden ürün seç"; }
@@ -1139,25 +1236,31 @@ function updateBar(){
     const eksik = minSepet - t;
     if(n===0){ go.disabled=true; go.textContent="Sepet boş — menüden ürün ekle"; }
     else if(eksik > 0){ go.disabled=true; go.innerHTML=`Min. sepet ${minSepet} TL · ${eksik} TL daha ekle`; }
-    else if(!pay){ go.disabled=true; go.textContent=`Ödeme yöntemi seç · ${grand()} TL`; }
+    else if(!pay){ go.disabled=false; go.classList.add("eksik"); go.textContent=`Ödeme yöntemi seç · ${grand()} TL`; }
     else { go.disabled=false; go.innerHTML=`✓ Siparişi tamamla · ${grand()} TL`; }
   }
 }
 
 async function submitOrder(){
+  if(!pay){ alanUyar("odemeSec", "Ödeme yöntemini seç ustam: Nakit, Kart ya da Online."); return; }
   const adSoyad = $("adsoyad").value.trim();
-  if(!adSoyad){ alert("Lütfen ad soyad gir — mesafeli satış sözleşmesi için gerekli ustam."); return; }
+  if(!adSoyad){ alanUyar("adsoyad", "Ad soyadını yaz ustam, sözleşme için gerekli."); return; }
+  const telHam = $("iltel").value.trim(), telN = telNormal(telHam);
+  if(!telN){ alanUyar("iltel", telHam ? "Bu numara eksik ya da hatalı görünüyor ustam (örn. 0544 123 45 67)." : "Telefon numaranı yaz ustam, kurye kapıda arayabilsin."); return; }
+  $("iltel").value = telGoster(telN);
   const bina = $("bina").value.trim();
-  if(!bina){ alert("Lütfen bina adı / adres gir."); return; }
+  if(!bina){ alanUyar("bina", "Adresini yaz ustam: bina adı / sokak no."); return; }
   const kat=$("kat").value.trim(), daire=$("daire").value.trim(), nt=$("adnot").value.trim();
   adresKaydet();
-  const address = `${adSoyad} — ${bina}${kat?", Kat "+kat:""}${daire?", Daire "+daire:""}${nt?" ("+nt+")":""}`;
+  let address = `${adSoyad} — ${bina}${kat?", Kat "+kat:""}${daire?", Daire "+daire:""}${nt?" ("+nt+")":""}`;
+  if(telN !== telNormal(TEL)) address += ` · Tel: ${telGoster(telN)}`;   // WhatsApp numarası yoksa/farklıysa restoran adreste de görsün
   let details = Object.values(cart).map(c=>`${c.item.name} x${c.qty}`).join(", ");
   const musteriNot = ($("sipnot") ? $("sipnot").value : "").trim();
   const tumNot = [draftNote, musteriNot].filter(Boolean).join(" · ");
   if(tumNot) details += ` — 📝 ${tumNot}`;
   const payload = { restaurant_name:rest, customer_phone:TEL, imza:IMZA, order_details:details, total_amount:grand(), payment_method:(pay==="Online"?"Online (bekliyor)":pay), address, lat:musteriLat||"", lng:musteriLng||"",
     customer_name: adSoyad,
+    iletisim_tel: telN,
     sozlesme_surum: SOZ_SURUM,
     sozlesme_onay: new Date().toISOString() };
   const go=$("go"); go.disabled=true; go.textContent="Gönderiliyor…";
@@ -1165,7 +1268,7 @@ async function submitOrder(){
     const r = await fetch(CONFIG.ORDER,{ method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload) });
     const res = await r.json().catch(()=>({}));
     if(res.durum && res.durum !== "ok"){          // sunucu reddetti: bölge dışı / konum yok
-      alert(res.mesaj || "Üzgünüm, bu restoran senin bölgene teslimat yapmıyor ustam.");
+      bildir(res.mesaj || "Üzgünüm, bu restoran senin bölgene teslimat yapmıyor ustam.");
       go.disabled=false; updateBar(); return;
     }
     const oid = res.order_id || res.id;
@@ -1178,12 +1281,12 @@ async function submitOrder(){
         const pd = await pr.json();
         if(pd.link){ showPayFrame(pd.link); return; }
       }catch(e){}
-      alert("Ödeme sayfası açılamadı — siparişin alındı, kapıda ödeyebilirsin ustam.");
+      bildir("Ödeme sayfası açılamadı — siparişin alındı, kapıda ödeyebilirsin ustam.");
     }
     $("okNo").textContent = oid ? "Sipariş No: #"+oid : "";
     $("okScreen").style.display="flex";
     setTimeout(()=>{ try{window.close();}catch(e){} }, 3500);
-  }catch(e){ alert("Bağlantı hatası, tekrar dene."); go.disabled=false; updateBar(); }
+  }catch(e){ bildir("Bağlantı hatası, tekrar dene."); go.disabled=false; updateBar(); }
 }
 
 /* ---------- GÖMÜLÜ ÖDEME (PayTR iFrame) ---------- */
@@ -1329,11 +1432,11 @@ async function gunlukGonder(){
       body: JSON.stringify({ code: CATERING, tel: TEL, secim, adres })
     });
     const res = await r.json();
-    if(!res.ok){ alert("Sipariş kaydedilemedi, tekrar dene."); go.disabled = false; gunlukBar(); return; }
+    if(!res.ok){ bildir("Sipariş kaydedilemedi, tekrar dene."); go.disabled = false; gunlukBar(); return; }
     $("okNo").textContent = res.order_id ? "Sipariş No: #" + res.order_id : "";
     $("okScreen").style.display = "flex";
     setTimeout(() => { try{ window.close(); }catch(e){} }, 3500);
-  }catch(e){ alert("Bağlantı hatası, tekrar dene."); go.disabled = false; gunlukBar(); }
+  }catch(e){ bildir("Bağlantı hatası, tekrar dene."); go.disabled = false; gunlukBar(); }
 }
 
 /* ---------- KURUMSAL (eski à la carte akışı) ---------- */
@@ -1365,7 +1468,7 @@ async function cateringSubmit(){
     $("okNo").textContent = (res.order_id||res.id) ? "Sipariş No: #"+(res.order_id||res.id) : "";
     $("okScreen").style.display="flex";
     setTimeout(()=>{ try{window.close();}catch(e){} }, 3500);
-  }catch(e){ alert("Bağlantı hatası, tekrar dene."); go.disabled=false; updateBar(); }
+  }catch(e){ bildir("Bağlantı hatası, tekrar dene."); go.disabled=false; updateBar(); }
 }
 
 /* ================= KEŞFET: yeni 1. ekran =================
@@ -1621,9 +1724,11 @@ function kfCiz(){
 }
 
 /* ---- mevcut menü/sepet ekranlarına devir (openRestaurant ile aynı durum alanları) ---- */
-function kfRestoranHazirla(r){
+async function kfRestoranHazirla(r){
   if(rest && rest !== r.ad && Object.keys(cart).length){
-    if(!confirm("Başka restorana geçiyorsun, sepetin sıfırlanacak. Devam?")) return false;
+    const ok = await uyariSor("Sepetinde farklı restorandan ürünler var",
+      `Sepetinde ${rest} ürünleri var. ${r.ad} için yeni sepet açarsan mevcut sepetin silinir.`, "Sepeti boşalt, devam et", "Vazgeç");
+    if(!ok){ sepetBalonu(true); return false; }
   }
   if(rest !== r.ad) for(const k in cart) delete cart[k];
   const nb = r.nb;
@@ -1633,14 +1738,14 @@ function kfRestoranHazirla(r){
   menu = r.menu; renderMenu();
   return true;
 }
-function kfSepetSec(b){
-  if(!b || !kfRestoranHazirla(b.r)) return;
+async function kfSepetSec(b){
+  if(!b || !(await kfRestoranHazirla(b.r))) return;
   for(const k in cart) delete cart[k];
   b.satir.forEach(s => { const id = s.u.m.id; cart[id] = { item: s.u.m, qty: (cart[id]?.qty || 0) + s.q }; });
   renderMenu(); go3();
 }
-function kfUrunEkle(r, u){
-  if(!r || !u || !kfRestoranHazirla(r)) return;
+async function kfUrunEkle(r, u){
+  if(!r || !u || !(await kfRestoranHazirla(r))) return;
   const id = u.m.id; cart[id] = { item: u.m, qty: (cart[id]?.qty || 0) + 1 };
   renderMenu(); go2();
 }

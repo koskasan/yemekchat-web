@@ -514,6 +514,18 @@ const API = {
   CAT_KOD_URET:   "https://webhook.yemekchat.com/webhook/catering-kod-uret",
   CAT_KOD_SAVE:   "https://webhook.yemekchat.com/webhook/catering-kod-kaydet"
 };
+/* Müşteri telefonu: kullanıcı adlı WhatsApp hesaplarında customer_phone "TR.…" kimliği olur; müşterinin formda yazdığı numara iletisim_tel'de */
+function musteriTel(o){
+  let n = String(o.iletisim_tel || "").replace(/\D/g, "");
+  if(n) return (n.length === 11 && n.startsWith("0")) ? "9" + n : n;
+  const c = String(o.customer_phone || "");
+  return /^\d{10,15}$/.test(c) ? c : "";
+}
+function telYaz(n){
+  if(!n) return "";
+  if(n.length === 12 && n.startsWith("90")){ const x = n.slice(2); return "0" + x.slice(0, 3) + " " + x.slice(3, 6) + " " + x.slice(6, 8) + " " + x.slice(8); }
+  return "+" + n;
+}
 const CAT_GRUPLAR = ["Çorba", "Ana Yemek", "Ara Sıcak", "Salata", "İçecek", "Tatlı"];
 const REFRESH_MS = 12000;
 // ================================================
@@ -681,11 +693,11 @@ function renderOrders(orders){
     return `<div class="ord ${sc.cls} ${isCatOrder?"cat":""} ${gec?"geciken":""}">
       <div class="hd"><span class="no">#${o.id} <span class="pill ${sc.pill}">${sc.lbl}</span>${isCatOrder?' <span class="pill kurumsal">Kurumsal</span>':""}${gec?' <span class="pill yeni">⏰ BEKLİYOR</span>':""}${(tumMarkaMi()&&o._marka)?` <span class="pill marka">${o._marka}</span>`:""}</span><span class="tm">${tm}</span></div>
       <div class="det">${o.order_details||"-"}</div>
-      <div class="meta"><b>Adres:</b> ${o.address||"-"}<br><b>Ödeme:</b> ${o.payment_method||"-"} &nbsp;·&nbsp; <b>Tel:</b> ${o.customer_phone||"-"}</div>
+      <div class="meta"><b>Adres:</b> ${o.address||"-"}<br><b>Ödeme:</b> ${o.payment_method||"-"} &nbsp;·&nbsp; <b>Tel:</b> ${musteriTel(o) ? `<a href="tel:+${musteriTel(o)}" style="color:inherit;font-weight:700">${telYaz(musteriTel(o))}</a>` : "-"}</div>
       <div class="tot">${Math.round(Number(o.total_amount)||0)} TL</div>
       ${done?"":`<div class="acts">
         ${nx?`<button class="b-next" onclick="setStatus(${o.id},'${nx}')">${nx} →</button>`:""}
-        <button class="b-call" onclick="window.open('https://wa.me/${o.customer_phone}','_blank')">Müşteriye yaz</button>
+        ${musteriTel(o) ? `<button class="b-call" onclick="window.open('https://wa.me/${musteriTel(o)}','_blank')">Müşteriye yaz</button>` : ""}
         <button class="b-cancel" onclick="setStatus(${o.id},'İptal')">İptal</button></div>`}
       <div class="acts">
         <button class="b-print" onclick="fisYazdir(${o.id})">🖨 Fiş yazdır</button>
@@ -1346,7 +1358,7 @@ function fisYazdir(id){
     ${online ? '<div class="box">ÖDEME ALINDI ✓</div>' : ""}
     ${bekliyor ? '<div class="box">ÖDEME BEKLİYOR — HAZIRLAMAYIN</div>' : ""}
     ${kurumsal ? '<div class="box">KURUMSAL SİPARİŞ</div>' : ""}
-    <div><span class="b">Tel:</span> ${o.customer_phone || "-"}</div>
+    <div><span class="b">Tel:</span> ${telYaz(musteriTel(o)) || "-"}</div>
     <div><span class="b">Adres:</span> ${o.address || "-"}</div>
     ${(Number(o.lat) && Number(o.lng)) ? `<div class="sm">📍 Konum: ${Number(o.lat).toFixed(5)}, ${Number(o.lng).toFixed(5)}</div>` : ""}
     <div class="hr"></div>
