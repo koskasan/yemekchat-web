@@ -582,6 +582,29 @@ function sepetBalonu(zipla){
 }
 $("sepetBalon").onclick = () => { if(Object.keys(cart).length) go3(); };
 
+/* ---------- dokunuş titreşimi: her düğmede belli belirsiz bir "tık" ----------
+   Android: navigator.vibrate(8). iPhone'da vibrate yok; iOS 18+ Safari, switch türündeki kutu değişince
+   sistemin hafif titreşimini veriyor -> görünmez bir switch'i dokunuş anında tetikliyoruz. */
+const haptik = (() => {
+  let lbl = null;
+  try{
+    const kap = document.createElement("div"); kap.id = "ycHaptikKap";
+    kap.style.cssText = "position:fixed;left:-20px;top:-20px;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none";
+    const inp = document.createElement("input"); inp.type = "checkbox"; inp.setAttribute("switch", ""); inp.id = "ycHaptik"; inp.tabIndex = -1;
+    lbl = document.createElement("label"); lbl.htmlFor = "ycHaptik"; lbl.setAttribute("aria-hidden", "true");
+    kap.append(inp, lbl); document.body.appendChild(kap);
+  }catch(e){}
+  return () => {
+    try{ if(navigator.vibrate && navigator.vibrate(8)) return; }catch(e){}
+    try{ if(lbl) lbl.click(); }catch(e){}
+  };
+})();
+document.addEventListener("click", e => {
+  const t = e.target;
+  if(!t || !t.closest || t.closest("#ycHaptikKap")) return;
+  if(t.closest("button, a, .opt, .item, .kf-rc, .kf-dish, .kf-chip, [onclick], [data-pay], label")) haptik();
+}, true);
+
 /* ---------- kayıtlı adres ---------- */
 const ADR_KEY = "yc_adres";
 function adresYukle(){
