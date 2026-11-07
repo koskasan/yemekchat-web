@@ -72,6 +72,7 @@
   .b-call{background:var(--card2);color:var(--mint)}
   .b-cancel{background:var(--card2);color:#F09595}
   .b-print{background:var(--card2);color:#EFC98A}
+  .acts button[disabled]{opacity:.45;cursor:wait}
   .b-map{background:var(--card2);color:#8FC4F5}
   .mthumb{width:46px;height:46px;border-radius:8px;object-fit:cover;flex-shrink:0;background:var(--card2)}
 
@@ -532,7 +533,7 @@ const REFRESH_MS = 12000;
 
 const FLOW = ["Yeni Sipariş","Hazırlanıyor","Yolda","Teslim Edildi"];
 let REST = null, timer = null, lastCount = 0, menuItems = [], editId = null;
-let alarmTimer = null, gecikenIds = [], alarmMode = null, BRANDS = [], siparisler = [], enSonBasilan = 0;
+let alarmTimer = null, gecikenIds = [], alarmMode = null, BRANDS = [], siparisler = [];
 function setAlarm(mode){
   if(alarmMode === mode) return;
   alarmMode = mode;
@@ -690,15 +691,16 @@ function renderOrders(orders){
     const nx=nextStatus(o.status); const done=sc.pill==="teslim"||sc.pill==="iptal";
     const isCatOrder=(o.payment_method||"").toLowerCase().includes("kurumsal");
     const gec = gecikenIds.includes(String(o.id));
-    return `<div class="ord ${sc.cls} ${isCatOrder?"cat":""} ${gec?"geciken":""}">
+    const kilit = durumKilitliMi(o.id) ? "disabled" : "";
+    return `<div class="ord ${sc.cls} ${isCatOrder?"cat":""} ${gec?"geciken":""}" data-id="${o.id}">
       <div class="hd"><span class="no">#${o.id} <span class="pill ${sc.pill}">${sc.lbl}</span>${isCatOrder?' <span class="pill kurumsal">Kurumsal</span>':""}${gec?' <span class="pill yeni">⏰ BEKLİYOR</span>':""}${(tumMarkaMi()&&o._marka)?` <span class="pill marka">${o._marka}</span>`:""}</span><span class="tm">${tm}</span></div>
       <div class="det">${o.order_details||"-"}</div>
       <div class="meta"><b>Adres:</b> ${o.address||"-"}<br><b>Ödeme:</b> ${o.payment_method||"-"} &nbsp;·&nbsp; <b>Tel:</b> ${musteriTel(o) ? `<a href="tel:+${musteriTel(o)}" style="color:inherit;font-weight:700">${telYaz(musteriTel(o))}</a>` : "-"}</div>
       <div class="tot">${Math.round(Number(o.total_amount)||0)} TL</div>
       ${done?"":`<div class="acts">
-        ${nx?`<button class="b-next" onclick="setStatus(${o.id},'${nx}')">${nx} →</button>`:""}
+        ${nx?`<button class="b-next" ${kilit} onclick="setStatus(${o.id},'${nx}')">${nx} →</button>`:""}
         ${musteriTel(o) ? `<button class="b-call" onclick="window.open('https://wa.me/${musteriTel(o)}','_blank')">Müşteriye yaz</button>` : ""}
-        <button class="b-cancel" onclick="setStatus(${o.id},'İptal')">İptal</button></div>`}
+        <button class="b-cancel" ${kilit} onclick="setStatus(${o.id},'İptal')">İptal</button></div>`}
       <div class="acts">
         <button class="b-print" onclick="fisYazdir(${o.id})">🖨 Fiş yazdır</button>
         <button class="b-map" onclick="yolTarifi(${o.id})">🧭 Buradan yol</button>
@@ -707,9 +709,57 @@ function renderOrders(orders){
     </div>`;
   }).join("");
 }
+/* ---------- DURUM DEĞİŞTİRME (tekrar basma koruması) ----------
+   Her durum değişikliği müşteriye WhatsApp mesajı gönderiyor. Koruma tamamen panelde:
+   - İstek sürerken ve bittikten sonra 4 sn o siparişin düğmeleri kilitli (üst üste basma).
+   - Bir sipariş için her durum bir kez gönderilir (bu tarayıcıda hatırlanır).
+   - Sadece ileri gidilir; teslim edilmiş ya da iptal olmuş siparişin durumu değişmez.
+   - Göndermeden önce güncel durum sunucudan okunur (başka cihazdan değiştirilmiş olabilir). */
+const DURUM_KEY = "yc_gonderilen_durumlar";
+const DURUM_BEKLEME_MS = 4000;
+const durumIstekte = new Set(), durumBeklemeBitis = {};
+function durumKilitliMi(id){ const k = String(id); return durumIstekte.has(k) || Date.now() < (durumBeklemeBitis[k] || 0); }
+function durumDugmeleri(id, kapali){
+  document.querySelectorAll('.ord[data-id="' + String(id) + '"] .b-next, .ord[data-id="' + String(id) + '"] .b-cancel')
+    .forEach(b => { b.disabled = kapali; });
+}
+function gonderilenDurumlar(){ try{ return JSON.parse(localStorage.getItem(DURUM_KEY) || "{}") || {}; }catch(e){ return {}; } }
+function durumGonderildi(id, pill){
+  const G = gonderilenDurumlar(), k = String(id);
+  G[k] = Array.from(new Set((G[k] || []).concat(pill)));
+  const ids = Object.keys(G);
+  if(ids.length > 500) ids.sort((a,b) => Number(a) - Number(b)).slice(0, ids.length - 500).forEach(x => delete G[x]);
+  try{ localStorage.setItem(DURUM_KEY, JSON.stringify(G)); }catch(e){}
+}
+const DURUM_SIRA = { yeni:0, hazir:1, yolda:2, teslim:3 };
+function durumGecisiUygun(mevcut, hedef){
+  const m = statusClass(mevcut).pill, h = statusClass(hedef).pill;
+  if(m === "teslim" || m === "iptal") return false;
+  if(h === "iptal") return true;
+  return (DURUM_SIRA[h] ?? 0) > (DURUM_SIRA[m] ?? 0);
+}
 async function setStatus(id, status){
-  try{ await fetch(API.STATUS, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({order_id:id,status}) }); loadOrders(); }
-  catch(e){ alert("Güncellenemedi, tekrar dene."); }
+  const k = String(id), hedef = statusClass(status).pill;
+  if(durumKilitliMi(k)) return;
+  if((gonderilenDurumlar()[k] || []).includes(hedef)){ loadOrders(); return; }
+  durumIstekte.add(k); durumDugmeleri(k, true);
+  try{
+    let o = siparisler.find(x => String(x.id) === k);
+    try{ const g = o ? await guncelSiparis(o) : null; if(g) o = g; }catch(e){}
+    if(o && !durumGecisiUygun(o.status, status)){ durumGonderildi(k, statusClass(o.status).pill); return; }
+    const r = await fetch(API.STATUS, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({order_id:id,status}) });
+    if(r.ok){
+      durumGonderildi(k, hedef);
+      const s = siparisler.find(x => String(x.id) === k); if(s) s.status = status;
+    }
+    durumBeklemeBitis[k] = Date.now() + DURUM_BEKLEME_MS;
+    setTimeout(() => { if(!durumKilitliMi(k)) durumDugmeleri(k, false); }, DURUM_BEKLEME_MS + 50);
+  }catch(e){ alert("Güncellenemedi, tekrar dene."); }
+  finally{
+    durumIstekte.delete(k);
+    if(!durumKilitliMi(k)) durumDugmeleri(k, false);
+    loadOrders();
+  }
 }
 
 /* ---------- MENÜ YÖNETİMİ ---------- */
@@ -1332,9 +1382,10 @@ function fisSatirlari(detay){
   });
   return { urunler, not, ekstra };
 }
-function fisYazdir(id){
-  const o = siparisler.find(x => String(x.id) === String(id));
+function fisYazdir(id, veri){
+  const o = veri || siparisler.find(x => String(x.id) === String(id));
   if(!o){ alert("Sipariş bulunamadı, sayfayı yenile."); return; }
+  basildiIsaretle(o.id);   // elle ya da otomatik basılan fiş bir daha otomatik çıkmasın
   const { urunler, not, ekstra } = fisSatirlari(o.order_details);
   const tarih = o.created_at ? new Date(o.created_at).toLocaleString("tr-TR", { day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit" }) : "";
   const marka = o._marka || (BRANDS.length > 1 ? aktifMarka() : null) || REST || "YemekChat";
@@ -1398,6 +1449,8 @@ function otoFisDegistir(btn){
   btn.classList.toggle("on");
   const acik = btn.classList.contains("on");
   localStorage.setItem("yc_otofis", acik ? "1" : "0");
+  // anahtar yeni açıldıysa ekrandaki mevcut siparişler basılmasın; bundan sonra gelenler basılır
+  if(acik) basildiIsaretle(siparisler.map(o => o.id));
   const msg = document.getElementById("sMsg");
   msg.textContent = acik ? "✓ Otomatik fiş açıldı" : "Otomatik fiş kapatıldı";
   setTimeout(() => { msg.textContent = ""; }, 2500);
@@ -1413,17 +1466,73 @@ function testFisi(){
   fisYazdir("TEST");
   siparisler = siparisler.filter(x => x.id !== "TEST");
 }
+/* Otomatik fiş kuralları:
+   - İptal edilmiş ya da teslim edilmiş siparişin fişi otomatik çıkmaz. Durum, yazdırmadan hemen önce
+     sunucudan tekrar okunur (panel uykudan/kapalıdan dönünce eski bilgiyle basılmasın diye).
+   - Panel kapalıyken gelen siparişler panel açılınca basılır, EN SON GELEN ÖNCE.
+   - Basılan fişler bu bilgisayarda hatırlanır; aynı fiş iki kez otomatik çıkmaz.
+   - 3 saatten eski siparişler otomatik basılmaz (askıda kalmış eski siparişler). */
+const OTO_FIS_PENCERE_MS = 3 * 60 * 60 * 1000;
+const OTO_FIS_KEY = "yc_basilan_fisler";
+let otoFisKuyruk = [], otoFisCalisiyor = false;
+function basilanlar(){ try{ return (JSON.parse(localStorage.getItem(OTO_FIS_KEY) || "[]") || []).map(String); }catch(e){ return []; } }
+function basildiIsaretle(ids){
+  const yeni = [].concat(ids).map(String).filter(x => x && x !== "TEST");
+  if(!yeni.length) return;
+  const L = basilanlar().filter(x => !yeni.includes(x)).concat(yeni);
+  try{ localStorage.setItem(OTO_FIS_KEY, JSON.stringify(L.slice(-400))); }catch(e){}
+}
+function otoFisBasilabilir(o){
+  const pill = statusClass(o.status).pill;
+  if(pill !== "yeni" && pill !== "hazir") return false;
+  const t = new Date(o.created_at || 0).getTime();
+  return !!t && (Date.now() - t) < OTO_FIS_PENCERE_MS;
+}
 function otoFisKontrol(orders){
   if(!otoFisAcikMi()) return;
-  const yeniler = orders.filter(o => Number(o.id) > enSonBasilan && statusClass(o.status).pill === "yeni");
-  if(!enSonBasilan){ // ilk yüklemede geçmişi basmayalım
-    enSonBasilan = orders.reduce((m,o) => Math.max(m, Number(o.id) || 0), 0);
-    return;
+  if(localStorage.getItem(OTO_FIS_KEY) === null){
+    // bu bilgisayarda ilk çalışma: zaten ilerlemiş siparişleri basılmış say, sadece bekleyen yenileri bas
+    basildiIsaretle(orders.filter(o => statusClass(o.status).pill !== "yeni").map(o => o.id));
+    if(localStorage.getItem(OTO_FIS_KEY) === null) try{ localStorage.setItem(OTO_FIS_KEY, "[]"); }catch(e){}
   }
-  yeniler.sort((a,b) => Number(a.id) - Number(b.id)).forEach((o,i) => {
-    setTimeout(() => fisYazdir(o.id), i * 2500);
-    enSonBasilan = Math.max(enSonBasilan, Number(o.id));
-  });
+  const basilan = new Set(basilanlar());
+  const kuyrukta = new Set(otoFisKuyruk.map(o => String(o.id)));
+  const yeniler = orders.filter(o => o && o.id && o.id !== "TEST" && otoFisBasilabilir(o)
+                                  && !basilan.has(String(o.id)) && !kuyrukta.has(String(o.id)));
+  if(!yeniler.length) return;
+  otoFisKuyruk = otoFisKuyruk.concat(yeniler);
+  // en son gelen sipariş en önde
+  otoFisKuyruk.sort((a,b) => (new Date(b.created_at||0) - new Date(a.created_at||0)) || (Number(b.id) - Number(a.id)));
+  otoFisCalistir();
+}
+async function guncelSiparis(o){
+  const r = await fetch(API.ORDERS + "?restaurant=" + encodeURIComponent(o._marka || aktifMarka()));
+  const t = await r.text();
+  let L = t ? JSON.parse(t) : [];
+  if(!Array.isArray(L)) L = L.data || [];
+  const g = L.find(x => x && String(x.id) === String(o.id));
+  return g ? Object.assign({}, g, { _marka: o._marka }) : null;
+}
+async function otoFisCalistir(){
+  if(otoFisCalisiyor) return;
+  otoFisCalisiyor = true;
+  try{
+    while(otoFisKuyruk.length){
+      if(!otoFisAcikMi()){ otoFisKuyruk = []; break; }
+      const o = otoFisKuyruk.shift();
+      let g = null;
+      try{ g = await guncelSiparis(o); }
+      catch(e){ continue; }              // bağlantı yok: basma, sonraki yenilemede tekrar denenir
+      if(!g) continue;                    // listede bulunamadı: basma
+      if(basilanlar().includes(String(o.id))) continue;
+      if(!otoFisBasilabilir(g)){          // iptal / teslim / yolda / çok eski → bir daha deneme
+        basildiIsaretle(o.id);
+        continue;
+      }
+      fisYazdir(o.id, g);
+      await new Promise(r => setTimeout(r, 2500));
+    }
+  } finally { otoFisCalisiyor = false; }
 }
 
 /* ---------- AYARLAR (mesai + teslimat) ---------- */
