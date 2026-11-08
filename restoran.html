@@ -528,6 +528,28 @@ function telYaz(n){
   return "+" + n;
 }
 const CAT_GRUPLAR = ["Çorba", "Ana Yemek", "Ara Sıcak", "Salata", "İçecek", "Tatlı"];
+/* KVKK: siparişten 24 saat sonra müşterinin adı, telefonu ve adresi panelde ve fişte gizlenir.
+   Kayıt veritabanında yasal süre (3 yıl) saklanır; restoranın teslimattan sonra bu bilgilere ihtiyacı yok. */
+const GIZLE_MS = 24 * 60 * 60 * 1000;
+function eskiSiparis(o){
+  const t = o && o.created_at ? new Date(o.created_at).getTime() : 0;
+  return !!t && (Date.now() - t) > GIZLE_MS;
+}
+function telMaskele(n){
+  const y = telYaz(n); if(!y) return "";
+  const d = y.replace(/\D/g, "");
+  return y.slice(0, 4) + " *** ** " + d.slice(-2);
+}
+function adresMaskele(adres){
+  const a = String(adres || "");
+  const bas = a.includes(" — ")
+    ? a.split(" — ")[0].trim().split(/\s+/).filter(Boolean).map(k => Array.from(k)[0] + "***").join(" ") + " · " : "";
+  return htmlKac(bas) + "adres gizlendi (24 saatten eski sipariş)";
+}
+/* müşterinin yazdığı metin (adres, not) panelde kod olarak çalışmasın */
+function htmlKac(s){
+  return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
+}
 const REFRESH_MS = 12000;
 // ================================================
 
@@ -692,18 +714,19 @@ function renderOrders(orders){
     const isCatOrder=(o.payment_method||"").toLowerCase().includes("kurumsal");
     const gec = gecikenIds.includes(String(o.id));
     const kilit = durumKilitliMi(o.id) ? "disabled" : "";
+    const eski = eskiSiparis(o);
     return `<div class="ord ${sc.cls} ${isCatOrder?"cat":""} ${gec?"geciken":""}" data-id="${o.id}">
       <div class="hd"><span class="no">#${o.id} <span class="pill ${sc.pill}">${sc.lbl}</span>${isCatOrder?' <span class="pill kurumsal">Kurumsal</span>':""}${gec?' <span class="pill yeni">⏰ BEKLİYOR</span>':""}${(tumMarkaMi()&&o._marka)?` <span class="pill marka">${o._marka}</span>`:""}</span><span class="tm">${tm}</span></div>
-      <div class="det">${o.order_details||"-"}</div>
-      <div class="meta"><b>Adres:</b> ${o.address||"-"}<br><b>Ödeme:</b> ${o.payment_method||"-"} &nbsp;·&nbsp; <b>Tel:</b> ${musteriTel(o) ? `<a href="tel:+${musteriTel(o)}" style="color:inherit;font-weight:700">${telYaz(musteriTel(o))}</a>` : "-"}</div>
+      <div class="det">${htmlKac(o.order_details)||"-"}</div>
+      <div class="meta"><b>Adres:</b> ${eski ? adresMaskele(o.address) : (htmlKac(o.address)||"-")}<br><b>Ödeme:</b> ${htmlKac(o.payment_method)||"-"} &nbsp;·&nbsp; <b>Tel:</b> ${musteriTel(o) ? (eski ? telMaskele(musteriTel(o)) : `<a href="tel:+${musteriTel(o)}" style="color:inherit;font-weight:700">${telYaz(musteriTel(o))}</a>`) : "-"}</div>
       <div class="tot">${Math.round(Number(o.total_amount)||0)} TL</div>
       ${done?"":`<div class="acts">
         ${nx?`<button class="b-next" ${kilit} onclick="setStatus(${o.id},'${nx}')">${nx} →</button>`:""}
-        ${musteriTel(o) ? `<button class="b-call" onclick="window.open('https://wa.me/${musteriTel(o)}','_blank')">Müşteriye yaz</button>` : ""}
+        ${(musteriTel(o) && !eski) ? `<button class="b-call" onclick="window.open('https://wa.me/${musteriTel(o)}','_blank')">Müşteriye yaz</button>` : ""}
         <button class="b-cancel" ${kilit} onclick="setStatus(${o.id},'İptal')">İptal</button></div>`}
       <div class="acts">
         <button class="b-print" onclick="fisYazdir(${o.id})">🖨 Fiş yazdır</button>
-        <button class="b-map" onclick="yolTarifi(${o.id})">🧭 Buradan yol</button>
+        ${eski ? "" : `<button class="b-map" onclick="yolTarifi(${o.id})">🧭 Buradan yol</button>`}
         <button class="b-map" onclick="yolTarifi(${o.id}, true)">🏪 Restorandan yol</button>
       </div>
     </div>`;
@@ -1387,6 +1410,7 @@ function fisYazdir(id, veri){
   if(!o){ alert("Sipariş bulunamadı, sayfayı yenile."); return; }
   basildiIsaretle(o.id);   // elle ya da otomatik basılan fiş bir daha otomatik çıkmasın
   const { urunler, not, ekstra } = fisSatirlari(o.order_details);
+  const eski = eskiSiparis(o);
   const tarih = o.created_at ? new Date(o.created_at).toLocaleString("tr-TR", { day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit" }) : "";
   const marka = o._marka || (BRANDS.length > 1 ? aktifMarka() : null) || REST || "YemekChat";
   const odeme = String(o.payment_method || "-");
@@ -1401,17 +1425,17 @@ function fisYazdir(id, veri){
     <div class="c b">SİPARİŞ #${o.id}</div>
     <div class="c sm">${tarih}</div>
     <div class="hr"></div>
-    ${urunler.map(u => `<div class="ln"><span>${u}</span></div>`).join("")}
+    ${urunler.map(u => `<div class="ln"><span>${htmlKac(u)}</span></div>`).join("")}
     <div class="hr"></div>
-    ${not ? `<div class="box">NOT: ${not.toUpperCase()}</div>` : ""}
-    ${ekstra.length ? ekstra.map(e => `<div class="sm">${e}</div>`).join("") + '<div class="hr"></div>' : ""}
+    ${not ? `<div class="box">NOT: ${htmlKac(not.toUpperCase())}</div>` : ""}
+    ${ekstra.length ? ekstra.map(e => `<div class="sm">${htmlKac(e)}</div>`).join("") + '<div class="hr"></div>' : ""}
     <div><span class="b">Ödeme:</span> ${odeme}</div>
     ${online ? '<div class="box">ÖDEME ALINDI ✓</div>' : ""}
     ${bekliyor ? '<div class="box">ÖDEME BEKLİYOR — HAZIRLAMAYIN</div>' : ""}
     ${kurumsal ? '<div class="box">KURUMSAL SİPARİŞ</div>' : ""}
-    <div><span class="b">Tel:</span> ${telYaz(musteriTel(o)) || "-"}</div>
-    <div><span class="b">Adres:</span> ${o.address || "-"}</div>
-    ${(Number(o.lat) && Number(o.lng)) ? `<div class="sm">📍 Konum: ${Number(o.lat).toFixed(5)}, ${Number(o.lng).toFixed(5)}</div>` : ""}
+    <div><span class="b">Tel:</span> ${(eski ? telMaskele(musteriTel(o)) : telYaz(musteriTel(o))) || "-"}</div>
+    <div><span class="b">Adres:</span> ${eski ? adresMaskele(o.address) : (htmlKac(o.address) || "-")}</div>
+    ${(!eski && Number(o.lat) && Number(o.lng)) ? `<div class="sm">📍 Konum: ${Number(o.lat).toFixed(5)}, ${Number(o.lng).toFixed(5)}</div>` : ""}
     <div class="hr"></div>
     <div class="ln lg"><span>TOPLAM</span><span>${Math.round(Number(o.total_amount) || 0)} TL</span></div>
     <div class="hr"></div>
