@@ -164,7 +164,7 @@
     padding:8px;width:100%;font-size:11.5px;font-weight:600;cursor:pointer}
   .oneri .okrt button.sepette{background:var(--card);color:var(--accent);border:1px solid var(--line)}
   .addmore{width:100%;background:var(--card2);border:1px dashed var(--line);color:var(--accent);border-radius:11px;padding:11px;font-size:13px;font-weight:600;cursor:pointer;margin-top:10px}
-  .legal{padding:4px 14px 10px;font-size:10px;color:var(--muted);text-align:center;line-height:1.7}
+  .legal{padding:4px 14px 10px;font-size:12px;color:var(--muted);text-align:center;line-height:1.7}
   .legal a{color:var(--txt3)}
   .legal a.soz{color:var(--accent);text-decoration:underline;cursor:pointer}
 
@@ -176,11 +176,11 @@
     border-radius:10px;padding:9px 6px;font-size:12px;cursor:pointer;font-weight:600}
   #sozWrap .sbar .stab.on{background:var(--brand);border-color:var(--brand);color:var(--brandInk)}
   #sozWrap .sbar .skapat{background:none;border:none;color:var(--accent);font-size:24px;cursor:pointer;padding:0 6px;line-height:1}
-  #sozWrap .sgovde{flex:1;overflow-y:auto;padding:14px 16px 24px;font-size:12.5px;line-height:1.65;color:var(--txt2)}
-  #sozWrap .sgovde h2{font-size:14px;color:var(--txt);margin:0 0 10px;line-height:1.4}
-  #sozWrap .sgovde h3{font-size:12.5px;color:var(--accent);margin:16px 0 5px;text-transform:none;letter-spacing:0}
+  #sozWrap .sgovde{flex:1;overflow-y:auto;padding:14px 16px 24px;font-size:16px;line-height:1.65;color:var(--txt2)}
+  #sozWrap .sgovde h2{font-size:18px;color:var(--txt);margin:0 0 10px;line-height:1.4}
+  #sozWrap .sgovde h3{font-size:16px;color:var(--accent);margin:16px 0 5px;text-transform:none;letter-spacing:0}
   #sozWrap .sgovde p{margin:0 0 7px}
-  #sozWrap .sgovde table{width:100%;border-collapse:collapse;margin:7px 0 10px;font-size:11.5px}
+  #sozWrap .sgovde table{width:100%;border-collapse:collapse;margin:7px 0 10px;font-size:16px}
   #sozWrap .sgovde th,#sozWrap .sgovde td{border:1px solid var(--line);padding:6px 7px;text-align:left;vertical-align:top}
   #sozWrap .sgovde th{background:var(--card);color:var(--txt2);font-weight:600}
   #sozWrap .sgovde td.sag{text-align:right;white-space:nowrap}
@@ -379,7 +379,7 @@
         Bu adresi kaydet, bir daha yazmayayım
       </label>
     </div>
-    <div class="legal">Bu siparişi tamamlayarak <a href="https://yemekchat.com/yasal.html#kullanici" target="_blank">Kullanıcı Sözleşmesi</a>, <a href="https://yemekchat.com/yasal.html#kvkk" target="_blank">KVKK Aydınlatma Metni</a> ve <a class="soz" onclick="sozAc('mss')">Mesafeli Satış Sözleşmesi</a>'ni kabul etmiş olursun · <a class="soz" onclick="sozAc('on')">Ön Bilgilendirme Formu</a></div>
+    <div class="legal">Siparişi tamamlayarak ödeme yükümlülüğü altına girer, <a class="soz" onclick="sozAc('mss')">Mesafeli Satış</a> ve <a href="https://yemekchat.com/yasal.html#kullanici" target="_blank">Kullanıcı Sözleşmesi</a>'ni kabul etmiş olursun · <a class="soz" onclick="sozAc('on')">Ön Bilgilendirme Formu</a> · <a href="https://yemekchat.com/yasal.html#kvkk" target="_blank">KVKK</a></div>
   </div>
 
   <!-- mesafeli satis sozlesmesi / on bilgilendirme -->
@@ -794,7 +794,11 @@ function renderMenu(){
   const cats = {};
   menu.forEach(m => { (cats[m.category||"Diğer"]=cats[m.category||"Diğer"]||[]).push(m); });
   let html = '<div class="sec"><h3>Menü</h3>';
-  for(const c in cats){
+  // sıralama: diğerleri (mevcut sırayla) → tatlılar → içecekler → soslar → poşet
+  const katSira = c => { const k = String(c).toLocaleLowerCase("tr");
+    return /tatl/.test(k) ? 1 : /(içecek|icecek)/.test(k) ? 2 : /^sos/.test(k) ? 3 : /^poşet/.test(k) ? 4 : 0; };
+  const katlar = Object.keys(cats).sort((a, b) => katSira(a) - katSira(b));
+  for(const c of katlar){
     html += `<div class="cat">${c}</div>`;
     cats[c].forEach(m => {
       const on = (m.is_available!==false && m.is_available!=="false");
@@ -881,7 +885,7 @@ const YC_BILGI = {
   telefon: "+90 505 489 88 26",
   web:     "www.yemekchat.com"
 };
-const SOZ_SURUM = "1.0";
+const SOZ_SURUM = "1.1";
 
 let sozAktif = "mss";
 
@@ -957,7 +961,7 @@ const SOZ_ORTAK = `
 <p>Ürünün ayıplı, eksik veya hatalı teslim edilmesi hâlinde sorumluluk SATICI'ya aittir. Online ödemeli siparişlerde, SATICI'nın iadeyi kabul etmesi veya kusurun kayıtlarla sabit olması hâlinde iade bedeli ödeme kuruluşu aracılığıyla ALICI'ya iade edilir. Kapıda ödemeli siparişlerde iade ve değişim teslimat anında veya sonrasında taraflar arasında çözülür.</p>
 
 <h3>Şikâyet ve başvuru yolları</h3>
-<p>ALICI, şikâyetlerini YemekChat WhatsApp hattına iletebilir; şikâyet SATICI'ya aktarılır ve yanıtı aynı kanaldan ALICI'ya iletilir. ALICI ayrıca, uyuşmazlık hâlinde Ticaret Bakanlığı'nca ilan edilen parasal sınırlar çerçevesinde, kendi yerleşim yerindeki veya tüketici işleminin yapıldığı yerdeki <b>Tüketici Hakem Heyetine</b> ya da <b>Tüketici Mahkemesine</b> başvurabilir.</p>
+<p>ALICI, şikâyetlerini YemekChat WhatsApp hattına iletebilir; şikâyet SATICI'ya aktarılır ve yanıtı aynı kanaldan ALICI'ya iletilir. ALICI ayrıca, uyuşmazlık hâlinde Ticaret Bakanlığı'nca ilan edilen parasal sınırlar çerçevesinde, kendi yerleşim yerindeki veya tüketici işleminin yapıldığı yerdeki <b>Tüketici Hakem Heyetine</b> ya da, dava açmadan önce arabulucuya başvurmak şartıyla, <b>Tüketici Mahkemesine</b> başvurabilir.</p>
 
 <h3>Aracı hizmet sağlayıcının konumu</h3>
 <p>YemekChat, 6563 sayılı Elektronik Ticaretin Düzenlenmesi Hakkında Kanun kapsamında <b>aracı hizmet sağlayıcıdır</b>; işbu satış sözleşmesinin tarafı değildir. Ürünün hazırlanması, gıda güvenliği mevzuatına uygunluğu, paketlenmesi ve teslimi münhasıran SATICI'nın sorumluluğundadır. YemekChat'in kurye ağı bulunmamakta olup teslimat SATICI tarafından gerçekleştirilir. Kullanıcıya satış belgesi (fiş/fatura) düzenleme yükümlülüğü SATICI'ya aittir. Aracı hizmet sağlayıcının mevzuattan doğan sorumlulukları saklıdır.</p>
