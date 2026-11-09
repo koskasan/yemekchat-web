@@ -7,10 +7,11 @@
 <title>YemekChat - Restoran Paneli</title>
 <style>
   :root{
-    --bg:#111B14; --card:#1C2A20; --card2:#243530; --line:#2C3E32;
-    --txt:#F1EFE8; --txt2:#B4B2A9; --txt3:#888780; --muted:#5F5E5A;
-    --green:#1D9E75; --greenDark:#04342C; --mint:#9FE1CB; --red:#E24B4A;
-    --amber:#EF9F27; --blue:#378ADD;
+    /* sipariş sayfasının koyu temasıyla aynı aile: sıcak antrasit + YemekChat kırmızısı */
+    --bg:#141211; --card:#1F1C1B; --card2:#2A2624; --line:#35302D;
+    --txt:#F2EEEB; --txt2:#BDB6B2; --txt3:#8F8884; --muted:#6E6764;
+    --green:#E0352B; --greenDark:#FFFFFF; --mint:#FF8A7F; --red:#E0352B;
+    --amber:#F1A24E; --blue:#5FA8F0; --ok:#52C68D;
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   html,body{background:var(--bg);color:var(--txt);font-family:-apple-system,"Segoe UI",Roboto,sans-serif}
@@ -29,7 +30,7 @@
   .top .logo{width:38px;height:38px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;color:#FCEBEB;font-weight:700;font-size:15px}
   .top .nm{font-size:16px;font-weight:600}
   .top .live{font-size:11px;color:var(--mint);display:flex;align-items:center;gap:5px}
-  .top .live .dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 1.6s infinite}
+  .top .live .dot{width:7px;height:7px;border-radius:50%;background:var(--ok);animation:pulse 1.6s infinite}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
   .top .out{margin-left:auto;background:var(--card2);border:none;color:var(--txt2);border-radius:8px;padding:7px 12px;font-size:12px;cursor:pointer}
   #brandSel{background:var(--card2);border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:6px 8px;font-size:13.5px;font-weight:600;font-family:inherit;max-width:190px}
@@ -49,7 +50,7 @@
   .ord.s-yeni{border-left-color:var(--red)}
   .ord.s-hazir{border-left-color:var(--amber)}
   .ord.s-yolda{border-left-color:var(--blue)}
-  .ord.s-teslim{border-left-color:var(--green);opacity:.65}
+  .ord.s-teslim{border-left-color:var(--ok);opacity:.65}
   .ord.s-iptal{border-left-color:var(--muted);opacity:.5}
   .ord.cat{border-left-color:#7F77DD;background:#1d1b2e}
   .ord .hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
@@ -187,7 +188,7 @@
   .rsat b{color:var(--mint)}
   .rtop{background:var(--card2);border-radius:11px;padding:12px;margin-top:10px}
   .rtop .rsat{border-bottom-color:var(--line)}
-  .rnet{font-size:16px;font-weight:700;color:var(--green)}
+  .rnet{font-size:16px;font-weight:700;color:var(--ok)}
 </style>
 </head>
 <body>
