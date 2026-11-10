@@ -361,7 +361,7 @@
     <div class="sec"><h3>Ödeme yöntemi</h3>
       <div class="pay" id="odemeSec">
         <div class="opt" data-pay="Nakit"><div class="ic">₺</div><div class="lb">Nakit</div></div>
-        <div class="opt" data-pay="Kredi Kartı"><div class="ic">▭</div><div class="lb">Kart</div></div>
+        <div class="opt" data-pay="Kredi Kartı"><div class="ic">▭</div><div class="lb">Kapıda POS</div></div>
         <div class="opt" data-pay="Online"><div class="ic">💳</div><div class="lb">Online Öde</div></div>
       </div>
     </div>
@@ -945,7 +945,7 @@ function urunTablosu(){
 function odemeMetni(){
   if(pay === "Online") return "Online ödeme (lisanslı ödeme kuruluşu PayTR altyapısı)";
   if(pay === "Nakit") return "Kapıda nakit ödeme";
-  if(pay === "Kredi Kartı") return "Kapıda kredi/banka kartı ile ödeme";
+  if(pay === "Kredi Kartı") return "Kapıda POS cihazıyla kartla ödeme";
   return "Sipariş onayında seçilecektir";
 }
 
@@ -1288,6 +1288,7 @@ async function submitOrder(){
   const payload = { restaurant_name:rest, customer_phone:TEL, imza:IMZA, order_details:details, total_amount:grand(), payment_method:(pay==="Online"?"Online (bekliyor)":pay), address, lat:musteriLat||"", lng:musteriLng||"",
     customer_name: adSoyad,
     iletisim_tel: telN,
+    kalemler: Object.values(cart).map(c => ({ id: c.item.id ?? null, ad: c.item.name, adet: c.qty, fiyat: Number(c.item.price) || 0 })),
     sozlesme_surum: SOZ_SURUM,
     sozlesme_onay: new Date().toISOString() };
   const go=$("go"); go.disabled=true; go.textContent="Gönderiliyor…";
