@@ -191,6 +191,23 @@
   .rtop{background:var(--card2);border-radius:11px;padding:12px;margin-top:10px}
   .rtop .rsat{border-bottom-color:var(--line)}
   .rnet{font-size:16px;font-weight:700;color:var(--ok)}
+  .posserit{background:var(--amber);color:#1a1205;font-weight:800;font-size:17px;letter-spacing:.3px;text-align:center;padding:10px 12px;border-radius:10px;margin:8px 0;animation:posnabiz 1.6s ease-in-out infinite}
+  .posserit small{display:block;font-size:12px;font-weight:700;margin-top:2px}
+  @keyframes posnabiz{0%,100%{box-shadow:0 0 0 0 rgba(241,162,78,.55)}50%{box-shadow:0 0 0 6px rgba(241,162,78,0)}}
+  .poskutu{display:flex;align-items:center;gap:8px;background:#3a2a15;color:#EFC98A;border:1px solid var(--amber);border-radius:10px;padding:9px 12px;font-size:14px;font-weight:700;cursor:pointer;width:100%}
+  .poskutu input{width:20px;height:20px;accent-color:var(--amber)}
+  #fisAlan .ters{background:#000;color:#fff;font-size:20px;font-weight:800;text-align:center;padding:3mm 1mm;margin:1.5mm 0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .gunler{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+  .gunler .gun{flex:1;min-width:52px;background:var(--card2);border:1px solid var(--line);color:var(--txt3);border-radius:10px;padding:10px 0;font-size:13.5px;font-weight:700;cursor:pointer}
+  .gunler .gun.on{background:#12331f;border-color:var(--ok);color:#7ee2a8}
+  .qrmodal{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;display:flex;align-items:center;justify-content:center;padding:16px}
+  .qrbox{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;width:100%;max-width:340px;text-align:center}
+  .qrbox h3{font-size:15px;margin-bottom:12px}
+  .qralan{background:#fff;border-radius:12px;padding:10px;aspect-ratio:1;display:flex;align-items:center;justify-content:center;color:#333;font-size:14px}
+  .qralan svg{width:100%;height:100%}
+  .qrbuyuk{font-size:17px;font-weight:800;margin-top:12px}
+  .qrkucuk{font-size:12px;color:var(--txt3);margin-top:4px}
+  .qrkapat{margin-top:12px;width:100%;background:var(--card2);color:var(--txt2);border:none;border-radius:10px;padding:11px;font-size:14px;font-weight:600;cursor:pointer}
 </style>
 </head>
 <body>
@@ -360,6 +377,9 @@
           <div><label>Açılış</label><input id="sAcilis" type="time"></div>
           <div><label>Kapanış</label><input id="sKapanis" type="time"></div>
         </div>
+        <label style="margin-top:14px">Açık günler</label>
+        <div class="hint" style="margin-top:0">Açık olduğunuz günleri seçin. Seçili olmayan günlerde restoranınız bütün gün kapalı görünür.</div>
+        <div class="gunler" id="sGunler"></div>
         <label style="margin-top:14px">Acil durum</label>
         <div class="cls">
           <div class="t">Şu an siparişe kapalıyım
@@ -507,6 +527,7 @@ const API = {
   RAPOR:         "https://webhook.yemekchat.com/webhook/panel-report",
   SETTINGS:      "https://webhook.yemekchat.com/webhook/panel-settings",
   SETTINGS_SAVE: "https://webhook.yemekchat.com/webhook/panel-settings-save",
+  KONUM_LINK: "https://webhook.yemekchat.com/webhook/panel-konum-link",
   BULK:          "https://webhook.yemekchat.com/webhook/panel-bulk-price",
   ZONES:         "https://webhook.yemekchat.com/webhook/panel-zones",
   CAT_MENU:      "https://webhook.yemekchat.com/webhook/catering-panel-menu",
@@ -551,6 +572,11 @@ function adresMaskele(adres){
 }
 /* kapıda kartla ödemenin görünen adı (kayıttaki değer 'Kredi Kartı' kalır; raporlar ve ödeme kuralı ona bakıyor) */
 function odemeAdi(p){ const s = String(p || ""); return s === "Kredi Kartı" ? "Kapıda POS" : s; }
+function posMu(o){ const s = String((o && o.payment_method) || "").toLowerCase(); return s === "kredi kartı" || s.includes("pos"); }
+/* POS siparişinde "Yolda"ya geçmeden önce "POS cihazını aldım" işaretlenmeli (yenilemelerde işaret korunur) */
+const posAlindi = new Set();
+function posIsaretle(id, kutu){ const k = String(id); if(kutu.checked) posAlindi.add(k); else posAlindi.delete(k);
+  const b = kutu.closest(".ord").querySelector(".b-next"); if(b){ b.disabled = !kutu.checked; b.textContent = kutu.checked ? "Yolda →" : "Önce POS'u işaretle"; } }
 /* müşterinin yazdığı metin (adres, not) panelde kod olarak çalışmasın */
 function htmlKac(s){
   return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
@@ -722,15 +748,18 @@ function renderOrders(orders){
     const eski = eskiSiparis(o);
     return `<div class="ord ${sc.cls} ${isCatOrder?"cat":""} ${gec?"geciken":""}" data-id="${o.id}">
       <div class="hd"><span class="no">#${o.id} <span class="pill ${sc.pill}">${sc.lbl}</span>${isCatOrder?' <span class="pill kurumsal">Kurumsal</span>':""}${gec?' <span class="pill yeni">⏰ BEKLİYOR</span>':""}${(tumMarkaMi()&&o._marka)?` <span class="pill marka">${o._marka}</span>`:""}</span><span class="tm">${tm}</span></div>
+      ${(posMu(o) && !done) ? `<div class="posserit">💳 POS CİHAZI GÖTÜR<small>Müşteri KARTLA ödeyecek · nakit isteme</small></div>` : ""}
       <div class="det">${htmlKac(o.order_details)||"-"}</div>
       <div class="meta"><b>Adres:</b> ${eski ? adresMaskele(o.address) : (htmlKac(o.address)||"-")}<br><b>Ödeme:</b> ${htmlKac(odemeAdi(o.payment_method))||"-"} &nbsp;·&nbsp; <b>Tel:</b> ${musteriTel(o) ? (eski ? telMaskele(musteriTel(o)) : `<a href="tel:+${musteriTel(o)}" style="color:inherit;font-weight:700">${telYaz(musteriTel(o))}</a>`) : "-"}</div>
       <div class="tot">${Math.round(Number(o.total_amount)||0)} TL</div>
       ${done?"":`<div class="acts">
-        ${nx?`<button class="b-next" ${kilit} onclick="setStatus(${o.id},'${nx}')">${nx} →</button>`:""}
+        ${(posMu(o) && nx === "Yolda") ? `<label class="poskutu"><input type="checkbox" ${posAlindi.has(String(o.id)) ? "checked" : ""} onchange="posIsaretle(${o.id}, this)"> 💳 POS cihazını aldım</label>` : ""}
+        ${nx?`<button class="b-next" ${(kilit || (posMu(o) && nx === "Yolda" && !posAlindi.has(String(o.id)))) ? "disabled" : ""} onclick="setStatus(${o.id},'${nx}')">${(posMu(o) && nx === "Yolda" && !posAlindi.has(String(o.id))) ? "Önce POS'u işaretle" : nx + " →"}</button>`:""}
         ${(musteriTel(o) && !eski) ? `<button class="b-call" onclick="window.open('https://wa.me/${musteriTel(o)}','_blank')">Müşteriye yaz</button>` : ""}
         <button class="b-cancel" ${kilit} onclick="setStatus(${o.id},'İptal')">İptal</button></div>`}
       <div class="acts">
         <button class="b-print" onclick="fisYazdir(${o.id})">🖨 Fiş yazdır</button>
+        ${(eski || done) ? "" : `<button class="b-map" onclick="konumKarekod(${o.id})">📱 Telefonda aç</button>`}
         ${eski ? "" : `<button class="b-map" onclick="yolTarifi(${o.id})">🧭 Buradan yol</button>`}
         <button class="b-map" onclick="yolTarifi(${o.id}, true)">🏪 Restorandan yol</button>
       </div>
@@ -1291,6 +1320,31 @@ async function restoranKonumu(){
     if(Number(d.latitude) && Number(d.longitude)){ restLat = Number(d.latitude); restLng = Number(d.longitude); }
   }catch(e){}
 }
+/* ---------- KONUM KAREKODU: kısa ömürlü bağlantı (3 saat ya da teslim/iptal); karekod tarayıcıda üretilir, kod dışarı gitmez ---------- */
+function qrKutuphane(){
+  if(window.qrcode) return Promise.resolve();
+  return new Promise((ok, hata) => { const sc = document.createElement("script");
+    sc.src = "https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"; sc.onload = ok; sc.onerror = hata; document.head.appendChild(sc); });
+}
+function qrKapat(){ const m = document.getElementById("qrModal"); if(m) m.remove(); }
+async function konumKarekod(id){
+  qrKapat();
+  const m = document.createElement("div"); m.id = "qrModal"; m.className = "qrmodal";
+  m.onclick = e => { if(e.target === m) qrKapat(); };
+  m.innerHTML = `<div class="qrbox"><h3>#${id} · Konumu telefonda aç</h3><div id="qrAlan" class="qralan">Hazırlanıyor…</div>
+    <p class="qrbuyuk">📷 Kameraya okut, konum çıksın</p>
+    <p class="qrkucuk">Bağlantı 3 saat ya da sipariş teslim edilene kadar çalışır.</p>
+    <button class="qrkapat" onclick="qrKapat()">Kapat</button></div>`;
+  document.body.appendChild(m);
+  const alan = document.getElementById("qrAlan");
+  try{
+    const [r] = await Promise.all([fetch(API.KONUM_LINK, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ order_id: id }) }), qrKutuphane()]);
+    const res = await r.json();
+    if(!res.ok){ alan.textContent = res.sebep === "konum_yok" ? "Bu siparişte konum yok." : res.sebep === "gecti" ? "Bu sipariş geçti." : "Karekod açılamadı, sayfayı yenileyip tekrar dene."; return; }
+    const q = qrcode(0, "M"); q.addData(res.link); q.make();
+    alan.innerHTML = q.createSvgTag({ cellSize: 6, margin: 2, scalable: true });
+  }catch(e){ alan.textContent = "Bağlantı hatası, tekrar dene."; }
+}
 async function yolTarifi(id, restorandan){
   const o = siparisler.find(x => String(x.id) === String(id));
   if(!o){ alert("Sipariş bulunamadı, sayfayı yenile."); return; }
@@ -1425,6 +1479,7 @@ function fisUrunHtml(o, urunler){
     const adet = Number(x.adet) || 0, fiyat = Number(x.fiyat) || 0;
     toplam += adet * fiyat;
     return `<div class="ln"><span>${adet} x ${htmlKac(x.ad)}</span><span class="fy">${fisTL(adet * fiyat)}</span></div>`
+         + ((Array.isArray(x.secenekler) && x.secenekler.length) ? `<div class="b">&nbsp;&nbsp;+ ${x.secenekler.map(htmlKac).join(", ").toLocaleUpperCase("tr")}</div>` : "")
          + (adet > 1 ? `<div class="sm">&nbsp;&nbsp;${adet} x ${fisTL(fiyat)}</div>` : "");
   }).join("");
   const fark = Math.round((toplam - (Number(o.total_amount) || 0)) * 100) / 100;
@@ -1442,6 +1497,7 @@ function fisYazdir(id, veri){
   const online = odeme.toLowerCase().includes("ödendi");
   const bekliyor = odeme.toLowerCase().includes("bekliyor");
   const kurumsal = odeme.toLowerCase().includes("kurumsal");
+  const pos = posMu(o);
   document.getElementById("fisAlan").innerHTML = `
     <div class="c xl">YEMEKCHAT</div>
     <div class="c sm">yemekchat.com</div>
@@ -1450,6 +1506,7 @@ function fisYazdir(id, veri){
     <div class="c b">SİPARİŞ #${o.id}</div>
     <div class="c sm">${tarih}</div>
     <div class="hr"></div>
+    ${pos ? '<div class="ters">KART — POS GÖTÜR</div><div class="c b">Müşteri kartla ödeyecek. Nakit isteme.</div><div class="hr"></div>' : ""}
     ${fisUrunHtml(o, urunler)}
     <div class="hr"></div>
     ${not ? `<div class="box">NOT: ${htmlKac(not.toUpperCase())}</div>` : ""}
@@ -1463,6 +1520,7 @@ function fisYazdir(id, veri){
     ${(!eski && Number(o.lat) && Number(o.lng)) ? `<div class="sm">📍 Konum: ${Number(o.lat).toFixed(5)}, ${Number(o.lng).toFixed(5)}</div>` : ""}
     <div class="hr"></div>
     <div class="ln lg"><span>TOPLAM</span><span>${Math.round(Number(o.total_amount) || 0)} TL</span></div>
+    ${pos ? '<div class="ters">💳 POS CİHAZI</div>' : ""}
     <div class="hr"></div>
     <div class="c sm">Afiyet olsun!</div>
     <div class="c sm">WhatsApp: @YemekChat</div>
@@ -1585,6 +1643,17 @@ async function otoFisCalistir(){
 }
 
 /* ---------- AYARLAR (mesai + teslimat) ---------- */
+const GUNLER = [[1,"Pzt"],[2,"Sal"],[3,"Çar"],[4,"Per"],[5,"Cum"],[6,"Cmt"],[0,"Paz"]];
+function gunleriCiz(kapali){
+  const k = new Set((kapali || []).map(Number));
+  document.getElementById("sGunler").innerHTML = GUNLER.map(([n, ad]) =>
+    `<button type="button" class="gun ${k.has(n) ? "" : "on"}" data-gun="${n}" onclick="this.classList.toggle('on')">${ad}</button>`).join("");
+}
+function kapaliGunlerDegeri(){
+  if(!document.querySelector("#sGunler .gun")) return "";   // ayarlar yüklenmediyse sunucu eski değeri korur
+  const k = [...document.querySelectorAll("#sGunler .gun:not(.on)")].map(b => b.dataset.gun);
+  return k.length ? k.join(",") : "yok";
+}
 async function loadSettings(){
   const kutu = document.getElementById("tabSettings");
   if(tumMarkaMi()){ document.getElementById("sMsg").textContent = "Ayarlar tek marka için — üstten marka seç."; return; }
@@ -1595,6 +1664,7 @@ async function loadSettings(){
     document.getElementById("sAcilis").value  = s.acilis || "";
     document.getElementById("sKapanis").value = s.kapanis || "";
     document.getElementById("sMax").value     = s.max_km ?? "";
+    gunleriCiz(Array.isArray(s.kapali_gunler) ? s.kapali_gunler : []);
     document.getElementById("sKapali").classList.toggle("on", s.kapali===true || s.kapali==="true");
     document.getElementById("sOtoFis").classList.toggle("on", otoFisAcikMi());
     document.getElementById("sOtoKabul").classList.toggle("on", otoKabulAcikMi());
@@ -1612,8 +1682,10 @@ document.getElementById("sSave").onclick = async () => {
     kapali:  document.getElementById("sKapali").classList.contains("on") ? "true" : "false",
     taban:   0,
     km_ucreti: 0,
-    max_km:  document.getElementById("sMax").value
+    max_km:  document.getElementById("sMax").value,
+    kapali_gunler: kapaliGunlerDegeri()
   };
+  if(kapaliGunlerDegeri().split(",").length === 7){ msg.textContent = "En az bir açık gün seçin."; return; }
   try{
     const r = await fetch(API.SETTINGS_SAVE, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload) });
     const res = await r.json();

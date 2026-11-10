@@ -137,6 +137,19 @@
   .sheet .tut{width:42px;height:4px;border-radius:2px;background:var(--line);margin:2px auto 12px}
   .sheet .bimg{width:100%;aspect-ratio:1/1;max-height:58vh;object-fit:contain;border-radius:14px;background:var(--card2);display:block}
   .sheet .bimg.yok{display:none}
+  .secGrup{margin-top:14px}
+  .secGrup .gb{font-size:14px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+  .secGrup .gb small{font-size:11.5px;color:var(--txt3);font-weight:500}
+  .secGrup .gb small.zorunlu{color:var(--amber)}
+  .secOpt{display:flex;align-items:center;gap:10px;padding:11px 12px;margin-top:7px;background:var(--card2);border:1px solid var(--line);border-radius:12px;font-size:14.5px;cursor:pointer;width:100%;color:var(--txt);font-family:inherit;text-align:left}
+  .secOpt.on{border-color:var(--red);background:rgba(224,53,43,.12)}
+  .secOpt .isr{width:20px;height:20px;border-radius:50%;border:2px solid var(--line);flex-shrink:0}
+  .secOpt.kutu .isr{border-radius:6px}
+  .secOpt.on .isr{border-color:var(--red);background:var(--red);box-shadow:inset 0 0 0 3px var(--card2)}
+  .secOpt .of{margin-left:auto;font-family:var(--fMono);font-size:13px;color:var(--txt2);white-space:nowrap}
+  .secHata{color:var(--amber);font-size:13px;min-height:18px;margin-top:10px}
+  .secEkle{width:100%;margin-top:6px;background:var(--red);color:#fff;border:none;border-radius:12px;padding:14px;font-size:15.5px;font-weight:700;cursor:pointer;font-family:inherit}
+  .citem .sec{font-size:12px;color:var(--txt2);margin-top:2px}
   .sheet .bad{font-size:17px;font-weight:600;margin-top:13px}
   .sheet .bds{font-size:13px;color:var(--txt2);margin-top:5px;line-height:1.5}
   .sheet .bpr{font-size:16px;color:var(--txt);margin-top:9px;font-family:var(--fMono);font-weight:600;font-variant-numeric:tabular-nums}
@@ -402,6 +415,20 @@
       <div class="bds" id="shDs"></div>
       <div class="bpr" id="shPr"></div>
       <button class="kapat" onclick="sheetKapat()">Kapat</button>
+    </div>
+  </div>
+
+  <!-- ürün seçenekleri -->
+  <div class="sheet" id="secSheet">
+    <div class="perde" onclick="secKapat()"></div>
+    <div class="panel">
+      <div class="tut"></div>
+      <div class="bad" id="secAd"></div>
+      <div class="bds" id="secDs"></div>
+      <div id="secGruplar"></div>
+      <div class="secHata" id="secHata"></div>
+      <button class="secEkle" id="secEkleBtn" onclick="secOnayla()">Sepete ekle</button>
+      <button class="kapat" onclick="secKapat()">Vazgeç</button>
     </div>
   </div>
 
@@ -817,8 +844,62 @@ function renderMenu(){
   if(restKapali) return;
   menu.forEach(m => { if(m.is_available!==false && m.is_available!=="false") renderCtrl(m.id); });
 }
+/* ---------- ÜRÜN SEÇENEKLERİ ---------- */
+function secenekliMi(m){ return !!(m && Array.isArray(m.secenekler) && m.secenekler.some(g => Array.isArray(g.secenekler) && g.secenekler.length)); }
+function urunAdi(c){ const s = (c.item && c.item._sec) || []; return c.item.name + (s.length ? " (" + s.map(o => o.ad).join(", ") + ")" : ""); }
+function urunSayisi(id){ return Object.values(cart).filter(c => String(c.item.id) === String(id)).reduce((t, c) => t + c.qty, 0); }
+let secUrun = null, secSecim = {};
+function secAc(m){
+  secUrun = m; secSecim = {};
+  m.secenekler.forEach(g => { const v = (g.secenekler || []).filter(o => o.v);
+    secSecim[g.id] = new Set((v.length ? v : (Number(g.min) >= 1 && Number(g.max) === 1 ? [g.secenekler[0]] : [])).filter(Boolean).map(o => String(o.id))); });
+  $("secAd").textContent = m.name; $("secDs").textContent = m.description || ""; $("secHata").textContent = "";
+  secCiz(); $("secSheet").classList.add("on");
+}
+function secKapat(){ $("secSheet").classList.remove("on"); }
+function secFiyat(){
+  let t = Number(secUrun.price) || 0;
+  secUrun.secenekler.forEach(g => (g.secenekler || []).forEach(o => { if(secSecim[g.id].has(String(o.id))) t += Number(o.fiyat) || 0; }));
+  return t;
+}
+function secCiz(){
+  $("secGruplar").innerHTML = secUrun.secenekler.filter(g => (g.secenekler || []).length).map(g => {
+    const tek = Number(g.max) === 1, min = Number(g.min) || 0, max = Number(g.max) || 99;
+    const kural = min >= 1 ? `<small class="zorunlu">${tek ? "1 seçim zorunlu" : "en az " + min}</small>` : `<small>${tek ? "isteğe bağlı" : "en fazla " + max}</small>`;
+    return `<div class="secGrup"><div class="gb">${esc(g.ad)}${kural}</div>` + g.secenekler.map(o => {
+      const on = secSecim[g.id].has(String(o.id)), f = Number(o.fiyat) || 0;
+      return `<button type="button" class="secOpt ${tek ? "" : "kutu"} ${on ? "on" : ""}" onclick="secSec('${g.id}','${o.id}')"><span class="isr"></span>${esc(o.ad)}<span class="of">${f > 0 ? "+" + f + " TL" : f < 0 ? f + " TL" : ""}</span></button>`;
+    }).join("") + `</div>`;
+  }).join("");
+  $("secEkleBtn").textContent = `Sepete ekle · ${secFiyat()} TL`;
+}
+function secSec(gid, oid){
+  const g = secUrun.secenekler.find(x => String(x.id) === String(gid)); if(!g) return;
+  const S = secSecim[g.id], k = String(oid), tek = Number(g.max) === 1, max = Number(g.max) || 99;
+  if(tek){ if(S.has(k) && !(Number(g.min) >= 1)) S.clear(); else { S.clear(); S.add(k); } }
+  else if(S.has(k)) S.delete(k);
+  else if(S.size < max) S.add(k);
+  else { $("secHata").textContent = `${g.ad}: en fazla ${max} seçebilirsin`; return; }
+  $("secHata").textContent = ""; secCiz();
+}
+function secOnayla(){
+  const eksik = secUrun.secenekler.find(g => (g.secenekler || []).length && secSecim[g.id].size < (Number(g.min) || 0));
+  if(eksik){ $("secHata").textContent = `${eksik.ad} seçmelisin`; return; }
+  const sec = [];
+  secUrun.secenekler.forEach(g => (g.secenekler || []).forEach(o => { if(secSecim[g.id].has(String(o.id))) sec.push({ id: String(o.id), ad: o.ad, fiyat: Number(o.fiyat) || 0 }); }));
+  const k = String(secUrun.id) + "~" + sec.map(o => o.id).sort().join(".");
+  const item = Object.assign({}, secUrun, { price: secFiyat(), _sec: sec });
+  cart[k] = { item, qty: (cart[k]?.qty || 0) + 1 };
+  secKapat(); renderCtrl(secUrun.id); updateBar();
+}
 function renderCtrl(id){
   const box = document.querySelector(`.ctrl[data-id="${id}"]`); if(!box) return;
+  const mm = menu.find(x => String(x.id) === String(id));
+  if(secenekliMi(mm)){
+    const n = urunSayisi(id);
+    box.innerHTML = `<button class="add">${n ? "Ekle (" + n + ")" : "Ekle"}</button>`; box.querySelector("button").onclick = () => secAc(mm);
+    return;
+  }
   const q = cart[id]?.qty || 0;
   if(q===0){ box.innerHTML = `<button class="add">Ekle</button>`; box.querySelector("button").onclick = () => chg(id,1); }
   else{
@@ -840,7 +921,7 @@ function renderCart(){
     const foto = c.item.image_url
       ? `<img class="thumb" src="${c.item.image_url}" alt="" loading="lazy" decoding="async" onerror="this.classList.add('yok')">`
       : "";
-    const ds = c.item.description ? `<div class="ds">${c.item.description}</div>` : "";
+    const ds = (c.item._sec && c.item._sec.length) ? `<div class="sec">+ ${c.item._sec.map(o => esc(o.ad)).join(", ")}</div>` : (c.item.description ? `<div class="ds">${c.item.description}</div>` : "");
     return `<div class="citem" onclick="urunAc('${k}')">${foto}
       <div class="info"><div class="nm">${c.item.name}</div>${ds}<div class="pr">${c.item.price*c.qty} TL</div></div>
       <div class="stp" data-k="${k}" onclick="event.stopPropagation()"><button>−</button><span class="qt">${c.qty}</span><button>+</button></div>
@@ -933,7 +1014,7 @@ function aliciKutusu(){
 }
 function urunTablosu(){
   const satir = Object.values(cart).map(c =>
-    `<tr><td>${esc(c.item.name)}</td><td class="sag">${c.qty}</td><td class="sag">${c.item.price} TL</td><td class="sag">${c.item.price*c.qty} TL</td></tr>`
+    `<tr><td>${esc(urunAdi(c))}</td><td class="sag">${c.qty}</td><td class="sag">${c.item.price} TL</td><td class="sag">${c.item.price*c.qty} TL</td></tr>`
   ).join("");
   const indT = indirimTutari();
   const ind = indT > 0
@@ -1048,7 +1129,7 @@ function urunAc(k){
   $("sheet").classList.add("on");
 }
 function sheetKapat(){ $("sheet").classList.remove("on"); }
-document.addEventListener("keydown", e => { if(e.key === "Escape"){ sheetKapat(); sozKapat(); } });
+document.addEventListener("keydown", e => { if(e.key === "Escape"){ sheetKapat(); sozKapat(); secKapat(); } });
 
 /* ---------- ekstra harcama önerileri (sepet, ödemeden önce) ---------- */
 const RE_ICECEK = /içecek|icecek|meşrubat|mesrubat|kola|cola|pepsi|ayran|soda|gazoz|fanta|sprite|fuse|ice tea|ayran|limonata|şalgam|salgam|maden suyu|meyve suyu|portakal suyu|şeftali|\bsu\b|\bçay\b|kahve|latte|americano/i;
@@ -1164,8 +1245,9 @@ function oneriEkle(id){
 
 function cartChg(k,d){
   const c = cart[k]; if(!c) return;
+  const uid = String(c.item.id);
   c.qty += d; if(c.qty<=0) delete cart[k];
-  renderCart(); renderCtrl(k); updateBar();
+  renderCart(); renderCtrl(uid); updateBar();
 }
 document.querySelectorAll(".pay .opt").forEach(o => o.onclick = () => {
   if(o.classList.contains("kapali")) return;
@@ -1281,14 +1363,14 @@ async function submitOrder(){
   adresKaydet();
   let address = `${adSoyad} — ${bina}${kat?", Kat "+kat:""}${daire?", Daire "+daire:""}${nt?" ("+nt+")":""}`;
   if(telN !== telNormal(TEL)) address += ` · Tel: ${telGoster(telN)}`;   // WhatsApp numarası yoksa/farklıysa restoran adreste de görsün
-  let details = Object.values(cart).map(c=>`${c.item.name} x${c.qty}`).join(", ");
+  let details = Object.values(cart).map(c=>`${urunAdi(c)} x${c.qty}`).join(", ");
   const musteriNot = ($("sipnot") ? $("sipnot").value : "").trim();
   const tumNot = [draftNote, musteriNot].filter(Boolean).join(" · ");
   if(tumNot) details += ` — 📝 ${tumNot}`;
   const payload = { restaurant_name:rest, customer_phone:TEL, imza:IMZA, order_details:details, total_amount:grand(), payment_method:(pay==="Online"?"Online (bekliyor)":pay), address, lat:musteriLat||"", lng:musteriLng||"",
     customer_name: adSoyad,
     iletisim_tel: telN,
-    kalemler: Object.values(cart).map(c => ({ id: c.item.id ?? null, ad: c.item.name, adet: c.qty, fiyat: Number(c.item.price) || 0 })),
+    kalemler: Object.values(cart).map(c => ({ id: c.item.id ?? null, ad: c.item.name, adet: c.qty, fiyat: Number(c.item.price) || 0, secenekler: ((c.item._sec) || []).map(o => o.id) })),
     sozlesme_surum: SOZ_SURUM,
     sozlesme_onay: new Date().toISOString() };
   const go=$("go"); go.disabled=true; go.textContent="Gönderiliyor…";
@@ -1487,7 +1569,7 @@ async function cateringEskiInit(){
   }catch(e){ document.body.innerHTML = '<div class="empty" style="padding-top:90px">Bağlantı hatası.</div>'; }
 }
 async function cateringSubmit(){
-  const details = Object.values(cart).map(c=>`${c.item.name} x${c.qty}`).join(", ");
+  const details = Object.values(cart).map(c=>`${urunAdi(c)} x${c.qty}`).join(", ");
   const payload = { code: CATERING, tel: TEL, order_details: details, total_amount: total() };
   const go=$("go"); go.disabled=true; go.textContent="Gönderiliyor…";
   try{
