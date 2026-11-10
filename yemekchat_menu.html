@@ -1185,7 +1185,7 @@ async function odemeHakkiUygula(){
   if(!TEL) return;
   let d = null;
   try{
-    const r = await fetch(`${CONFIG.ODEME_HAKKI}?tel=${encodeURIComponent(TEL)}`);
+    const r = await fetch(`${CONFIG.ODEME_HAKKI}?tel=${encodeURIComponent(TEL)}&s=${encodeURIComponent(IMZA)}`);
     d = await r.json();
     if(Array.isArray(d)) d = d[0];
     if(d && d.kapida_odeme_hakki) d = d.kapida_odeme_hakki;
