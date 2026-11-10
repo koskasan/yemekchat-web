@@ -103,9 +103,22 @@
   <div class="logo">YC</div>
   <h1>YemekChat Yönetim</h1>
   <p>Platform özeti — sadece yönetici</p>
-  <input id="anahtar" type="password" placeholder="Yönetim şifresi">
+  <input id="anahtar" type="password" placeholder="Yönetim şifresi" autocomplete="current-password">
   <div class="err" id="girisErr"></div>
-  <button onclick="girisYap()">Giriş yap</button>
+  <button id="girisBtn" onclick="girisYap()">Giriş yap</button>
+  <a href="#" id="unuttumLink" onclick="sifreUnuttum(); return false;" style="color:var(--txt2);font-size:13px">Şifremi unuttum</a>
+  <div id="sifirlaKutu" style="display:none;width:100%;max-width:320px;flex-direction:column;gap:12px">
+    <p style="margin:0">Yeni yönetici şifreni belirle (en az 10 karakter). Not: restoran şifrelerinin görüntülenebilir kopyaları eski şifrenle kilitli olduğu için silinir; restoranlar girmeye devam eder, görmek istediğin şifreyi panelden yeniden belirlersin.</p>
+    <input id="sifirlaSifre" type="password" placeholder="Yeni yönetici şifresi" autocomplete="new-password">
+    <input id="sifirlaSifre2" type="password" placeholder="Yeni şifre (tekrar)" autocomplete="new-password">
+    <button onclick="sifirlaYap()">Yeni şifreyi kaydet</button>
+  </div>
+  <div id="kurulumKutu" style="display:none;width:100%;max-width:320px;flex-direction:column;gap:12px">
+    <p style="margin:0">İlk kurulum: kendine yeni bir yönetici şifresi belirle (en az 10 karakter). Eski şifre bundan sonra çalışmaz. Bu şifreyi unutma: restoran şifrelerini görmek için de bu şifre gerekecek.</p>
+    <input id="yeniSifre" type="password" placeholder="Yeni yönetici şifresi" autocomplete="new-password">
+    <input id="yeniSifre2" type="password" placeholder="Yeni şifre (tekrar)" autocomplete="new-password">
+    <button onclick="kurulumYap()">Yeni şifreyi kaydet</button>
+  </div>
 </div>
 
 <div class="app" id="appScr">
@@ -160,7 +173,7 @@
     <input id="dKonum" placeholder="39.9241693, 32.817152">
 
     <div class="d3">
-      <div><label>Şifre</label><input id="dSifre" placeholder="panel şifresi"></div>
+      <div><label>Şifre <a href="#" id="dSifreBtn" onclick="sifreGoster(); return false;" style="color:var(--purple);font-weight:600;margin-left:6px">göster</a></label><input id="dSifre" placeholder="panel şifresi" autocomplete="off"><div id="dSifreGor" style="font-size:12px;color:var(--txt2);margin-top:4px;min-height:14px"></div></div>
       <div><label>Min. sepet ₺</label><input id="dMin" type="number" inputmode="numeric" placeholder="200"></div>
       <div><label>Puan</label><input id="dPuan" type="number" step="0.1" placeholder="4.5"></div>
     </div>
@@ -197,10 +210,15 @@
 // ===================== AYAR =====================
 const API = "https://webhook.yemekchat.com/webhook/admin-data";
 const API_KAYDET = "https://webhook.yemekchat.com/webhook/admin-save";
+const API_GIRIS = "https://webhook.yemekchat.com/webhook/admin-login";
+const API_KURULUM = "https://webhook.yemekchat.com/webhook/admin-kurulum";
+const API_SIFRELER = "https://webhook.yemekchat.com/webhook/admin-sifreler";
 const KOMISYON = 5; // %
 // ================================================
 
-let ANAHTAR = localStorage.getItem("yc_admin") || "";
+/* Oturum: yönetici şifresi ve oturum anahtarı SADECE sayfa açıkken bellekte durur, cihaza kaydedilmez (12 saatte biter). */
+let TOKEN = "", YSIFRE = "", ESKI_GIRIS = "";
+try{ localStorage.removeItem("yc_admin"); }catch(e){}   // eski sürümün cihaza kaydettiği sabit şifreyi sil
 let veri = [], aralikTip = "bugun";
 const $ = id => document.getElementById(id);
 const gunStr = d => new Date(d.getTime() - d.getTimezoneOffset()*60000).toISOString().slice(0,10);
@@ -220,25 +238,95 @@ function aralik(tip, btn){
   veriYukle();
 }
 
-function girisYap(){
+async function girisYap(){
   const k = $("anahtar").value.trim();
   if(!k){ $("girisErr").textContent = "Şifre gerekli."; return; }
-  ANAHTAR = k;
-  veriYukle(true);
+  $("girisErr").textContent = "";
+  try{
+    const r = await fetch(API_GIRIS, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ sifre: k }) });
+    const d = await r.json();
+    if(d.kurulum){ kurulumGoster(k); return; }
+    if(d.bekle){ $("girisErr").textContent = "Çok fazla hatalı deneme. 15 dakika sonra tekrar dene."; return; }
+    if(!d.ok || !d.token){ $("girisErr").textContent = "Şifre hatalı."; return; }
+    TOKEN = d.token; YSIFRE = k; $("anahtar").value = "";
+    veriYukle(true);
+  }catch(e){ $("girisErr").textContent = "Bağlantı hatası."; }
 }
-function cikis(){ localStorage.removeItem("yc_admin"); location.reload(); }
+function kurulumGoster(eski){
+  ESKI_GIRIS = eski;
+  $("anahtar").style.display = "none"; $("girisBtn").style.display = "none";
+  $("kurulumKutu").style.display = "flex"; $("girisErr").textContent = "";
+  $("yeniSifre").focus();
+}
+async function kurulumYap(){
+  const a = $("yeniSifre").value, b = $("yeniSifre2").value;
+  if(a.length < 10){ $("girisErr").textContent = "Yeni şifre en az 10 karakter olmalı."; return; }
+  if(a !== b){ $("girisErr").textContent = "İki şifre aynı değil."; return; }
+  $("girisErr").textContent = "Kaydediliyor…";
+  try{
+    const r = await fetch(API_KURULUM, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ eski: ESKI_GIRIS, yeni: a }) });
+    const d = await r.json();
+    if(d.ok || d.zaten){
+      if(d.zaten){ $("girisErr").textContent = "Yönetici şifresi zaten belirlenmiş. Yeni şifrenle giriş yap."; }
+      $("kurulumKutu").style.display = "none"; $("anahtar").style.display = ""; $("girisBtn").style.display = "";
+      $("yeniSifre").value = ""; $("yeniSifre2").value = ""; ESKI_GIRIS = "";
+      if(d.ok){ $("anahtar").value = a; girisYap(); }
+    } else $("girisErr").textContent = "Eski yönetim şifresi hatalı. Sayfayı yenileyip eski şifreyle tekrar dene.";
+  }catch(e){ $("girisErr").textContent = "Bağlantı hatası."; }
+}
+function cikis(){ TOKEN = ""; YSIFRE = ""; location.reload(); }
+/* şifremi unuttum: bağlantı yalnızca iki kayıtlı yönetici e-postasına gider */
+async function sifreUnuttum(){
+  $("girisErr").textContent = "Gönderiliyor…";
+  try{
+    const r = await fetch("https://webhook.yemekchat.com/webhook/admin-sifre-unuttum", { method:"POST", headers:{"Content-Type":"application/json"}, body:"{}" });
+    const d = await r.json();
+    $("girisErr").textContent = d.ok ? "Sıfırlama bağlantısı kayıtlı yönetici e-postalarına gönderildi (30 dk geçerli)."
+      : d.sebep === "bekle" ? "Az önce bağlantı gönderildi. 10 dakika sonra tekrar dene."
+      : d.sebep === "gunluk" ? "Bugünlük sıfırlama hakkı doldu." : "Önce yönetici şifresi kurulumu yapılmalı.";
+  }catch(e){ $("girisErr").textContent = "Bağlantı hatası."; }
+}
+let SIFIRLA = "";
+async function sifirlaYap(){
+  const a = $("sifirlaSifre").value, b = $("sifirlaSifre2").value;
+  if(a.length < 10){ $("girisErr").textContent = "Yeni şifre en az 10 karakter olmalı."; return; }
+  if(a !== b){ $("girisErr").textContent = "İki şifre aynı değil."; return; }
+  try{
+    const r = await fetch("https://webhook.yemekchat.com/webhook/admin-sifre-sifirla", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ token: SIFIRLA, yeni: a }) });
+    const d = await r.json().catch(() => ({}));
+    if(d.ok){ history.replaceState(null, "", location.pathname); location.reload(); }
+    else $("girisErr").textContent = "Bağlantının süresi dolmuş ya da kullanılmış. Yeniden 'Şifremi unuttum' de.";
+  }catch(e){ $("girisErr").textContent = "Bağlantı hatası."; }
+}
+(function(){
+  const m = location.hash.match(/sifirla=([0-9a-f]{64})/);
+  if(!m) return;
+  SIFIRLA = m[1];
+  ["anahtar", "girisBtn", "unuttumLink"].forEach(i => { $(i).style.display = "none"; });
+  $("sifirlaKutu").style.display = "flex";
+})();
+async function sifreGoster(){
+  if(!duzenlenenId){ $("dSifreGor").textContent = "Yeni restoranda şifreyi kutuya yaz."; return; }
+  $("dSifreGor").textContent = "…";
+  try{
+    const r = await fetch(API_SIFRELER, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ token: TOKEN, sifre: YSIFRE }) });
+    const d = await r.json();
+    if(!d.ok){ $("dSifreGor").textContent = "Gösterilemedi (oturum bitmiş olabilir, yeniden giriş yap)."; return; }
+    const x = (d.liste || []).find(s => String(s.id) === String(duzenlenenId));
+    $("dSifreGor").textContent = x && x.sifre ? "Mevcut şifre: " + x.sifre : "Bu restoranın şifresi görüntülenemiyor; yeni şifre yazıp kaydedebilirsin.";
+  }catch(e){ $("dSifreGor").textContent = "Bağlantı hatası."; }
+}
 
 async function veriYukle(ilk){
   const t = tarihler();
   try{
-    const r = await fetch(`${API}?key=${encodeURIComponent(ANAHTAR)}&from=${t.from}&to=${t.to}`);
+    const r = await fetch(`${API}?token=${encodeURIComponent(TOKEN)}&from=${t.from}&to=${t.to}`);
     const d = await r.json();
     if(!d.ok){
-      if(ilk){ $("girisErr").textContent = "Şifre hatalı."; }
-      else toast("Yetki hatası");
+      if(ilk){ $("girisErr").textContent = "Oturum açılamadı, tekrar dene."; }
+      else { toast("Oturum bitti, yeniden giriş yap"); setTimeout(cikis, 1500); }
       return;
     }
-    localStorage.setItem("yc_admin", ANAHTAR);
     $("girisScr").style.display = "none";
     $("appScr").style.display = "block";
     veri = d.data || [];
@@ -365,7 +453,10 @@ function duzenleAc(id){
   $("dKat").value     = r ? (r.kategori || "") : "";
   $("dTel").value     = r ? (r.telefon || "") : "";
   $("dKonum").value   = (r && r.latitude && r.longitude) ? `${r.latitude}, ${r.longitude}` : "";
-  $("dSifre").value   = r ? (r.sifre || "") : "";
+  $("dSifre").value   = "";
+  $("dSifre").placeholder = r ? "Değiştirmek için yeni şifre yaz" : "Panel şifresi";
+  $("dSifreGor").textContent = "";
+  $("dSifreBtn").style.display = r ? "" : "none";
   $("dMin").value     = r ? (r.min_sepet || "") : "";
   $("dPuan").value    = (r && Number(r.rating)) ? r.rating : "";
   $("dAcilis").value  = r ? (r.acilis || "") : "";
@@ -393,7 +484,8 @@ async function duzenleKaydet(){
   const lat = (konum[0] || "").replace(",", "."), lng = (konum[1] || "").replace(",", ".");
   const btn = $("dKaydet"); btn.disabled = true; btn.textContent = "Kaydediliyor…";
   const govde = {
-    key: ANAHTAR,
+    token: TOKEN,
+    yonetim_sifre: YSIFRE,
     id: duzenlenenId || "",
     name: ad,
     category: $("dKat").value.trim(),
@@ -421,8 +513,7 @@ async function duzenleKaydet(){
 document.getElementById("dmodal").addEventListener("click", e => { if(e.target.id === "dmodal") duzenleKapat(); });
 
 /* otomatik giriş + 60 sn yenileme */
-if(ANAHTAR) veriYukle(true);
-setInterval(() => { if(ANAHTAR && $("appScr").style.display === "block") veriYukle(); }, 60000);
+setInterval(() => { if(TOKEN && $("appScr").style.display === "block") veriYukle(); }, 60000);
 $("anahtar").addEventListener("keydown", e => { if(e.key === "Enter") girisYap(); });
 </script>
 </body>
