@@ -139,6 +139,8 @@
   .cp-yaz textarea:disabled{opacity:.5}
   .cp-yaz button{background:#00A884;border:none;border-radius:50%;width:42px;height:42px;color:#111;font-size:18px;cursor:pointer;flex-shrink:0}
   .cp-yaz button:disabled{opacity:.4;cursor:default}
+  .cl-say{font-size:11.5px;color:#8696A0;padding:6px 14px}
+  .cl-daha{display:block;width:calc(100% - 20px);margin:10px;background:#202C33;color:#00A884;border:none;border-radius:8px;padding:10px;font-size:13px;font-weight:700;cursor:pointer}
   .cs-bos{color:#8696A0;font-size:13px;padding:30px;text-align:center;margin:auto}
   @media(max-width:760px){.cl{width:100%}.cp{display:none}.cs.pano .cl{display:none}.cs.pano .cp{display:flex}.cp-geri{display:block}.sekmeler .sk{padding:7px 9px;font-size:11.5px}}
   .sp-btn{margin-left:auto;background:#00A884;color:#111;border:none;border-radius:8px;padding:9px 12px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
@@ -153,6 +155,42 @@
   .sp-u button{width:30px;height:30px;border-radius:8px;border:none;background:var(--card2);color:var(--txt);font-size:16px;cursor:pointer}
   .sp-u .ad-n{min-width:18px;text-align:center;font-weight:700}
   .sp-ozet{margin-top:12px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.5}
+  .tel-btn{margin-left:auto;background:#2A3942;color:#E9EDEF;border:1px solid #3b4a54;border-radius:8px;padding:9px 12px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
+  .tel-btn + .sp-btn, .tel-btn + .dv-btn{margin-left:6px}
+  .tlm{position:fixed;inset:0;background:#0d0d0d;z-index:600;display:flex;align-items:center;justify-content:center;gap:24px;padding:16px}
+  .tlm-ar{display:flex;flex-direction:column;gap:8px;min-width:170px}
+  .tlm-ar button{background:#2A3942;color:#E9EDEF;border:none;border-radius:10px;padding:11px 14px;font-size:13.5px;font-weight:700;cursor:pointer;text-align:left}
+  .tlm-ar button.on{background:#00A884;color:#111}
+  .tlm-ar small{color:#8696A0;font-size:11.5px;line-height:1.45}
+  .tf{--h:min(92vh,900px);height:var(--h);width:calc(var(--h) * 9 / 16);border-radius:calc(var(--h) * .055);background:#000;padding:calc(var(--h) * .014);box-shadow:0 20px 60px rgba(0,0,0,.6);flex-shrink:0}
+  .te{height:100%;width:100%;border-radius:calc(var(--h) * .045);overflow:hidden;display:flex;flex-direction:column;font-family:-apple-system,"Segoe UI",Roboto,sans-serif;font-size:calc(var(--h) * .0185)}
+  .te{--bg:#EFEAE2;--bas:#F0F2F5;--btx:#111B21;--alt:#667781;--gel:#FFFFFF;--git:#D9FDD3;--tx:#111B21;--tg:#E1E8ED}
+  .te.koyu{--bg:#0B141A;--bas:#202C33;--btx:#E9EDEF;--alt:#8696A0;--gel:#202C33;--git:#005C4B;--tx:#E9EDEF;--tg:#182229}
+  .te-durum{height:5.2%;display:flex;align-items:center;justify-content:space-between;padding:0 7%;background:var(--bas);color:var(--btx);font-weight:600;font-size:.82em}
+  .te-bas{display:flex;align-items:center;gap:3%;padding:2.2% 3.5%;background:var(--bas);color:var(--btx);border-bottom:1px solid rgba(0,0,0,.06)}
+  .te-bas .lg{width:2.3em;height:2.3em;border-radius:50%;flex-shrink:0;background-size:cover;background-position:center}
+  .te-bas b{font-size:1.02em;display:flex;align-items:center;gap:.3em}.te-bas small{display:block;color:var(--alt);font-size:.78em;font-weight:400}
+  .te-bas .tik{display:inline-flex;width:1em;height:1em;border-radius:50%;background:#25D366;color:#fff;font-size:.62em;align-items:center;justify-content:center}
+  .te-akis{flex:1;overflow-y:auto;padding:3% 4%;display:flex;flex-direction:column;gap:.45em;background:var(--bg);scroll-behavior:smooth}
+  .te-akis::-webkit-scrollbar{display:none}
+  .tb{max-width:80%;padding:.45em .65em .3em;border-radius:.65em;color:var(--tx);line-height:1.32;white-space:pre-wrap;word-wrap:break-word;box-shadow:0 1px .5px rgba(0,0,0,.13);font-size:.95em;animation:tbgir .25s ease-out}
+  .tb.gel{background:var(--gel);align-self:flex-start;border-top-left-radius:.15em}
+  .tb.git{background:var(--git);align-self:flex-end;border-top-right-radius:.15em}
+  .tb .s{display:block;text-align:right;font-size:.68em;color:var(--alt);margin-top:.1em}
+  .tb .btn{display:block;text-align:center;color:#027EB5;border-top:1px solid rgba(0,0,0,.08);margin:.4em -.65em -.3em;padding:.45em;font-weight:500}
+  .te.koyu .tb .btn{color:#53BDEB;border-top-color:rgba(255,255,255,.08)}
+  .tb .ses{display:flex;align-items:center;gap:.4em;color:var(--alt);font-size:.85em;margin-bottom:.15em}
+  .tb .knm{height:6em;border-radius:.4em;margin:-.15em -.35em .3em;background:repeating-linear-gradient(45deg,#cfe3c9,#cfe3c9 .5em,#dcebd6 .5em,#dcebd6 1em);display:flex;align-items:center;justify-content:center;font-size:2em}
+  .te-gun{align-self:center;background:var(--tg);color:var(--alt);font-size:.75em;padding:.3em .8em;border-radius:.5em;margin:.3em 0;box-shadow:0 1px .5px rgba(0,0,0,.08)}
+  .tb.yaz{padding:.6em .9em}.tb.yaz i{display:inline-block;width:.45em;height:.45em;border-radius:50%;background:var(--alt);margin:0 .12em;animation:tbnok 1s infinite}
+  .tb.yaz i:nth-child(2){animation-delay:.15s}.tb.yaz i:nth-child(3){animation-delay:.3s}
+  .te-alt{display:flex;align-items:center;gap:2.5%;padding:2% 3%;background:var(--bas)}
+  .te-alt div{flex:1;background:var(--gel);border-radius:1.4em;padding:.6em 1em;color:var(--alt);font-size:.92em}
+  .te-alt span{width:2.4em;height:2.4em;border-radius:50%;background:#00A884;color:#fff;display:flex;align-items:center;justify-content:center;font-size:.95em}
+  .te.saatsiz .tb .s{display:none}
+  @keyframes tbgir{from{opacity:0;transform:translateY(.5em)}to{opacity:1;transform:none}}
+  @keyframes tbnok{0%,60%,100%{opacity:.3}30%{opacity:1}}
+  @media(max-width:760px){.tlm{flex-direction:column;gap:10px}.tlm-ar{flex-direction:row;flex-wrap:wrap;min-width:0}.tlm-ar small{display:none}.tf{--h:min(78vh,900px)}}
 </style>
 </head>
 <body>
@@ -193,7 +231,7 @@
   <div id="sohbetSek" style="display:none">
     <div class="cs">
       <div class="cl">
-        <div class="cl-ara"><input id="csAra" placeholder="🔍 Ara: son 4 hane, ad, mesaj…" oninput="csListeCiz()"></div>
+        <div class="cl-ara"><input id="csAra" placeholder="🔍 Ara: son haneler, ad, mesaj…" oninput="csAraDegisti()"></div>
         <div class="cl-f" id="csFiltre"></div>
         <div id="csListe" class="cl-liste"><div class="cs-bos">Yükleniyor…</div></div>
       </div>
@@ -303,7 +341,8 @@ const API_SOHBETLER = "https://webhook.yemekchat.com/webhook/admin-sohbetler";
 const API_SOHBET = "https://webhook.yemekchat.com/webhook/admin-sohbet";
 const API_DEVRAL = "https://webhook.yemekchat.com/webhook/admin-devral";
 const API_MESAJ = "https://webhook.yemekchat.com/webhook/admin-mesaj";
-let csListe = [], csSecili = null, csFiltreTip = "hepsi", csZamanlayici = null, csSonImza = "", csGonderiyor = false;
+let csSohbetVeri = null;
+let csListe = [], csSecili = null, csFiltreTip = "hepsi", csZamanlayici = null, csSonImza = "", csGonderiyor = false, csAdet = 100, csToplam = 0, csAraZ = null;
 function hk(t){ return String(t == null ? "" : t).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 async function csPost(url, govde){
   const r = await fetch(url, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(Object.assign({ token: TOKEN }, govde || {})) });
@@ -320,25 +359,31 @@ function sekme(t){
   if(s){ csFiltreCiz(); csYenile(); csZamanlayici = setInterval(csYenile, 5000); }
 }
 function csSaat(z){ if(!z) return ""; const d = new Date(z), b = new Date(), sa = d.toLocaleTimeString("tr-TR", {hour:"2-digit", minute:"2-digit"});
-  return d.toDateString() === b.toDateString() ? sa : d.toLocaleDateString("tr-TR", {day:"2-digit", month:"2-digit"}) + " " + sa; }
+  const dun = new Date(b); dun.setDate(b.getDate() - 1);
+  if(d.toDateString() === b.toDateString()) return sa;
+  if(d.toDateString() === dun.toDateString()) return "Dün " + sa;
+  return d.toLocaleDateString("tr-TR", d.getFullYear() === b.getFullYear() ? {day:"numeric", month:"short"} : {day:"numeric", month:"short", year:"numeric"}) + " " + sa; }
 function csBaslik(k){ return (k.ad ? hk(k.ad) + " · " : "") + hk(k.maske); }
 function csHarf(k){ const a = String(k.ad || "").trim().split(/\s+/).filter(Boolean); return a.length ? hk((a[0][0] + (a[1] ? a[1][0] : "")).toLocaleUpperCase("tr")) : "👤"; }
-const CS_FILTRE = [["hepsi","Tümü"],["sepet","Sepette"],["siparis","Sipariş"],["bolge_disi","Bölge dışı"],["devral","Devralınan"]];
-function csFiltreCiz(){ $("csFiltre").innerHTML = CS_FILTRE.map(([k, a]) => `<button class="${csFiltreTip === k ? "on" : ""}" onclick="csFiltreTip='${k}';csFiltreCiz();csListeCiz()">${a}</button>`).join(""); }
-async function csYenile(){
+const CS_FILTRE = [["hepsi","Tümü"],["siparis_veren","Sipariş verenler"],["sepet","Sepette"],["bolge_disi","Bölge dışı"],["devral","Devralınan"]];
+function csFiltreCiz(){ $("csFiltre").innerHTML = CS_FILTRE.map(([k, a]) => `<button class="${csFiltreTip === k ? "on" : ""}" onclick="csFiltreTip='${k}';csAdet=100;csFiltreCiz();csYenile(true)">${a}</button>`).join(""); }
+function csAraDegisti(){ clearTimeout(csAraZ); csAraZ = setTimeout(() => { csAdet = 100; csYenile(true); }, 400); }
+function csDahaFazla(){ csAdet += 100; csYenile(true); }
+async function csYenile(ilk){
   if(!TOKEN || $("sohbetSek").style.display === "none") return;
-  const j = await csPost(API_SOHBETLER);
-  if(j.ok){ csListe = j.liste || []; csListeCiz(); }
+  if(ilk) $("csListe").innerHTML = '<div class="cs-bos">Yükleniyor…</div>';
+  const j = await csPost(API_SOHBETLER, { filtre: csFiltreTip, ara: $("csAra").value.trim(), adet: csAdet });
+  if(j.ok){ csListe = j.liste || []; csToplam = j.toplam || 0; csListeCiz(); }
   if(csSecili) csAc(csSecili, true);
 }
 function csListeCiz(){
-  const ara = ($("csAra").value || "").toLocaleLowerCase("tr").replace(/\s/g, "");
-  const l = csListe.filter(k => (csFiltreTip === "hepsi" || (csFiltreTip === "sepet" && k.sepet) || (csFiltreTip === "siparis" && k.siparis) || (csFiltreTip === "bolge_disi" && k.bolge_disi) || (csFiltreTip === "devral" && k.devral))
-    && (!ara || [k.ad, k.maske, k.son].join(" ").toLocaleLowerCase("tr").replace(/\s/g, "").includes(ara)));
+  const l = csListe;
   $("csListe").innerHTML = l.length ? l.map(k => `<div class="ck ${csSecili === k.ref ? "sec" : ""}" onclick="csAc('${hk(k.ref)}')">
       <div class="cav">${csHarf(k)}</div><div class="cki"><div class="u"><span>${csBaslik(k)}</span><small>${csSaat(k.z)}</small></div>
-      <div class="a">${k.devral ? '<span class="crz dv">DEVRALINDI</span>' : ""}${k.siparis ? `<span class="crz sip">SİPARİŞ #${hk(k.siparis)}</span>` : ""}${k.sepet ? '<span class="crz sep">SEPETTE</span>' : ""}${k.bolge_disi ? '<span class="crz bd">BÖLGE DIŞI</span>' : ""}${k.rol === "ai" ? "🤖 " : ""}${k.ses ? "🎤 " : ""}${hk(k.son)}</div></div></div>`).join("")
+      <div class="a">${k.devral ? '<span class="crz dv">DEVRALINDI</span>' : ""}${k.siparis ? `<span class="crz sip">SİPARİŞ #${hk(k.siparis)}</span>` : (k.siparis_sayisi ? `<span class="crz sip">✓ ${hk(k.siparis_sayisi)} sipariş</span>` : "")}${k.sepet ? '<span class="crz sep">SEPETTE</span>' : ""}${k.bolge_disi ? '<span class="crz bd">BÖLGE DIŞI</span>' : ""}${k.rol === "ai" ? "🤖 " : ""}${k.ses ? "🎤 " : ""}${hk(k.son)}</div></div></div>`).join("")
     : '<div class="cs-bos">Konuşma yok.</div>';
+  $("csListe").innerHTML = `<div class="cl-say">${csToplam.toLocaleString("tr-TR")} konuşma${csToplam > l.length ? " · ilk " + l.length + " gösteriliyor" : ""}</div>` + $("csListe").innerHTML
+    + (csToplam > l.length ? '<button class="cl-daha" onclick="csDahaFazla()">Daha fazla göster</button>' : "");
 }
 async function csAc(ref, sessiz){
   csSecili = ref; document.querySelector(".cs").classList.add("pano");
@@ -350,7 +395,7 @@ async function csAc(ref, sessiz){
   const imza = (m.length ? m[m.length - 1].id : 0) + "|" + (s.devral || "") + "|" + JSON.stringify(s.sepet || "");
   if(sessiz && imza === csSonImza) return;
   const kutu = $("csMetin"), yaziyor = kutu && document.activeElement === kutu, taslak = kutu ? kutu.value : "";
-  csSonImza = imza;
+  csSonImza = imza; csSohbetVeri = s;
   const dv = !!s.devral, eski24 = !!s.son_musteri && (Date.now() - new Date(s.son_musteri).getTime()) > 24 * 3600 * 1000;
   let gun = "", akis = "";
   m.forEach(x => { const g = new Date(x.z).toLocaleDateString("tr-TR", {day:"2-digit", month:"long"});
@@ -362,6 +407,7 @@ async function csAc(ref, sessiz){
   const yazabilir = dv && !eski24;
   $("csPano").innerHTML = `<div class="cp-bas"><button class="cp-geri" onclick="document.querySelector('.cs').classList.remove('pano');csSecili=null;csListeCiz()">←</button>
       <div class="cav">${csHarf(s)}</div><div class="cki"><b>${csBaslik(s)}</b><small>${ss}</small></div>
+      <button class="tel-btn" onclick="telAc()" title="Pazarlama için telefon görünümü">📱 Telefon</button>
       ${dv ? '<button class="sp-btn" onclick="spAc()">🛒 Sepet kur</button>' : ""}
       <button class="dv-btn ${dv ? "birak" : ""}" onclick="csDevral(${dv ? "false" : "true"})">${dv ? "🤖 Bota bırak" : "✋ Devral"}</button></div>
     ${sep}<div class="cp-akis" id="csAkis">${akis || '<div class="cs-bos">Mesaj yok.</div>'}</div>
@@ -430,6 +476,78 @@ async function spGonder(){
     else toast(j.mesaj || (j.sebep === "devral_yok" ? "Önce Devral (süre dolmuş olabilir)" : j.sebep === "urun_yok" ? "Ürün menüde bulunamadı" : "Sepet kurulamadı"));
   } finally { b.disabled = false; b.textContent = "Müşteriye gönder"; }
 }
+
+// ---------- Telefon görünümü (pazarlama içeriği) ----------
+let telTema = "acik", telSaatsiz = false, telOynatma = null;
+function telMaske(t){
+  return String(t || "")
+    .replace(/https?:\/\/\S+/g, "🔗 bağlantı")
+    .replace(/[\w.+-]+@[\w-]+\.[\w.]+/g, "•••@•••")
+    .replace(/(\+?9?0?[\s.-]*)?\(?5\d{2}\)?[\s.-]*\d{3}[\s.-]*\d{2}[\s.-]*\d{2}/g, "05•• ••• •• ••")
+    .replace(/-?\d{1,3}[.,]\d{4,}/g, "•••")
+    .replace(/[^\s,.;:]*\s*((mahallesi|mahalle|sokağı|sokak|caddesi|cadde|bulvarı|bulvar|apartmanı|apartman|sitesi|blok)\b|(mah|mh|sok|sk|cad|cd|blv|apt)\.)[^\n,;]*/gi, "••• (adres)")
+    .replace(/\b(no|daire|kat)\s*[:.]?\s*\d+\w?\b/gi, "•••");
+}
+function telBalon(x){
+  const metin = x.metin || "", musteri = x.rol === "human";
+  if(/^\[NOT:/.test(metin)) return "";
+  const z = new Date(x.z).toLocaleTimeString("tr-TR", {hour:"2-digit", minute:"2-digit"});
+  let govde, btn = "";
+  if(metin === "📍 Konum paylaştı") govde = '<div class="knm">📍</div>Konum';
+  else {
+    let t = metin.replace(/^\[Sepeti gönderdim: ([^\]]+)\]$/, "🛒 Sepetin hazır: $1").replace(/^\[Restoran listesi butonunu gönderdim\]\s*/, "");
+    const m = t.match(/\n?\[([^\]\n]{2,30})\]\s*$/);
+    if(m){ btn = `<span class="btn">${hk(m[1])}</span>`; t = t.slice(0, m.index); }
+    else if(/^🛒 Sepetin hazır/.test(t)) btn = '<span class="btn">Sepeti Aç</span>';
+    govde = hk(telMaske(t.trim()));
+  }
+  return `<div class="tb ${musteri ? "git" : "gel"}">${x.ses ? '<div class="ses">🎤 Sesli mesaj</div>' : ""}${govde}<span class="s">${z}${musteri ? " ✓✓" : ""}</span>${btn}</div>`;
+}
+function telCiz(oynat){
+  const m = (csSohbetVeri && csSohbetVeri.mesajlar) || [];
+  const logo = getComputedStyle(document.querySelector(".top .logo")).backgroundImage;
+  $("telModal").innerHTML = `<div class="tlm-ar">
+      <button onclick="telOynat()">▶ Oynat</button>
+      <button class="${telTema === "acik" ? "on" : ""}" onclick="telTema='acik';telCiz()">☀️ Açık tema</button>
+      <button class="${telTema === "koyu" ? "on" : ""}" onclick="telTema='koyu';telCiz()">🌙 Koyu tema</button>
+      <button class="${telSaatsiz ? "on" : ""}" onclick="telSaatsiz=!telSaatsiz;telCiz()">🕒 Saatleri gizle</button>
+      <button onclick="telKapat()">✕ Kapat</button>
+      <small>Kaydı ekran kaydıyla al. Telefon, adres, konum, e-posta ve bağlantılar otomatik gizlenir; yine de müşterinin izni olmadan gerçek konuşmayı paylaşma.</small>
+    </div>
+    <div class="tf"><div class="te ${telTema === "koyu" ? "koyu" : ""} ${telSaatsiz ? "saatsiz" : ""}">
+      <div class="te-durum"><span>${new Date().toLocaleTimeString("tr-TR", {hour:"2-digit", minute:"2-digit"})}</span><span>📶 🔋</span></div>
+      <div class="te-bas"><span style="font-size:1.2em">‹</span><div class="lg" style="background-image:${logo};background-color:#E0352B"></div>
+        <div><b>YemekChat <span class="tik">✓</span></b><small>işletme hesabı</small></div></div>
+      <div class="te-akis" id="telAkis"></div>
+      <div class="te-alt"><div>Mesaj</div><span>🎤</span></div>
+    </div></div>`;
+  const a = $("telAkis");
+  if(oynat) return a;
+  let gun = "", h = "";
+  m.forEach(x => { const g = new Date(x.z).toLocaleDateString("tr-TR", {day:"numeric", month:"long"}); if(g !== gun){ gun = g; h += `<div class="te-gun">${g}</div>`; } h += telBalon(x); });
+  a.innerHTML = h || '<div class="te-gun">Mesaj yok</div>'; a.scrollTop = a.scrollHeight;
+}
+function telAc(){
+  if(!csSohbetVeri){ toast("Önce bir konuşma seç"); return; }
+  let m = $("telModal"); if(!m){ m = document.createElement("div"); m.id = "telModal"; m.className = "tlm"; document.body.appendChild(m); }
+  m.style.display = "flex"; telCiz();
+}
+function telKapat(){ clearTimeout(telOynatma); const m = $("telModal"); if(m) m.style.display = "none"; }
+function telOynat(){
+  clearTimeout(telOynatma);
+  const a = telCiz(true), m = ((csSohbetVeri && csSohbetVeri.mesajlar) || []).filter(x => !/^\[NOT:/.test(x.metin || ""));
+  a.innerHTML = ""; let i = 0;
+  const adim = () => {
+    if(i >= m.length) return;
+    const x = m[i++], bot = x.rol !== "human";
+    if(bot){
+      a.insertAdjacentHTML("beforeend", '<div class="tb gel yaz" id="telYaz"><i></i><i></i><i></i></div>'); a.scrollTop = a.scrollHeight;
+      telOynatma = setTimeout(() => { const y = $("telYaz"); if(y) y.remove(); a.insertAdjacentHTML("beforeend", telBalon(x)); a.scrollTop = a.scrollHeight; telOynatma = setTimeout(adim, 1100); }, 1200);
+    } else { a.insertAdjacentHTML("beforeend", telBalon(x)); a.scrollTop = a.scrollHeight; telOynatma = setTimeout(adim, 1300); }
+  };
+  telOynatma = setTimeout(adim, 600);
+}
+document.addEventListener("keydown", e => { if(e.key === "Escape") telKapat(); });
 
 // ===================== AYAR =====================
 const API = "https://webhook.yemekchat.com/webhook/admin-data";
