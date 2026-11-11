@@ -1419,7 +1419,7 @@ function showPayFrame(link){
 async function draftInit(){
   isDraft = true;
   try{
-    const r = await fetch(`${CONFIG.DRAFT}?id=${encodeURIComponent(DRAFT)}`);
+    const r = await fetch(`${CONFIG.DRAFT}?id=${encodeURIComponent(DRAFT)}&tel=${encodeURIComponent(TEL || "")}&s=${encodeURIComponent(IMZA || "")}`);
     const d = await r.json();
     if(!d || !d.restaurant_name){
       document.body.innerHTML = '<div class="empty" style="padding-top:90px">Taslak bulunamadı ustam.</div>'; return;

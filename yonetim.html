@@ -356,7 +356,7 @@ function sekme(t){
   $("skSohbet").classList.toggle("on", s); $("skOzet").classList.toggle("on", !s);
   document.body.classList.toggle("sohbet-acik", s);
   clearInterval(csZamanlayici); csZamanlayici = null;
-  if(s){ csFiltreCiz(); csYenile(); csZamanlayici = setInterval(csYenile, 5000); }
+  if(s){ csFiltreCiz(); csYenile(); csZamanlayici = setInterval(csYenile, 4000); }
 }
 function csSaat(z){ if(!z) return ""; const d = new Date(z), b = new Date(), sa = d.toLocaleTimeString("tr-TR", {hour:"2-digit", minute:"2-digit"});
   const dun = new Date(b); dun.setDate(b.getDate() - 1);
@@ -369,20 +369,30 @@ const CS_FILTRE = [["hepsi","Tümü"],["siparis_veren","Sipariş verenler"],["se
 function csFiltreCiz(){ $("csFiltre").innerHTML = CS_FILTRE.map(([k, a]) => `<button class="${csFiltreTip === k ? "on" : ""}" onclick="csFiltreTip='${k}';csAdet=100;csFiltreCiz();csYenile(true)">${a}</button>`).join(""); }
 function csAraDegisti(){ clearTimeout(csAraZ); csAraZ = setTimeout(() => { csAdet = 100; csYenile(true); }, 400); }
 function csDahaFazla(){ csAdet += 100; csYenile(true); }
+let csSonGun = null, csHata = false, csMesgul = false;
 async function csYenile(ilk){
   if(!TOKEN || $("sohbetSek").style.display === "none") return;
-  if(ilk) $("csListe").innerHTML = '<div class="cs-bos">Yükleniyor…</div>';
-  const j = await csPost(API_SOHBETLER, { filtre: csFiltreTip, ara: $("csAra").value.trim(), adet: csAdet });
-  if(j.ok){ csListe = j.liste || []; csToplam = j.toplam || 0; csListeCiz(); }
-  if(csSecili) csAc(csSecili, true);
+  if(!ilk && (document.hidden || csMesgul)) return;
+  csMesgul = true;
+  try {
+    if(ilk) $("csListe").innerHTML = '<div class="cs-bos">Yükleniyor…</div>';
+    const j = await csPost(API_SOHBETLER, { filtre: csFiltreTip, ara: $("csAra").value.trim(), adet: csAdet });
+    csHata = !j.ok;
+    if(j.ok){ csListe = j.liste || []; csToplam = j.toplam || 0; csSonGun = new Date(); }
+    csListeCiz();
+    if(csSecili) await csAc(csSecili, true);
+  } catch(e){ csHata = true; try { csListeCiz(); } catch(_){} }
+  finally { csMesgul = false; }
 }
+function csElleYenile(){ csSonImza = ""; csYenile(true); }
+document.addEventListener("visibilitychange", () => { if(!document.hidden) csYenile(); });
 function csListeCiz(){
   const l = csListe;
   $("csListe").innerHTML = l.length ? l.map(k => `<div class="ck ${csSecili === k.ref ? "sec" : ""}" onclick="csAc('${hk(k.ref)}')">
       <div class="cav">${csHarf(k)}</div><div class="cki"><div class="u"><span>${csBaslik(k)}</span><small>${csSaat(k.z)}</small></div>
       <div class="a">${k.devral ? '<span class="crz dv">DEVRALINDI</span>' : ""}${k.siparis ? `<span class="crz sip">SİPARİŞ #${hk(k.siparis)}</span>` : (k.siparis_sayisi ? `<span class="crz sip">✓ ${hk(k.siparis_sayisi)} sipariş</span>` : "")}${k.sepet ? '<span class="crz sep">SEPETTE</span>' : ""}${k.bolge_disi ? '<span class="crz bd">BÖLGE DIŞI</span>' : ""}${k.rol === "ai" ? "🤖 " : ""}${k.ses ? "🎤 " : ""}${hk(k.son)}</div></div></div>`).join("")
     : '<div class="cs-bos">Konuşma yok.</div>';
-  $("csListe").innerHTML = `<div class="cl-say">${csToplam.toLocaleString("tr-TR")} konuşma${csToplam > l.length ? " · ilk " + l.length + " gösteriliyor" : ""}</div>` + $("csListe").innerHTML
+  $("csListe").innerHTML = `<div class="cl-say" style="display:flex;align-items:center;gap:8px"><span style="flex:1">${csToplam.toLocaleString("tr-TR")} konuşma${csToplam > l.length ? " · ilk " + l.length + " gösteriliyor" : ""}${csHata ? ' · <b style="color:#ff6b5e">⚠️ bağlantı yok</b>' : (csSonGun ? " · " + csSonGun.toLocaleTimeString("tr-TR") : "")}</span><button onclick="csElleYenile()" title="Yenile" style="background:none;border:1px solid currentColor;color:inherit;border-radius:8px;padding:2px 9px;cursor:pointer;font:inherit">↻ Yenile</button></div>` + $("csListe").innerHTML
     + (csToplam > l.length ? '<button class="cl-daha" onclick="csDahaFazla()">Daha fazla göster</button>' : "");
 }
 async function csAc(ref, sessiz){
