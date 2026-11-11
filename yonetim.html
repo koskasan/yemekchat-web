@@ -496,8 +496,8 @@ function telBalon(x){
   if(metin === "📍 Konum paylaştı") govde = '<div class="knm">📍</div>Konum';
   else {
     let t = metin.replace(/^\[Sepeti gönderdim: ([^\]]+)\]$/, "🛒 Sepetin hazır: $1").replace(/^\[Restoran listesi butonunu gönderdim\]\s*/, "");
-    const m = t.match(/\n?\[([^\]\n]{2,30})\]\s*$/);
-    if(m){ btn = `<span class="btn">${hk(m[1])}</span>`; t = t.slice(0, m.index); }
+    const m = t.match(/(\s*\[[^\]\n]{1,30}\])+\s*$/);
+    if(m){ btn = (m[0].match(/\[([^\]\n]{1,30})\]/g) || []).map(b => `<span class="btn">${hk(b.slice(1, -1))}</span>`).join(""); t = t.slice(0, m.index); }
     else if(/^🛒 Sepetin hazır/.test(t)) btn = '<span class="btn">Sepeti Aç</span>';
     govde = hk(telMaske(t.trim()));
   }
@@ -516,11 +516,12 @@ function telCiz(oynat){
     </div>
     <div class="tf"><div class="te ${telTema === "koyu" ? "koyu" : ""} ${telSaatsiz ? "saatsiz" : ""}">
       <div class="te-durum"><span>${new Date().toLocaleTimeString("tr-TR", {hour:"2-digit", minute:"2-digit"})}</span><span>📶 🔋</span></div>
-      <div class="te-bas"><span style="font-size:1.2em">‹</span><div class="lg" style="background-image:${logo};background-color:#E0352B"></div>
+      <div class="te-bas"><span style="font-size:1.2em">‹</span><div class="lg" id="telLogo"></div>
         <div><b>YemekChat <span class="tik">✓</span></b><small>işletme hesabı</small></div></div>
       <div class="te-akis" id="telAkis"></div>
       <div class="te-alt"><div>Mesaj</div><span>🎤</span></div>
     </div></div>`;
+  const lg = $("telLogo"); if(lg){ lg.style.backgroundImage = logo; lg.style.backgroundColor = "#E0352B"; }
   const a = $("telAkis");
   if(oynat) return a;
   let gun = "", h = "";
