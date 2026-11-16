@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/png" href="/YemekChat-Kafa.png">
+<title>YemekChat Kasa Kurulumu</title>
+<style>
+:root{
+  --bg:#FAF8F7; --surface:#FFFFFF; --tint:#F3EFEC; --ink:#1A1716; --muted:#655E5B; --line:#E9E3E0;
+  --red:#FA0202; --red-ink:#FFFFFF; --red-soft:#FFECEA; --ok:#1C7A4B; --ok-soft:#E3F3EA;
+  --shadow:0 1px 2px rgba(40,20,15,.06),0 10px 30px rgba(40,20,15,.08);
+  --f-display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --f-body:"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121010; --surface:#1C1A19; --tint:#191716; --ink:#F3EFEC; --muted:#A8A09C; --line:#2F2A28;
+  --red-soft:#3A1614; --ok:#5BD08F; --ok-soft:#173326;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 32px rgba(0,0,0,.4); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121010; --surface:#1C1A19; --tint:#191716; --ink:#F3EFEC; --muted:#A8A09C; --line:#2F2A28;
+  --red-soft:#3A1614; --ok:#5BD08F; --ok-soft:#173326;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 32px rgba(0,0,0,.4); color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+main{max-width:640px;margin:0 auto;padding:40px 16px 56px}
+.marka{display:flex;align-items:center;gap:12px;margin-bottom:28px}
+.marka img{width:44px;height:44px;border-radius:12px}
+.marka span{font-family:var(--f-display);font-weight:800;font-size:22px;letter-spacing:-.01em}
+h1{font-family:var(--f-display);font-weight:800;font-size:clamp(28px,6vw,38px);line-height:1.1;letter-spacing:-.02em;margin:0 0 10px}
+.alt{color:var(--muted);margin:0 0 28px}
+.kart{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:var(--shadow)}
+.indir{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:16px 20px;border-radius:14px;background:var(--red);color:var(--red-ink);
+  font-weight:700;font-size:18px;text-decoration:none;transition:transform .12s ease,filter .12s ease}
+.indir:hover{filter:brightness(.95)}
+.indir:active{transform:scale(.98)}
+.indir:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.kucuk{color:var(--muted);font-size:14px;margin:12px 0 0;text-align:center}
+h2{font-family:var(--f-display);font-weight:800;font-size:20px;margin:36px 0 14px}
+ol{list-style:none;padding:0;margin:0;counter-reset:a}
+ol li{counter-increment:a;position:relative;padding:0 0 18px 46px}
+ol li::before{content:counter(a);position:absolute;left:0;top:-2px;width:32px;height:32px;border-radius:50%;background:var(--red-soft);color:var(--red);
+  font-weight:800;display:flex;align-items:center;justify-content:center}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) ol li::before{color:#FF6B66}}
+b{font-weight:700}
+.not{background:var(--tint);border-radius:14px;padding:16px 18px;margin-top:8px;font-size:15px}
+.not p{margin:0 0 8px}.not p:last-child{margin:0}
+</style>
+</head>
+<body>
+<main>
+  <div class="marka"><img src="/YemekChat-Kafa.png" alt=""><span>YemekChat</span></div>
+  <h1>Kasa kurulumu</h1>
+  <p class="alt">Restoran panelini fiş yazıcısıyla birlikte tek tıkla açan masaüstü simgesini kurar. Windows bilgisayarlar içindir.</p>
+
+  <div class="kart">
+    <a class="indir" href="/YemekChat-Kasa-Kurulum.exe" download>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11"/><path d="m7 10 5 5 5-5"/><path d="M5 20h14"/></svg>
+      Kurulum dosyasını indir
+    </a>
+    <p class="kucuk">YemekChat-Kasa-Kurulum.exe · Google Chrome gerekir</p>
+  </div>
+
+  <h2>Nasıl kurulur?</h2>
+  <ol>
+    <li>Yukarıdaki düğmeyle dosyayı indirin. Tarayıcı “bu dosya sık indirilmiyor” derse <b>Sakla</b>’yı seçin.</li>
+    <li>İnen dosyayı açın. Windows mavi bir uyarı gösterirse <b>Ek bilgi</b>’ye, sonra <b>Yine de çalıştır</b>’a basın.</li>
+    <li>“Kurulum tamamlandı” mesajı gelince masaüstünde <b>YemekChat Kasa</b> simgesi belirir. Bilgisayar her açıldığında panel kendiliğinden açılır; kapanırsa bu simgeden açın.</li>
+    <li>İlk açılışta restoran kullanıcı adınız ve şifrenizle bir kez giriş yapın.</li>
+  </ol>
+
+  <div class="not">
+    <p><b>Sipariş gelince alarm çalar, fiş otomatik yazdırılır.</b> Bilgisayarın sesi açık olsun. Fiş yazıcınızın Windows’ta <b>varsayılan yazıcı</b> olarak seçili olduğundan emin olun (Ayarlar → Yazıcılar ve tarayıcılar).</p>
+    <p>Kurulumda bir sorun olursa ekranın fotoğrafını çekip YemekChat’e gönderin.</p>
+  </div>
+</main>
+</body>
+</html>
